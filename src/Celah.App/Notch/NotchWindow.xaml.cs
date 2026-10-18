@@ -19,7 +19,8 @@ public partial class NotchWindow : Window
 {
     private static readonly Size SlimSize = new(160, 4);
     private static readonly Size IdleSize = new(200, 32);
-    private static readonly Size MusicSize = new(260, 32);
+    // Revisi: desain 260 px membuat cover dan visualizer terlalu berjauhan.
+    private static readonly Size MusicSize = new(104, 32);
     private static readonly Size PeekSize = new(320, 44);
     private static readonly Size ExpandedSize = new(560, 260);
 
@@ -45,7 +46,7 @@ public partial class NotchWindow : Window
         MusicModuleView.DataContext = music;
     }
 
-    /// <summary>Lebar pil bergantung pada isinya: idle 200, musik 260 (Collapsed.dc.html).</summary>
+    /// <summary>Lebar pil bergantung pada isinya: idle 200, musik 104.</summary>
     private Size CollapsedSize => _activity == CollapsedActivity.Music ? MusicSize : IdleSize;
 
     public MusicPill MusicPill => MusicPillView;

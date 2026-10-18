@@ -1,4 +1,5 @@
-<!-- Pil musik 260 × 32 (Collapsed.dc.html): cover 20 px (r 6) di kiri 6 px, empat bar 3 px di kanan 12 px. -->
+<!-- Pil musik 104 × 32: cover 20 px (r 6) di kiri 6 px, empat bar 3 px di kanan 10 px.
+     Desain aslinya 260 px; dipersempit supaya cover dan visualizer berdekatan (revisi #9). -->
 <UserControl x:Class="Celah.App.Music.MusicPill"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -40,7 +41,7 @@
             </Border>
         </Border>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
             <Rectangle x:Name="Bar0" Style="{StaticResource Bar}" Margin="0" />
             <Rectangle x:Name="Bar1" Style="{StaticResource Bar}" />
             <Rectangle x:Name="Bar2" Style="{StaticResource Bar}" />

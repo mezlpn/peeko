@@ -15,7 +15,9 @@ namespace Celah.App.Music;
 /// </summary>
 public sealed class MusicController : IDisposable
 {
-    private static readonly TimeSpan PausedLinger = TimeSpan.FromSeconds(30);
+    // Desain: 30 dtk. Revisi #10: Kedip harus cepat kembali setelah musik dijeda. Tidak 0 karena
+    // saat ganti lagu beberapa pemutar sempat melaporkan "dijeda" sesaat.
+    private static readonly TimeSpan PausedLinger = TimeSpan.FromSeconds(1.5);
     private const int BarCount = 4;
 
     private readonly IMediaSource _source;
@@ -63,7 +65,7 @@ public sealed class MusicController : IDisposable
 
     public MusicViewModel ViewModel { get; }
 
-    /// <summary>Isi pil yang diinginkan modul musik (Music saat diputar atau baru dijeda &lt; 30 dtk).</summary>
+    /// <summary>Isi pil yang diinginkan modul musik (Music saat diputar atau baru saja dijeda).</summary>
     public event Action<CollapsedActivity>? ActivityChanged;
 
     /// <summary>Level 4 bar visualizer (0–1) untuk pil musik.</summary>

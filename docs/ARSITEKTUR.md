@@ -195,6 +195,9 @@ Revisi setelah dicoba langsung:
 
 7. **Hover lebih cepat.** Begitu kursor menyentuh notch, pil langsung menggembung ke 212 × 34 (90 ms) sebagai umpan balik. Jeda hover 120 → 60 ms. Bentuk mengembang 460 → 340 ms, dan isi panel muncul mulai 120 ms (sebelumnya 220 ms).
 8. **Mode tipis (state `Slim`).** Jika jendela aktif menempel ke tepi atas layar dan melintasi tengahnya (mis. Chrome di-maximize dengan tab di atas), notch menjadi garis 160 × 4 tanpa bahu dan tanpa Kedip. Hover pada garis ±150 ms membuka panel penuh, lalu kembali menjadi garis saat ditinggal. Peek tetap turun sebentar lalu kembali menjadi garis. Fullscreen tetap menang (notch disembunyikan). Nanti di Pengaturan: Otomatis / Selalu pil / Selalu garis.
+9. **Pil musik 104 px** (desain: 260 px). Cover dan visualizer terlalu berjauhan di 260 px.
+10. **Kedip kembali 1,5 dtk setelah musik dijeda** (desain: 30 dtk). Tidak 0 karena beberapa pemutar sempat melaporkan "dijeda" saat ganti lagu.
+11. **Klik cover di pil collapsed tidak dibuat.** Jeda hover 60 ms (revisi #7) membuat pil sudah mengembang sebelum sempat diklik; play/pause ada di panel.
 
 ## 11. Kontrak desain ↔ kode
 
