@@ -11,14 +11,21 @@ namespace Celah.App.Notch;
 
 /// <summary>
 /// Jendela notch berukuran tetap 640 × 320 (transparan). Yang dianimasikan hanya ukuran Border
-/// <c>Body</c> dan opacity/transform lapisan isi, sesuai Motion.dc.html.
+/// <c>Body</c> dan opacity/transform lapisan isi, sesuai Motion.dc.html (dengan revisi kecepatan
+/// hover dan mode tipis, lihat ARSITEKTUR §10).
 /// </summary>
 public partial class NotchWindow : Window
 {
+    private static readonly Size SlimSize = new(160, 4);
     private static readonly Size CollapsedSize = new(200, 32);
     private static readonly Size PeekSize = new(320, 44);
     private static readonly Size ExpandedSize = new(560, 260);
 
+    // Respons hover instan: pil sedikit menggembung sebelum panel terbuka.
+    private static readonly Size SlimHoverSize = new(184, 6);
+    private static readonly Size CollapsedHoverSize = new(212, 34);
+
+    private static readonly CornerRadius SlimRadius = new(0, 0, 2, 2);
     private static readonly CornerRadius CollapsedRadius = new(0, 0, 16, 16);
     private static readonly CornerRadius PeekRadius = new(0, 0, 22, 22);
     private static readonly CornerRadius ExpandedRadius = new(0, 0, 28, 28);
@@ -71,10 +78,28 @@ public partial class NotchWindow : Window
         switch (to)
         {
             case NotchState.Expanded: ToExpanded(); break;
-            case NotchState.Collapsed: ToCollapsed(from); break;
+            case NotchState.Collapsed: ToRest(from, slim: false); break;
+            case NotchState.Slim: ToRest(from, slim: true); break;
             case NotchState.Peek: ToPeek(from); break;
             case NotchState.Hidden: ToHidden(); break;
         }
+    }
+
+    /// <summary>Umpan balik langsung saat kursor menyentuh notch, sebelum jeda hover selesai.</summary>
+    public void ShowHoverAck(bool hovering)
+    {
+        var (normal, hover, radius) = _visualState switch
+        {
+            NotchState.Collapsed => (CollapsedSize, CollapsedHoverSize, CollapsedRadius),
+            NotchState.Slim => (SlimSize, SlimHoverSize, SlimRadius),
+            _ => (Size.Empty, Size.Empty, default),
+        };
+        if (normal.IsEmpty) return;
+
+        if (hovering)
+            AnimateShape(hover, radius, Motion.Instant, Motion.Out, widthDelay: 0, heightDelay: 0);
+        else
+            AnimateShape(normal, radius, Motion.Fast, Motion.Standard, widthDelay: 0, heightDelay: 0);
     }
 
     // ── Transisi ────────────────────────────────────────────────────────────
@@ -82,52 +107,84 @@ public partial class NotchWindow : Window
     private void ToExpanded()
     {
         Kedip.StopIdle();
-        FadeOut(CollapsedLayer, Motion.Ms(100));
-        ScaleCollapsed(0.96, Motion.Ms(100), Motion.In);
-        FadeOut(PeekLayer, Motion.Ms(100));
+        FadeOut(CollapsedLayer, Motion.Ms(80));
+        ScaleCollapsed(0.96, Motion.Ms(80), Motion.In);
+        FadeOut(PeekLayer, Motion.Ms(80));
+        AnimateShoulders(1, Motion.Ms(200), Motion.Out);
 
-        AnimateShape(ExpandedSize, ExpandedRadius, Motion.ShapeOpen, Motion.Spring, widthDelay: 0, heightDelay: 50);
+        // Revisi hover: bentuk 460 → 340 ms, isi muncul mulai 120 ms (sebelumnya 220 ms).
+        AnimateShape(ExpandedSize, ExpandedRadius, Motion.Ms(340), Motion.Spring, widthDelay: 0, heightDelay: 30);
 
         UpdateClock();
         ExpandedLayer.Visibility = Visibility.Visible;
-        FadeIn(ExpandedLayer, Motion.Base, delayMs: 220);
-        Slide(TabBarShift, TranslateTransform.YProperty, from: -6, Motion.Base, delayMs: 220);
-        Slide(ModuleShift, TranslateTransform.YProperty, from: 8, Motion.Ms(300), delayMs: 260);
+        FadeIn(ExpandedLayer, Motion.Ms(180), delayMs: 120);
+        Slide(TabBarShift, TranslateTransform.YProperty, from: -6, Motion.Ms(180), delayMs: 120);
+        Slide(ModuleShift, TranslateTransform.YProperty, from: 8, Motion.Ms(240), delayMs: 150);
     }
 
-    private void ToCollapsed(NotchState from)
+    /// <summary>Kembali ke state istirahat: pil (Collapsed) atau garis tipis (Slim).</summary>
+    private void ToRest(NotchState from, bool slim)
     {
         _clockTimer.Stop();
         ShowWindowIfHidden();
 
+        var size = slim ? SlimSize : CollapsedSize;
+        var radius = slim ? SlimRadius : CollapsedRadius;
+
         if (from == NotchState.Hidden)
         {
             // Turun kembali dari atas layar.
-            SetShapeImmediately(CollapsedSize, CollapsedRadius);
-            ShowLayerImmediately(CollapsedLayer);
-            HideShift.Animate(TranslateTransform.YProperty,
-                Motion.To(0, Reduced(Motion.Ms(380)), Motion.SpringSoft));
+            SetShapeImmediately(size, radius);
+            ShowLayerImmediately(slim ? null : CollapsedLayer);
+            SetShouldersImmediately(slim ? 0 : 1);
+            HideShift.Animate(TranslateTransform.YProperty, Motion.To(0, Reduced(Motion.Ms(380)), Motion.SpringSoft));
             ShapeHost.Animate(OpacityProperty, Motion.To(1, Motion.Ms(120), Motion.Out));
-        }
-        else if (from == NotchState.Expanded)
-        {
-            FadeOut(ExpandedLayer, Motion.Fast);
-            Slide(TabBarShift, TranslateTransform.YProperty, from: null, Motion.Fast, to: -4, ease: Motion.In);
-            AnimateShape(CollapsedSize, CollapsedRadius, Motion.ShapeClose, Motion.Standard, widthDelay: 110, heightDelay: 80);
-            FadeIn(CollapsedLayer, Motion.Base, delayMs: 380);
-            ScaleCollapsed(1, Motion.Base, Motion.Out, delayMs: 380);
-            Kedip.Blink(delayMs: 520);
         }
         else
         {
-            FadeOut(PeekLayer, Motion.Fast);
-            AnimateShape(CollapsedSize, CollapsedRadius, Motion.Ms(280), Motion.Standard, widthDelay: 60, heightDelay: 60);
-            FadeIn(CollapsedLayer, Motion.Base, delayMs: 180);
-            ScaleCollapsed(1, Motion.Base, Motion.Out, delayMs: 180);
+            double contentDelay;
+            switch (from)
+            {
+                case NotchState.Expanded:
+                    FadeOut(ExpandedLayer, Motion.Fast);
+                    Slide(TabBarShift, TranslateTransform.YProperty, from: null, Motion.Fast, to: -4, ease: Motion.In);
+                    AnimateShape(size, radius, Motion.ShapeClose, Motion.Standard, widthDelay: 110, heightDelay: 80);
+                    contentDelay = 380;
+                    break;
+                case NotchState.Peek:
+                    FadeOut(PeekLayer, Motion.Fast);
+                    AnimateShape(size, radius, Motion.Ms(280), Motion.Standard, widthDelay: 60, heightDelay: 60);
+                    contentDelay = 180;
+                    break;
+                default: // Collapsed ↔ Slim
+                    AnimateShape(size, radius, Motion.Base, Motion.Standard, widthDelay: 0, heightDelay: 0);
+                    contentDelay = 120;
+                    break;
+            }
+
+            if (slim)
+            {
+                FadeOut(CollapsedLayer, Motion.Ms(100));
+                AnimateShoulders(0, Motion.Base, Motion.In);
+            }
+            else
+            {
+                FadeIn(CollapsedLayer, Motion.Base, contentDelay);
+                ScaleCollapsed(1, Motion.Base, Motion.Out, contentDelay);
+                AnimateShoulders(1, Motion.Base, Motion.Out);
+                if (from == NotchState.Expanded) Kedip.Blink(delayMs: 520);
+            }
         }
 
-        Kedip.StartIdle();
-        Kedip.BreatheOnce();
+        if (slim)
+        {
+            Kedip.StopIdle();
+        }
+        else
+        {
+            Kedip.StartIdle();
+            Kedip.BreatheOnce();
+        }
     }
 
     private void ToPeek(NotchState from)
@@ -141,6 +198,7 @@ public partial class NotchWindow : Window
         }
 
         FadeOut(CollapsedLayer, Motion.Ms(100));
+        AnimateShoulders(1, Motion.Base, Motion.Out);
         AnimateShape(PeekSize, PeekRadius, Motion.PeekIn, Motion.SpringSoft, widthDelay: 40, heightDelay: 40);
 
         PeekLayer.Visibility = Visibility.Visible;
@@ -204,7 +262,32 @@ public partial class NotchWindow : Window
         Body.CornerRadius = radius;
     }
 
-    private void ShowLayerImmediately(UIElement layer)
+    /// <summary>Bahu cekung ikut menyusut di mode tipis supaya garisnya bersih.</summary>
+    private void AnimateShoulders(double scale, TimeSpan duration, IEasingFunction ease)
+    {
+        if (Motion.Reduced)
+        {
+            SetShouldersImmediately(scale);
+            return;
+        }
+        foreach (var t in new[] { LeftShoulderScale, RightShoulderScale })
+        {
+            t.Animate(ScaleTransform.ScaleXProperty, Motion.To(scale, duration, ease));
+            t.Animate(ScaleTransform.ScaleYProperty, Motion.To(scale, duration, ease));
+        }
+    }
+
+    private void SetShouldersImmediately(double scale)
+    {
+        foreach (var t in new[] { LeftShoulderScale, RightShoulderScale })
+        {
+            t.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+            t.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+            t.ScaleX = t.ScaleY = scale;
+        }
+    }
+
+    private void ShowLayerImmediately(UIElement? layer)
     {
         foreach (var other in new UIElement[] { CollapsedLayer, PeekLayer, ExpandedLayer })
         {

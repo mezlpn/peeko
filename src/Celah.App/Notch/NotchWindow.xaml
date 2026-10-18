@@ -56,8 +56,12 @@
 
             <!-- Bahu cekung 10 × 10 yang menyatukan pil dengan tepi layar -->
             <Path x:Name="LeftShoulder" Width="10" Height="10" VerticalAlignment="Top"
-                  Fill="{StaticResource Celah.Brush.NotchBg}"
-                  Data="M0,0 L10,0 L10,10 A10,10 0 0 0 0,0 Z" />
+                  Fill="{StaticResource Celah.Brush.NotchBg}" RenderTransformOrigin="1,0"
+                  Data="M0,0 L10,0 L10,10 A10,10 0 0 0 0,0 Z">
+                <Path.RenderTransform>
+                    <ScaleTransform x:Name="LeftShoulderScale" />
+                </Path.RenderTransform>
+            </Path>
 
             <Border x:Name="Body" Width="200" Height="32" VerticalAlignment="Top"
                     CornerRadius="{StaticResource Celah.Radius.NotchPill}"
@@ -150,8 +154,12 @@
             </Border>
 
             <Path x:Name="RightShoulder" Width="10" Height="10" VerticalAlignment="Top"
-                  Fill="{StaticResource Celah.Brush.NotchBg}"
-                  Data="M10,0 L0,0 L0,10 A10,10 0 0 1 10,0 Z" />
+                  Fill="{StaticResource Celah.Brush.NotchBg}" RenderTransformOrigin="0,0"
+                  Data="M10,0 L0,0 L0,10 A10,10 0 0 1 10,0 Z">
+                <Path.RenderTransform>
+                    <ScaleTransform x:Name="RightShoulderScale" />
+                </Path.RenderTransform>
+            </Path>
         </StackPanel>
     </Grid>
 </Window>

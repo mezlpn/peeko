@@ -1,18 +1,24 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using static Celah.Platform.Native.NativeMethods;
 
 namespace Celah.Platform.Display;
 
 /// <summary>
-/// Mendeteksi aplikasi fullscreen di monitor tempat notch berada, tanpa polling.
-/// Sumber event: pergantian jendela foreground, minimize/restore, dan perubahan ukuran
-/// jendela milik proses foreground (mis. video YouTube masuk fullscreen tanpa ganti jendela).
+/// Mengamati jendela foreground di monitor tempat notch berada, tanpa polling, lalu melaporkan:
+/// <list type="bullet">
+/// <item><see cref="IsFullscreen"/>: aplikasi fullscreen (game, video, presentasi) → notch menyingkir.</item>
+/// <item><see cref="CoversTop"/>: jendela menempel ke tepi atas di posisi notch (mis. tab Chrome
+/// yang di-maximize) → notch menjadi garis tipis.</item>
+/// </list>
+/// Sumber event: pergantian foreground, minimize/restore, dan perubahan ukuran/posisi jendela
+/// milik proses foreground (mis. video YouTube masuk fullscreen tanpa ganti jendela).
 /// </summary>
 /// <remarks>
 /// Harus dibuat dan di-<see cref="Start"/> dari thread yang punya message loop (thread UI WPF),
 /// karena hook WINEVENT_OUTOFCONTEXT dikirim lewat message loop thread pemasangnya.
 /// </remarks>
-public sealed class FullscreenWatcher : IDisposable
+public sealed class ForegroundWindowWatcher : IDisposable
 {
     private static readonly HashSet<string> ShellClasses =
         ["Progman", "WorkerW", "Shell_TrayWnd", "Shell_SecondaryTrayWnd"];
@@ -30,7 +36,7 @@ public sealed class FullscreenWatcher : IDisposable
     private uint _locationPid;
 
     /// <param name="targetMonitor">HMONITOR tempat notch berada.</param>
-    public FullscreenWatcher(Func<IntPtr> targetMonitor)
+    public ForegroundWindowWatcher(Func<IntPtr> targetMonitor)
     {
         _targetMonitor = targetMonitor;
         _globalCallback = OnGlobalEvent;
@@ -39,7 +45,11 @@ public sealed class FullscreenWatcher : IDisposable
 
     public bool IsFullscreen { get; private set; }
 
+    public bool CoversTop { get; private set; }
+
     public event Action<bool>? FullscreenChanged;
+
+    public event Action<bool>? CoversTopChanged;
 
     /// <summary>Jendela foreground berganti (dipakai untuk menegaskan ulang topmost).</summary>
     public event Action? ForegroundChanged;
@@ -64,33 +74,46 @@ public sealed class FullscreenWatcher : IDisposable
         GetWindowThreadProcessId(hwnd, out var pid);
         if (pid == _ownPid) return; // menu tray/jendela kita sendiri: pertahankan status sebelumnya
 
-        var fullscreen = IsWindowFullscreen(hwnd) || IsShellReportingFullscreen();
-        if (fullscreen == IsFullscreen) return;
+        var (fullscreen, coversTop) = Classify(hwnd);
+        fullscreen |= IsShellReportingFullscreen();
 
-        IsFullscreen = fullscreen;
-        FullscreenChanged?.Invoke(fullscreen);
+        if (fullscreen != IsFullscreen)
+        {
+            IsFullscreen = fullscreen;
+            FullscreenChanged?.Invoke(fullscreen);
+        }
+        if (coversTop != CoversTop)
+        {
+            CoversTop = coversTop;
+            CoversTopChanged?.Invoke(coversTop);
+        }
     }
 
-    private bool IsWindowFullscreen(IntPtr hwnd)
+    private (bool Fullscreen, bool CoversTop) Classify(IntPtr hwnd)
     {
-        if (!IsWindowVisible(hwnd) || IsIconic(hwnd)) return false;
-        if (hwnd == GetShellWindow() || hwnd == GetDesktopWindow()) return false;
-        if (ShellClasses.Contains(GetClassName(hwnd))) return false;
+        if (!IsWindowVisible(hwnd) || IsIconic(hwnd)) return default;
+        if (hwnd == GetShellWindow() || hwnd == GetDesktopWindow()) return default;
+        if (ShellClasses.Contains(GetClassName(hwnd))) return default;
 
         var monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-        if (monitor != _targetMonitor()) return false;
+        if (monitor != _targetMonitor()) return default;
 
-        var info = new MONITORINFO { cbSize = System.Runtime.InteropServices.Marshal.SizeOf<MONITORINFO>() };
-        if (!GetMonitorInfo(monitor, ref info) || !GetWindowRect(hwnd, out var rect)) return false;
+        var info = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
+        if (!GetMonitorInfo(monitor, ref info) || !GetWindowRect(hwnd, out var rect)) return default;
 
         var m = info.rcMonitor;
         bool exact = rect.Left == m.Left && rect.Top == m.Top && rect.Right == m.Right && rect.Bottom == m.Bottom;
-        if (exact) return true;
 
         // Jendela yang di-maximize meluber beberapa piksel di luar monitor (border). Kalau taskbar
         // auto-hide, ia menutupi seluruh layar walau bukan fullscreen, jadi dikecualikan.
         bool covers = rect.Left <= m.Left && rect.Top <= m.Top && rect.Right >= m.Right && rect.Bottom >= m.Bottom;
-        return covers && !IsZoomed(hwnd);
+        bool fullscreen = exact || (covers && !IsZoomed(hwnd));
+
+        // Tepi atas jendela berada di baris paling atas layar dan melintasi tengah layar (posisi notch).
+        int centerX = m.Left + m.Width / 2;
+        bool coversTop = rect.Top <= m.Top + 2 && rect.Left < centerX && rect.Right > centerX;
+
+        return (fullscreen, coversTop && !fullscreen);
     }
 
     private static bool IsShellReportingFullscreen()
@@ -132,7 +155,7 @@ public sealed class FullscreenWatcher : IDisposable
             IntPtr.Zero, _locationCallback, pid, 0, WINEVENT_OUTOFCONTEXT);
 
         if (_locationHook == IntPtr.Zero)
-            Debug.WriteLine($"FullscreenWatcher: gagal memasang hook lokasi untuk PID {pid}");
+            Debug.WriteLine($"ForegroundWindowWatcher: gagal memasang hook lokasi untuk PID {pid}");
     }
 
     public void Dispose()

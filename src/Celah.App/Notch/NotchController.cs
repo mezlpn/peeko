@@ -12,7 +12,7 @@ public sealed class NotchController : IDisposable
     private readonly NotchWindow _window;
     private readonly NotchStateMachine _stateMachine;
     private readonly ILogger<NotchController> _log;
-    private FullscreenWatcher? _fullscreen;
+    private ForegroundWindowWatcher? _foreground;
 
     public NotchController(NotchWindow window, NotchStateMachine stateMachine, ILogger<NotchController> log)
     {
@@ -32,10 +32,11 @@ public sealed class NotchController : IDisposable
 
         _window.Show();
 
-        _fullscreen = new FullscreenWatcher(() => NotchWindowInterop.GetMonitorOf(_window.Handle));
-        _fullscreen.FullscreenChanged += OnFullscreenChanged;
-        _fullscreen.ForegroundChanged += _window.EnsureTopmost;
-        _fullscreen.Start();
+        _foreground = new ForegroundWindowWatcher(() => NotchWindowInterop.GetMonitorOf(_window.Handle));
+        _foreground.FullscreenChanged += OnFullscreenChanged;
+        _foreground.CoversTopChanged += OnCoversTopChanged;
+        _foreground.ForegroundChanged += _window.EnsureTopmost;
+        _foreground.Start();
 
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
         _log.LogInformation("Notch aktif");
@@ -51,14 +52,29 @@ public sealed class NotchController : IDisposable
         _window.TransitionTo(from, to);
     }
 
-    private void OnPointerEnter(object sender, MouseEventArgs e) => _stateMachine.PointerEntered();
+    private void OnPointerEnter(object sender, MouseEventArgs e)
+    {
+        // Umpan balik instan sebelum panel mengembang (revisi: hover terasa telat).
+        _window.ShowHoverAck(true);
+        _stateMachine.PointerEntered();
+    }
 
-    private void OnPointerLeave(object sender, MouseEventArgs e) => _stateMachine.PointerExited();
+    private void OnPointerLeave(object sender, MouseEventArgs e)
+    {
+        _window.ShowHoverAck(false);
+        _stateMachine.PointerExited();
+    }
 
     private void OnFullscreenChanged(bool fullscreen)
     {
         _log.LogDebug("Fullscreen: {Fullscreen}", fullscreen);
         _stateMachine.SetFullscreen(fullscreen);
+    }
+
+    private void OnCoversTopChanged(bool coversTop)
+    {
+        _log.LogDebug("Jendela menutupi tepi atas: {CoversTop}", coversTop);
+        _stateMachine.SetSlim(coversTop);
     }
 
     private void OnDisplaySettingsChanged(object? sender, EventArgs e)
@@ -67,14 +83,14 @@ public sealed class NotchController : IDisposable
         _window.Dispatcher.BeginInvoke(() =>
         {
             _window.Reposition();
-            _fullscreen?.Evaluate();
+            _foreground?.Evaluate();
         });
     }
 
     public void Dispose()
     {
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
-        _fullscreen?.Dispose();
+        _foreground?.Dispose();
         _stateMachine.Dispose();
     }
 }

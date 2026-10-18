@@ -191,6 +191,11 @@ Desain lengkap ada di `design/project/*.dc.html`. Bagian berikut **menimpa** des
 5. **Shelf:** reaksi drag dimulai saat file masuk ke area pil, bukan saat masih 80 px di sekitarnya.
 6. **Baterai headphone** hanya ditampilkan jika tersedia. **Visualizer** memakai level peak WASAPI (`IAudioMeterInformation`), bukan spektrum.
 
+Revisi setelah dicoba langsung:
+
+7. **Hover lebih cepat.** Begitu kursor menyentuh notch, pil langsung menggembung ke 212 × 34 (90 ms) sebagai umpan balik. Jeda hover 120 → 60 ms. Bentuk mengembang 460 → 340 ms, dan isi panel muncul mulai 120 ms (sebelumnya 220 ms).
+8. **Mode tipis (state `Slim`).** Jika jendela aktif menempel ke tepi atas layar dan melintasi tengahnya (mis. Chrome di-maximize dengan tab di atas), notch menjadi garis 160 × 4 tanpa bahu dan tanpa Kedip. Hover pada garis ±150 ms membuka panel penuh, lalu kembali menjadi garis saat ditinggal. Peek tetap turun sebentar lalu kembali menjadi garis. Fullscreen tetap menang (notch disembunyikan). Nanti di Pengaturan: Otomatis / Selalu pil / Selalu garis.
+
 ## 11. Kontrak desain ↔ kode
 
 Hasil dari Claude Design diterjemahkan menjadi:

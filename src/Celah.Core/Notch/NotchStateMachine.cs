@@ -19,6 +19,7 @@ public sealed class NotchStateMachine : IDisposable
     private bool _holdOpen;
     private bool _fullscreen;
     private bool _suspended;
+    private bool _slim;
 
     public NotchStateMachine(TimeProvider time, Action<Action> post, NotchTimings? timings = null)
     {
@@ -41,6 +42,10 @@ public sealed class NotchStateMachine : IDisposable
 
     private bool ShouldHide => _fullscreen || _suspended;
 
+    /// <summary>State tempat notch kembali setelah panel ditutup atau peek selesai.</summary>
+    private NotchState RestState =>
+        ShouldHide ? NotchState.Hidden : _slim ? NotchState.Slim : NotchState.Collapsed;
+
     /// <param name="openDelay">
     /// Jeda sebelum mengembang. Area yang bisa diklik di mode collapsed memakai jeda lebih panjang
     /// supaya klik sempat terjadi (keputusan desain #4).
@@ -50,8 +55,23 @@ public sealed class NotchStateMachine : IDisposable
         _pointerOver = true;
         _leaveClose.Cancel();
 
-        if (State is NotchState.Collapsed or NotchState.Peek)
-            _hoverOpen.Start(openDelay ?? _timings.HoverOpenDelay);
+        if (State is NotchState.Collapsed or NotchState.Peek or NotchState.Slim)
+        {
+            var defaultDelay = State == NotchState.Slim ? _timings.SlimRevealDelay : _timings.HoverOpenDelay;
+            _hoverOpen.Start(openDelay ?? defaultDelay);
+        }
+    }
+
+    /// <summary>
+    /// Jendela aktif menempel ke tepi atas layar (mis. tab Chrome yang di-maximize), jadi notch
+    /// menjadi garis tipis. Saat panel terbuka, perubahan baru berlaku setelah panel ditutup.
+    /// </summary>
+    public void SetSlim(bool slim)
+    {
+        if (_slim == slim) return;
+        _slim = slim;
+        if (State is NotchState.Collapsed or NotchState.Slim)
+            SetState(RestState);
     }
 
     /// <summary>Kursor pindah ke area dengan jeda berbeda tanpa keluar dari notch.</summary>
@@ -106,7 +126,7 @@ public sealed class NotchStateMachine : IDisposable
         if (suspended)
             Hide();
         else if (!ShouldHide)
-            SetState(NotchState.Collapsed);
+            SetState(RestState);
     }
 
     /// <summary>Tampilkan peek. Mengembalikan false jika peek tidak bisa tampil sebagai pil.</summary>
@@ -132,7 +152,7 @@ public sealed class NotchStateMachine : IDisposable
 
     private void OnHoverOpenElapsed()
     {
-        if (_pointerOver && State is NotchState.Collapsed or NotchState.Peek)
+        if (_pointerOver && State is NotchState.Collapsed or NotchState.Peek or NotchState.Slim)
         {
             _peekEnd.Cancel();
             SetState(NotchState.Expanded);
@@ -142,21 +162,21 @@ public sealed class NotchStateMachine : IDisposable
     private void OnLeaveCloseElapsed()
     {
         if (State == NotchState.Expanded && !_pointerOver && !_holdOpen)
-            SetState(NotchState.Collapsed);
+            SetState(RestState);
     }
 
     private void OnPeekEndElapsed()
     {
         if (State != NotchState.Peek) return;
         if (_pointerOver) return; // hover menahan peek; PointerExited memulai ulang hitungan
-        SetState(ShouldHide ? NotchState.Hidden : NotchState.Collapsed);
+        SetState(RestState);
     }
 
     private void OnFullscreenSettled()
     {
         _fullscreen = false;
         if (State == NotchState.Hidden && !ShouldHide)
-            SetState(NotchState.Collapsed);
+            SetState(RestState);
     }
 
     private void SetState(NotchState next)

@@ -25,7 +25,7 @@ public class NotchStateMachineTests
     public void Hover_expands_after_delay()
     {
         _sm.PointerEntered();
-        Wait(119);
+        Wait(59);
         Assert.Equal(NotchState.Collapsed, _sm.State);
         Wait(1);
         Assert.Equal(NotchState.Expanded, _sm.State);
@@ -35,7 +35,7 @@ public class NotchStateMachineTests
     public void Brief_hover_does_not_expand()
     {
         _sm.PointerEntered();
-        Wait(80);
+        Wait(40);
         _sm.PointerExited();
         Wait(500);
         Assert.Equal(NotchState.Collapsed, _sm.State);
@@ -194,12 +194,69 @@ public class NotchStateMachineTests
     }
 
     [Fact]
+    public void Slim_replaces_collapsed_and_back()
+    {
+        _sm.SetSlim(true);
+        Assert.Equal(NotchState.Slim, _sm.State);
+        _sm.SetSlim(false);
+        Assert.Equal(NotchState.Collapsed, _sm.State);
+    }
+
+    [Fact]
+    public void Hovering_slim_line_reveals_panel_then_returns_to_slim()
+    {
+        _sm.SetSlim(true);
+        _sm.PointerEntered();
+        Wait(149);
+        Assert.Equal(NotchState.Slim, _sm.State);
+        Wait(1);
+        Assert.Equal(NotchState.Expanded, _sm.State);
+
+        _sm.PointerExited();
+        Wait(350);
+        Assert.Equal(NotchState.Slim, _sm.State);
+    }
+
+    [Fact]
+    public void Slim_change_while_expanded_applies_after_close()
+    {
+        _sm.PointerEntered();
+        Wait(60);
+        _sm.SetSlim(true);
+        Assert.Equal(NotchState.Expanded, _sm.State);
+
+        _sm.PointerExited();
+        Wait(350);
+        Assert.Equal(NotchState.Slim, _sm.State);
+    }
+
+    [Fact]
+    public void Peek_from_slim_returns_to_slim()
+    {
+        _sm.SetSlim(true);
+        Assert.True(_sm.ShowPeek());
+        Wait(1500);
+        Assert.Equal(NotchState.Slim, _sm.State);
+    }
+
+    [Fact]
+    public void Fullscreen_wins_over_slim_and_restores_slim()
+    {
+        _sm.SetSlim(true);
+        _sm.SetFullscreen(true);
+        Assert.Equal(NotchState.Hidden, _sm.State);
+        _sm.SetFullscreen(false);
+        Wait(400);
+        Assert.Equal(NotchState.Slim, _sm.State);
+    }
+
+    [Fact]
     public void State_changed_reports_previous_and_next()
     {
         var log = new List<(NotchState, NotchState)>();
         _sm.StateChanged += (a, b) => log.Add((a, b));
         _sm.PointerEntered();
-        Wait(120);
+        Wait(60);
         Assert.Equal([(NotchState.Collapsed, NotchState.Expanded)], log);
     }
 }
