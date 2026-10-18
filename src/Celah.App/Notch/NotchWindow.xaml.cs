@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using Celah.App.Animation;
 using Celah.App.Lyrics;
 using Celah.App.Music;
+using Celah.App.Productivity;
 using Celah.Core.Notch;
 using Celah.Core.Peeks;
 using Celah.Platform.Display;
@@ -23,6 +24,7 @@ public partial class NotchWindow : Window
     private static readonly Size IdleSize = new(200, 32);
     // Revisi #12: ukuran pil musik sama dengan pil idle; isinya yang dirapatkan di tengah.
     private static readonly Size MusicSize = IdleSize;
+    private static readonly Size WaterSize = new(260, 32);
     private static readonly Size PeekSize = new(320, 44);
     private static readonly Size ExpandedSize = new(560, 260);
 
@@ -55,14 +57,36 @@ public partial class NotchWindow : Window
         LyricsModuleView.DataContext = lyrics;
     }
 
-    /// <summary>Ukuran pil per isi. Sekarang idle dan musik sama-sama 200 × 32.</summary>
-    private Size CollapsedSize => _activity == CollapsedActivity.Music ? MusicSize : IdleSize;
+    /// <summary>
+    /// Ukuran pil per isi: semuanya 200 × 32 (revisi #12), kecuali pengingat minum yang butuh ruang
+    /// untuk teks dan chip "+1 gelas".
+    /// </summary>
+    private Size CollapsedSize => _activity switch
+    {
+        CollapsedActivity.Water => WaterSize,
+        CollapsedActivity.Music => MusicSize,
+        _ => IdleSize,
+    };
 
     public MusicPill MusicPill => MusicPillView;
 
     public MusicModule MusicModule => MusicModuleView;
 
     public LyricsModule LyricsModule => LyricsModuleView;
+
+    public FocusPill FocusPill => FocusPillView;
+
+    public WaterPill WaterPill => WaterPillView;
+
+    public FocusModule FocusModule => FocusModuleView;
+
+    public WaterModule WaterModule => WaterModuleView;
+
+    public TodoModule TodoModule => TodoModuleView;
+
+    public ShelfModule ShelfModule => ShelfModuleView;
+
+    public FrameworkElement DropTarget => ShapeHost;
 
     /// <summary>Tab yang dipilih (walau panel sedang tertutup).</summary>
     public int SelectedModule => _moduleIndex;
@@ -73,10 +97,19 @@ public partial class NotchWindow : Window
     /// <summary>Panel dibuka/ditutup atau tab berganti.</summary>
     public event Action<int>? VisibleModuleChanged;
 
+    public const int FocusTab = 2;
+    public const int WaterTab = 3;
+    public const int TodoTab = 4;
+    public const int ShelfTab = 5;
+
     private UIElement ModuleView(int index) => index switch
     {
         MusicTab => MusicModuleView,
         LyricsTab => LyricsModuleView,
+        FocusTab => FocusModuleView,
+        WaterTab => WaterModuleView,
+        TodoTab => TodoModuleView,
+        ShelfTab => ShelfModuleView,
         _ => PlaceholderModule,
     };
 
@@ -84,7 +117,26 @@ public partial class NotchWindow : Window
     {
         MusicModuleView.SetActive(VisibleModule == MusicTab);
         LyricsModuleView.SetVisible(VisibleModule == LyricsTab);
+        if (VisibleModule != TodoTab) TodoModuleView.EndInput();
         VisibleModuleChanged?.Invoke(VisibleModule);
+    }
+
+    /// <summary>
+    /// Input teks (to-do) dibuka: jendela notch sementara boleh aktif supaya bisa menerima ketikan.
+    /// Normalnya WS_EX_NOACTIVATE agar tidak mencuri fokus dari aplikasi lain.
+    /// </summary>
+    public void SetTextInput(bool active)
+    {
+        if (Handle == IntPtr.Zero) return;
+        NotchWindowInterop.SetActivatable(Handle, active);
+        if (active) Activate();
+    }
+
+    protected override void OnDeactivated(EventArgs e)
+    {
+        base.OnDeactivated(e);
+        // Klik di aplikasi lain: akhiri input supaya panel bisa menutup lagi.
+        TodoModuleView.EndInput();
     }
 
     public IntPtr Handle { get; private set; }
@@ -252,35 +304,54 @@ public partial class NotchWindow : Window
     }
 
     /// <summary>
-    /// Ganti isi pil (idle ↔ musik). Saat pil terlihat: lebar berubah 300 ms ease-spring-soft
-    /// dan isi crossfade 160 ms (Collapsed.dc.html).
+    /// Ganti isi pil. Saat pil terlihat: lebar berubah 300 ms ease-spring-soft dan isi crossfade
+    /// 160 ms (Collapsed.dc.html). Musik + fokus: musik di kiri, timer ringkas di kanan.
     /// </summary>
     public void SetCollapsedActivity(CollapsedActivity activity)
     {
         if (_activity == activity) return;
         _activity = activity;
 
-        UIElement show = activity == CollapsedActivity.Music ? MusicPillView : Kedip;
-        UIElement hide = activity == CollapsedActivity.Music ? Kedip : MusicPillView;
+        bool combined = activity == CollapsedActivity.MusicAndFocus;
+        MusicPillView.SetCompact(combined);
+        FocusPillView.SetCompact(combined);
+        FocusPillView.HorizontalAlignment = combined ? HorizontalAlignment.Right : HorizontalAlignment.Center;
+        FocusPillView.Margin = new Thickness(0, 0, combined ? 12 : 0, 0);
+        WaterPillView.SetPulsing(activity == CollapsedActivity.Water && _visualState == NotchState.Collapsed);
 
-        if (_visualState == NotchState.Collapsed)
+        var wanted = new HashSet<UIElement>(activity switch
         {
+            CollapsedActivity.Music => [MusicPillView],
+            CollapsedActivity.Focus => [FocusPillView],
+            CollapsedActivity.MusicAndFocus => [MusicPillView, FocusPillView],
+            CollapsedActivity.Water => [WaterPillView],
+            _ => new UIElement[] { Kedip },
+        });
+
+        bool visible = _visualState == NotchState.Collapsed;
+        if (visible)
             AnimateShape(CollapsedSize, CollapsedRadius, Motion.Ms(300), Motion.SpringSoft, widthDelay: 0, heightDelay: 0);
-            FadeOut(hide, Motion.Ms(160));
-            FadeIn(show, Motion.Ms(160), delayMs: 80);
-        }
-        else
+
+        foreach (var element in new UIElement[] { Kedip, MusicPillView, FocusPillView, WaterPillView })
         {
-            // Tidak terlihat sekarang; lapisan collapsed akan menampilkan isi yang benar saat kembali.
-            hide.BeginAnimation(OpacityProperty, null);
-            hide.Opacity = 0;
-            hide.Visibility = Visibility.Collapsed;
-            show.BeginAnimation(OpacityProperty, null);
-            show.Opacity = 1;
-            show.Visibility = Visibility.Visible;
+            bool show = wanted.Contains(element);
+            if (visible)
+            {
+                if (show && (element.Visibility != Visibility.Visible || element.Opacity < 1)) FadeIn(element, Motion.Ms(160), delayMs: 80);
+                else if (!show) FadeOut(element, Motion.Ms(160));
+            }
+            else
+            {
+                // Tidak terlihat sekarang; lapisan collapsed menampilkan isi yang benar saat kembali.
+                element.BeginAnimation(OpacityProperty, null);
+                element.Opacity = show ? 1 : 0;
+                element.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
         UpdateKedipIdle();
     }
+
+    public CollapsedActivity CollapsedActivity => _activity;
 
     /// <summary>Pilih tab sebelum panel terbuka (mis. buka tab Musik saat lagu diputar).</summary>
     public void SelectModule(int index)

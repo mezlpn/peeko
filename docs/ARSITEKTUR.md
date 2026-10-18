@@ -209,6 +209,13 @@ Revisi setelah dicoba langsung:
     - Saat panel terbuka, peek tampil sebagai baris 32 px di bawah bar tab.
     - Klik peek belum membuka modul terkait karena modulnya belum ada; hover tetap membuka panel.
     - Argumen `--demo-peeks` memutar semua contoh peek, untuk mengecek tampilan.
+17. **Modul produktivitas (tahap 5).**
+    - Timer fokus menyimpan waktu selesai (`EndsAt`), jadi tetap akurat setelah sleep. Fokus selesai → istirahat langsung berjalan; istirahat selesai → fokus berikutnya menunggu ditekan.
+    - Pil fokus, musik + fokus, dan idle sama-sama 200 px. Pengingat minum 260 px karena butuh ruang untuk teks dan chip "+1 gelas"; di atas pil ini jeda hover dinaikkan ke 450 ms supaya chip bisa diklik (keputusan #4).
+    - Pengingat minum tampil 8 dtk, lalu berikutnya satu interval lagi walau belum minum.
+    - Kotak input to-do: jendela notch sementara dibuat bisa aktif (tanpa `WS_EX_NOACTIVATE`) dan panel ditahan terbuka; kembali normal saat input selesai atau jendela kehilangan fokus.
+    - Rak: file dari folder sementara disalin; file lain hanya ditautkan dan file asli tidak pernah dihapus. Seret file ke pil: peek "Simpan di rak", ditahan 600 ms → panel terbuka ke tab Rak.
+    - Belum dibuat: seret untuk mengurutkan to-do, pilih banyak file di rak (Ctrl+klik), kartu "+n" (diganti gulir horizontal), dan pengaturan durasi/target (menunggu jendela Pengaturan).
 
 ## 11. Kontrak desain ↔ kode
 

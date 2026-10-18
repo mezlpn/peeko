@@ -142,6 +142,27 @@ public sealed class NotchStateMachine : IDisposable
         return true;
     }
 
+    /// <summary>
+    /// Buka panel tanpa hover. Dipakai saat file diseret ke notch: selama drag-and-drop Windows
+    /// tidak mengirim event mouse biasa. Panel menutup lewat <see cref="PointerExited"/>.
+    /// </summary>
+    public void ExpandNow()
+    {
+        if (State is not (NotchState.Collapsed or NotchState.Peek or NotchState.Slim)) return;
+        _hoverOpen.Cancel();
+        _peekEnd.Cancel();
+        _pointerOver = true;
+        SetState(NotchState.Expanded);
+    }
+
+    /// <summary>Akhiri peek sekarang juga (mis. file batal di-drop).</summary>
+    public void EndPeek()
+    {
+        if (State != NotchState.Peek) return;
+        _peekEnd.Cancel();
+        SetState(RestState);
+    }
+
     private void Hide()
     {
         _hoverOpen.Cancel();

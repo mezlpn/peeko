@@ -118,6 +118,21 @@ public sealed class PeekView : Grid
                 AddIcon(r.Flag ? HeadphoneIcon : VolumeIcon, "TextTertiary");
                 AddTwoLine(r.Text ?? "Perangkat audio", "Terputus");
                 break;
+            case PeekKind.FocusDone:
+                AddHappyEyes();
+                AddLabel("Sesi selesai");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true);
+                break;
+            case PeekKind.BreakDone:
+                AddIcon((Geometry)Application.Current.Resources["Celah.Icon.Focus"], "Accent");
+                AddLabel("Istirahat selesai");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true);
+                break;
+            case PeekKind.ShelfDrop:
+                AddIcon((Geometry)Application.Current.Resources["Celah.Icon.Shelf"], "TextPrimary");
+                AddLabel(r.Flag ? "Tersimpan di rak" : "Simpan di rak");
+                AddValue(r.Text ?? "", "TextSecondary", small: true);
+                break;
         }
     }
 

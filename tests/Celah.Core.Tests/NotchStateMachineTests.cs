@@ -251,6 +251,37 @@ public class NotchStateMachineTests
     }
 
     [Fact]
+    public void Expand_now_opens_from_peek_and_closes_after_pointer_exit()
+    {
+        _sm.ShowPeek(TimeSpan.FromSeconds(30));
+        _sm.ExpandNow();
+        Assert.Equal(NotchState.Expanded, _sm.State);
+        Wait(30_000);
+        Assert.Equal(NotchState.Expanded, _sm.State); // peek lama tidak menutup panel
+
+        _sm.PointerExited();
+        Wait(350);
+        Assert.Equal(NotchState.Collapsed, _sm.State);
+    }
+
+    [Fact]
+    public void Expand_now_is_ignored_when_hidden()
+    {
+        _sm.SetFullscreen(true);
+        _sm.ExpandNow();
+        Assert.Equal(NotchState.Hidden, _sm.State);
+    }
+
+    [Fact]
+    public void End_peek_returns_to_rest_state_immediately()
+    {
+        _sm.SetSlim(true);
+        _sm.ShowPeek(TimeSpan.FromSeconds(30));
+        _sm.EndPeek();
+        Assert.Equal(NotchState.Slim, _sm.State);
+    }
+
+    [Fact]
     public void State_changed_reports_previous_and_next()
     {
         var log = new List<(NotchState, NotchState)>();

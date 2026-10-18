@@ -9,6 +9,7 @@ using Celah.App.Music;
 using Celah.Core.Lyrics;
 using Celah.App.Notch;
 using Celah.App.Peeks;
+using Celah.App.Productivity;
 using Celah.Core.Media;
 using Celah.Core.Notch;
 using Celah.Platform.Media;
@@ -42,6 +43,14 @@ public partial class App : Application
             return;
         }
 
+        // Jika Serilog sendiri gagal menulis (izin, file terkunci), alasannya dicatat di sini.
+        Directory.CreateDirectory(DataDirectory);
+        Serilog.Debugging.SelfLog.Enable(msg =>
+        {
+            try { File.AppendAllText(Path.Combine(DataDirectory, "serilog-selflog.txt"), msg + Environment.NewLine); }
+            catch (IOException) { }
+        });
+
         Log.Logger = new LoggerConfiguration()
 #if DEBUG
             .MinimumLevel.Debug()
@@ -54,6 +63,19 @@ public partial class App : Application
             .CreateLogger();
 
         DispatcherUnhandledException += OnUnhandledException;
+        // Exception di thread latar (timer, COM, hook) mematikan proses tanpa jejak; catat dulu.
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            Log.Fatal(args.ExceptionObject as Exception, "Exception tak tertangani di thread latar");
+            Log.CloseAndFlush();
+        };
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            Log.Error(args.Exception, "Task gagal tanpa ditangani");
+            args.SetObserved();
+        };
+        SessionEnding += (_, args) => Log.Information("Windows sign out/shutdown: {Reason}", args.ReasonSessionEnding);
+        Log.Information("Celah {Version} mulai (PID {Pid})", typeof(App).Assembly.GetName().Version, Environment.ProcessId);
 
         var builder = Host.CreateApplicationBuilder();
         builder.Logging.ClearProviders();
@@ -77,6 +99,9 @@ public partial class App : Application
         builder.Services.AddSingleton<LyricsController>();
         builder.Services.AddSingleton(sp => sp.GetRequiredService<LyricsController>().ViewModel);
         builder.Services.AddSingleton<SystemPeekController>();
+        builder.Services.AddSingleton<FocusController>();
+        builder.Services.AddSingleton<WaterController>();
+        builder.Services.AddSingleton<ListsController>();
         builder.Services.AddSingleton<NotchWindow>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
@@ -128,6 +153,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        Log.Information("Celah keluar (kode {Code})", e.ApplicationExitCode);
         _tray?.Dispose();
         _host?.Services.GetService<NotchController>()?.Dispose();
         _host?.Dispose();

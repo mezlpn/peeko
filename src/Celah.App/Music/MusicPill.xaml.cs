@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using Celah.App.Animation;
@@ -12,6 +13,16 @@ public partial class MusicPill : UserControl
     {
         InitializeComponent();
         _bars = [Bar0, Bar1, Bar2, Bar3];
+    }
+
+    /// <summary>
+    /// Bersama timer fokus: musik pindah ke kiri pil dengan tiga bar (Collapsed.dc.html → gabungan).
+    /// </summary>
+    public void SetCompact(bool compact)
+    {
+        Root.HorizontalAlignment = compact ? HorizontalAlignment.Left : HorizontalAlignment.Center;
+        Root.Margin = new Thickness(compact ? 8 : 0, 0, 0, 0);
+        Bar3.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
     }
 
     /// <summary>

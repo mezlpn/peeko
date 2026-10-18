@@ -5,6 +5,7 @@
         xmlns:music="clr-namespace:Celah.App.Music"
         xmlns:lyrics="clr-namespace:Celah.App.Lyrics"
         xmlns:peeks="clr-namespace:Celah.App.Peeks"
+        xmlns:prod="clr-namespace:Celah.App.Productivity"
         Title="Celah"
         Width="640" Height="320"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
@@ -51,7 +52,7 @@
 
     <Grid>
         <!-- Bentuk notch: bahu kiri + badan + bahu kanan. Hanya area berwarna yang menerima hover. -->
-        <StackPanel x:Name="ShapeHost" Orientation="Horizontal"
+        <StackPanel x:Name="ShapeHost" Orientation="Horizontal" AllowDrop="True"
                     HorizontalAlignment="Center" VerticalAlignment="Top">
             <StackPanel.RenderTransform>
                 <TranslateTransform x:Name="HideShift" />
@@ -77,6 +78,9 @@
                         </Grid.RenderTransform>
                         <controls:Kedip x:Name="Kedip" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <music:MusicPill x:Name="MusicPillView" Opacity="0" Visibility="Collapsed" />
+                        <prod:FocusPill x:Name="FocusPillView" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Opacity="0" Visibility="Collapsed" />
+                        <prod:WaterPill x:Name="WaterPillView" Opacity="0" Visibility="Collapsed" />
                     </Grid>
 
                     <!-- ── Peek: tinggi 44, lebar 280–340 sesuai isi (Peek.dc.html) ── -->
@@ -127,6 +131,10 @@
                             </Grid.RenderTransform>
                             <music:MusicModule x:Name="MusicModuleView" />
                             <lyrics:LyricsModule x:Name="LyricsModuleView" Visibility="Collapsed" />
+                            <prod:FocusModule x:Name="FocusModuleView" Visibility="Collapsed" />
+                            <prod:WaterModule x:Name="WaterModuleView" Visibility="Collapsed" />
+                            <prod:TodoModule x:Name="TodoModuleView" Visibility="Collapsed" />
+                            <prod:ShelfModule x:Name="ShelfModuleView" Visibility="Collapsed" />
                             <Border x:Name="PlaceholderModule" Visibility="Collapsed"
                                     CornerRadius="{StaticResource Celah.Radius.Lg}" Background="{StaticResource Celah.Brush.SurfaceRaised}">
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

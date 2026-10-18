@@ -17,6 +17,17 @@ public static class NotchWindowInterop
         SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(ex));
     }
 
+    /// <summary>
+    /// Sementara izinkan jendela menerima fokus keyboard (mis. mengetik to-do), lalu kembalikan
+    /// ke mode tidak-mencuri-fokus.
+    /// </summary>
+    public static void SetActivatable(IntPtr hwnd, bool activatable)
+    {
+        var ex = (long)GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+        ex = activatable ? ex & ~WS_EX_NOACTIVATE : ex | WS_EX_NOACTIVATE;
+        SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(ex));
+    }
+
     /// <summary>Tegaskan ulang posisi paling atas (jendela topmost lain bisa menyalip).</summary>
     public static void EnsureTopmost(IntPtr hwnd)
     {
