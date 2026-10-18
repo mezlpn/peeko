@@ -3,7 +3,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Net.Http;
+using Celah.App.Lyrics;
 using Celah.App.Music;
+using Celah.Core.Lyrics;
 using Celah.App.Notch;
 using Celah.Core.Media;
 using Celah.Core.Notch;
@@ -62,6 +65,16 @@ public partial class App : Application
         builder.Services.AddSingleton<IMediaSource, GsmtcMediaSource>();
         builder.Services.AddSingleton<MusicController>();
         builder.Services.AddSingleton(sp => sp.GetRequiredService<MusicController>().ViewModel);
+        builder.Services.AddSingleton(sp =>
+        {
+            // LRCLIB meminta User-Agent yang menyebut nama dan versi aplikasi.
+            var http = new HttpClient { Timeout = TimeSpan.FromSeconds(6) };
+            var version = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "0.1.0";
+            http.DefaultRequestHeaders.UserAgent.ParseAdd($"Celah/{version} (aplikasi notch Windows)");
+            return new LyricsService(http, Path.Combine(DataDirectory, "lyrics"), sp.GetRequiredService<TimeProvider>());
+        });
+        builder.Services.AddSingleton<LyricsController>();
+        builder.Services.AddSingleton(sp => sp.GetRequiredService<LyricsController>().ViewModel);
         builder.Services.AddSingleton<NotchWindow>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();

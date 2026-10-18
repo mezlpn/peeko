@@ -199,6 +199,8 @@ Revisi setelah dicoba langsung:
 10. **Kedip kembali 1,5 dtk setelah musik dijeda** (desain: 30 dtk). Tidak 0 karena beberapa pemutar sempat melaporkan "dijeda" saat ganti lagu.
 11. **Klik cover di pil collapsed tidak dibuat.** Jeda hover 60 ms (revisi #7) membuat pil sudah mengembang sebelum sempat diklik; play/pause ada di panel.
 12. **Pil musik tetap 200 × 32** seperti pil idle (desain: 260 px dengan cover di kiri dan bar di kanan). Cover dan bar dirapatkan di tengah dengan jarak 10 px, sama seperti jarak kedua mata Kedip.
+14. **Lirik:** baris yang terlalu panjang dipotong dengan elipsis (desain: dibungkus jadi 2 baris dengan slot 52 px). Slot bervariasi membuat pergeseran daftar lebih rumit; ditinjau ulang jika sering terjadi. Varian "Ambil lirik dari internet sedang mati" menunggu jendela Pengaturan (tahap 6). Teks biasa bisa di-scroll dengan roda mouse, tapi tanpa scrollbar tipis.
+15. **Pencarian lirik** mengutamakan lirik tersinkron. Hasil teks biasa dari pencocokan persis hanya dijadikan cadangan, lalu dicari lagi dengan judul dasar tanpa keterangan versi seperti "(Alternate Version)". Maksimal 3 kandidat kueri.
 13. **Pemilihan sumber media** (`SessionSelector`). Sesi yang tampil tidak ikut berpindah saat dijeda. Sesi lain yang baru mulai diputar mengambil alih, kecuali pengguna memilih sesi secara manual dan sesi itu masih diputar. Jika ada lebih dari satu sesi, chip sumber di modul Musik diberi panah "‹ ● Brave 1/2 ›".
 
 ## 11. Kontrak desain ↔ kode

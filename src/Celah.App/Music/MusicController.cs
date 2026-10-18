@@ -73,6 +73,19 @@ public sealed class MusicController : IDisposable
 
     public CollapsedActivity Activity => _activity;
 
+    /// <summary>State media terbaru sudah diterapkan (thread UI). Dipakai modul Lirik.</summary>
+    public event Action<MediaState?>? StateApplied;
+
+    public MediaState? State => _state;
+
+    /// <summary>Posisi lagu sekarang hasil ekstrapolasi <see cref="PlaybackClock"/>.</summary>
+    public TimeSpan Position => _clock.GetPosition(DateTimeOffset.Now);
+
+    public double PlaybackRate => _state?.Playback.Rate is > 0 and var r ? r : 1;
+
+    public Task SeekToAsync(TimeSpan position) =>
+        _state?.Playback.CanSeek == true ? _source.SeekAsync(position) : Task.CompletedTask;
+
     public async Task StartAsync()
     {
         _source.Changed += state => _dispatcher.BeginInvoke(() => Apply(state));
@@ -127,6 +140,7 @@ public sealed class MusicController : IDisposable
             _coverKey = null;
             UpdateActivity();
             UpdateTimers();
+            StateApplied?.Invoke(null);
             return;
         }
 
@@ -175,6 +189,7 @@ public sealed class MusicController : IDisposable
         UpdateProgress();
         UpdateActivity();
         UpdateTimers();
+        StateApplied?.Invoke(state);
     }
 
     private async Task LoadCoverAsync(byte[]? bytes, string key)

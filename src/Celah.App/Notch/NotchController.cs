@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using Celah.App.Lyrics;
 using Celah.App.Music;
 using Celah.Core.Notch;
 using Celah.Platform.Display;
@@ -15,14 +16,17 @@ public sealed class NotchController : IDisposable
     private readonly NotchWindow _window;
     private readonly NotchStateMachine _stateMachine;
     private readonly MusicController _music;
+    private readonly LyricsController _lyrics;
     private readonly ILogger<NotchController> _log;
     private ForegroundWindowWatcher? _foreground;
 
-    public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music, ILogger<NotchController> log)
+    public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music,
+        LyricsController lyrics, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
         _music = music;
+        _lyrics = lyrics;
         _log = log;
     }
 
@@ -42,6 +46,12 @@ public sealed class NotchController : IDisposable
         seekBar.Nudged += direction => _ = _music.SeekByAsync(NudgeStep * direction);
         // Panel tetap terbuka selama slider digeser walau kursor keluar dari notch.
         seekBar.DraggingChanged += _stateMachine.SetHoldOpen;
+
+        var lyricsView = _window.LyricsModule;
+        _lyrics.LinesChanged += lyricsView.SetLines;
+        _lyrics.ActiveLineChanged += lyricsView.SetActive;
+        lyricsView.LineClicked += _lyrics.SeekToLine;
+        _window.VisibleModuleChanged += module => _lyrics.SetVisible(module == NotchWindow.LyricsTab);
 
         _window.Show();
         _ = _music.StartAsync();
@@ -64,9 +74,11 @@ public sealed class NotchController : IDisposable
     {
         _log.LogDebug("Notch {From} → {To}", from, to);
 
-        // Hover membuka tab aktivitas terkait (Collapsed.dc.html → Interaksi).
-        if (to == NotchState.Expanded && _music.Activity == CollapsedActivity.Music)
-            _window.SelectModule(0);
+        // Hover membuka tab aktivitas terkait (Collapsed.dc.html → Interaksi). Tab Lirik dibiarkan
+        // jika terakhir dipilih, supaya pengguna yang membaca lirik tidak dilempar balik ke Musik.
+        if (to == NotchState.Expanded && _music.Activity == CollapsedActivity.Music
+            && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.LyricsTab))
+            _window.SelectModule(NotchWindow.MusicTab);
 
         _window.TransitionTo(from, to);
         _music.SetNotchState(to);
@@ -111,6 +123,7 @@ public sealed class NotchController : IDisposable
     {
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
         _foreground?.Dispose();
+        _lyrics.Dispose();
         _music.Dispose();
         _stateMachine.Dispose();
     }

@@ -18,6 +18,20 @@ public sealed class BoolToVisibilityConverter : IValueConverter
         throw new NotSupportedException();
 }
 
+/// <summary>Visible jika nilai (mis. enum) sama dengan parameter; beberapa nilai dipisah koma.</summary>
+public sealed class EqualsToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        var text = value?.ToString();
+        var options = (parameter as string ?? "").Split(',', StringSplitOptions.TrimEntries);
+        return options.Contains(text) ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
 /// <summary>Semua nilai bool true → Visible (untuk kondisi gabungan di MultiBinding).</summary>
 public sealed class AllTrueToVisibilityConverter : IMultiValueConverter
 {

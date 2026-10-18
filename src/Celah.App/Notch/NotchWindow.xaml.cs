@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Celah.App.Animation;
+using Celah.App.Lyrics;
 using Celah.App.Music;
 using Celah.Core.Notch;
 using Celah.Platform.Display;
@@ -38,12 +39,16 @@ public partial class NotchWindow : Window
     private CollapsedActivity _activity = CollapsedActivity.Idle;
     private int _moduleIndex;
 
-    public NotchWindow(MusicViewModel music)
+    public const int MusicTab = 0;
+    public const int LyricsTab = 1;
+
+    public NotchWindow(MusicViewModel music, LyricsViewModel lyrics)
     {
         InitializeComponent();
         _clockTimer.Tick += (_, _) => UpdateClock();
         MusicPillView.DataContext = music;
         MusicModuleView.DataContext = music;
+        LyricsModuleView.DataContext = lyrics;
     }
 
     /// <summary>Ukuran pil per isi. Sekarang idle dan musik sama-sama 200 × 32.</summary>
@@ -52,6 +57,31 @@ public partial class NotchWindow : Window
     public MusicPill MusicPill => MusicPillView;
 
     public MusicModule MusicModule => MusicModuleView;
+
+    public LyricsModule LyricsModule => LyricsModuleView;
+
+    /// <summary>Tab yang dipilih (walau panel sedang tertutup).</summary>
+    public int SelectedModule => _moduleIndex;
+
+    /// <summary>Modul yang benar-benar terlihat sekarang, atau −1 jika panel tertutup.</summary>
+    public int VisibleModule => _visualState == NotchState.Expanded ? _moduleIndex : -1;
+
+    /// <summary>Panel dibuka/ditutup atau tab berganti.</summary>
+    public event Action<int>? VisibleModuleChanged;
+
+    private UIElement ModuleView(int index) => index switch
+    {
+        MusicTab => MusicModuleView,
+        LyricsTab => LyricsModuleView,
+        _ => PlaceholderModule,
+    };
+
+    private void NotifyVisibleModule()
+    {
+        MusicModuleView.SetActive(VisibleModule == MusicTab);
+        LyricsModuleView.SetVisible(VisibleModule == LyricsTab);
+        VisibleModuleChanged?.Invoke(VisibleModule);
+    }
 
     public IntPtr Handle { get; private set; }
 
@@ -97,6 +127,8 @@ public partial class NotchWindow : Window
             case NotchState.Peek: ToPeek(from); break;
             case NotchState.Hidden: ToHidden(); break;
         }
+        if (from == NotchState.Expanded || to == NotchState.Expanded)
+            NotifyVisibleModule();
     }
 
     /// <summary>Umpan balik langsung saat kursor menyentuh notch, sebelum jeda hover selesai.</summary>
@@ -135,7 +167,6 @@ public partial class NotchWindow : Window
         FadeIn(ExpandedLayer, Motion.Ms(180), delayMs: 120);
         Slide(TabBarShift, TranslateTransform.YProperty, from: -6, Motion.Ms(180), delayMs: 120);
         Slide(ModuleShift, TranslateTransform.YProperty, from: 8, Motion.Ms(240), delayMs: 150);
-        MusicModuleView.SetActive(_moduleIndex == 0);
     }
 
     /// <summary>Kembali ke state istirahat: pil (Collapsed) atau garis tipis (Slim).</summary>
@@ -192,7 +223,6 @@ public partial class NotchWindow : Window
             }
         }
 
-        MusicModuleView.SetActive(false);
         UpdateKedipIdle();
     }
 
@@ -256,15 +286,17 @@ public partial class NotchWindow : Window
 
         // Ganti tab (Motion.dc.html): isi lama keluar 120 ms ∓12 px, isi baru masuk 220 ms ±12 px.
         int direction = index > _moduleIndex ? 1 : -1;
+        UIElement hide = ModuleView(_moduleIndex);
+        UIElement show = ModuleView(index);
         _moduleIndex = index;
 
-        bool music = index == 0;
         PlaceholderTitle.Text = tab.ToolTip is string name ? $"Modul {name} menyusul" : "Modul menyusul";
-        UIElement show = music ? MusicModuleView : PlaceholderModule;
-        UIElement hide = music ? PlaceholderModule : MusicModuleView;
 
-        hide.BeginAnimation(OpacityProperty, null);
-        hide.Visibility = Visibility.Collapsed;
+        if (hide != show)
+        {
+            hide.BeginAnimation(OpacityProperty, null);
+            hide.Visibility = Visibility.Collapsed;
+        }
         show.Visibility = Visibility.Visible;
         if (!Motion.Reduced && _visualState == NotchState.Expanded)
         {
@@ -277,7 +309,7 @@ public partial class NotchWindow : Window
             show.Opacity = 1;
         }
 
-        MusicModuleView.SetActive(music && _visualState == NotchState.Expanded);
+        NotifyVisibleModule();
     }
 
     private void ToPeek(NotchState from)
@@ -308,7 +340,6 @@ public partial class NotchWindow : Window
     {
         _clockTimer.Stop();
         Kedip.StopIdle();
-        MusicModuleView.SetActive(false);
 
         double distance = Body.ActualHeight + 12;
         var up = Motion.To(-distance, Reduced(Motion.Ms(260)), Motion.In);

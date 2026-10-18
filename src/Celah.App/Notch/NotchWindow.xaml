@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:Celah.App.Controls"
         xmlns:music="clr-namespace:Celah.App.Music"
+        xmlns:lyrics="clr-namespace:Celah.App.Lyrics"
         Title="Celah"
         Width="640" Height="320"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
@@ -143,6 +144,7 @@
                                 <TranslateTransform x:Name="ModuleShift" />
                             </Grid.RenderTransform>
                             <music:MusicModule x:Name="MusicModuleView" />
+                            <lyrics:LyricsModule x:Name="LyricsModuleView" Visibility="Collapsed" />
                             <Border x:Name="PlaceholderModule" Visibility="Collapsed"
                                     CornerRadius="{StaticResource Celah.Radius.Lg}" Background="{StaticResource Celah.Brush.SurfaceRaised}">
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
