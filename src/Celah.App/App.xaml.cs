@@ -3,8 +3,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Celah.App.Music;
 using Celah.App.Notch;
+using Celah.Core.Media;
 using Celah.Core.Notch;
+using Celah.Platform.Media;
 using H.NotifyIcon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -55,6 +58,10 @@ public partial class App : Application
         builder.Services.AddSingleton(sp => new NotchStateMachine(
             sp.GetRequiredService<TimeProvider>(),
             action => Dispatcher.BeginInvoke(action)));
+        builder.Services.AddSingleton(Dispatcher);
+        builder.Services.AddSingleton<IMediaSource, GsmtcMediaSource>();
+        builder.Services.AddSingleton<MusicController>();
+        builder.Services.AddSingleton(sp => sp.GetRequiredService<MusicController>().ViewModel);
         builder.Services.AddSingleton<NotchWindow>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();

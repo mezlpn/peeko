@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using Celah.App.Music;
 using Celah.Core.Notch;
 using Celah.Platform.Display;
 using Microsoft.Extensions.Logging;
@@ -9,15 +10,19 @@ namespace Celah.App.Notch;
 /// <summary>Menghubungkan state machine, sumber event platform, dan jendela notch.</summary>
 public sealed class NotchController : IDisposable
 {
+    private static readonly TimeSpan NudgeStep = TimeSpan.FromSeconds(5);
+
     private readonly NotchWindow _window;
     private readonly NotchStateMachine _stateMachine;
+    private readonly MusicController _music;
     private readonly ILogger<NotchController> _log;
     private ForegroundWindowWatcher? _foreground;
 
-    public NotchController(NotchWindow window, NotchStateMachine stateMachine, ILogger<NotchController> log)
+    public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
+        _music = music;
         _log = log;
     }
 
@@ -30,7 +35,16 @@ public sealed class NotchController : IDisposable
         _window.HoverTarget.MouseEnter += OnPointerEnter;
         _window.HoverTarget.MouseLeave += OnPointerLeave;
 
+        _music.ActivityChanged += _window.SetCollapsedActivity;
+        _music.LevelsUpdated += _window.MusicPill.SetLevels;
+        var seekBar = _window.MusicModule.SeekBar;
+        seekBar.SeekRequested += fraction => _ = _music.SeekAsync(fraction);
+        seekBar.Nudged += direction => _ = _music.SeekByAsync(NudgeStep * direction);
+        // Panel tetap terbuka selama slider digeser walau kursor keluar dari notch.
+        seekBar.DraggingChanged += _stateMachine.SetHoldOpen;
+
         _window.Show();
+        _ = _music.StartAsync();
 
         _foreground = new ForegroundWindowWatcher(() => NotchWindowInterop.GetMonitorOf(_window.Handle));
         _foreground.FullscreenChanged += OnFullscreenChanged;
@@ -49,7 +63,13 @@ public sealed class NotchController : IDisposable
     private void OnStateChanged(NotchState from, NotchState to)
     {
         _log.LogDebug("Notch {From} → {To}", from, to);
+
+        // Hover membuka tab aktivitas terkait (Collapsed.dc.html → Interaksi).
+        if (to == NotchState.Expanded && _music.Activity == CollapsedActivity.Music)
+            _window.SelectModule(0);
+
         _window.TransitionTo(from, to);
+        _music.SetNotchState(to);
     }
 
     private void OnPointerEnter(object sender, MouseEventArgs e)
@@ -91,6 +111,7 @@ public sealed class NotchController : IDisposable
     {
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
         _foreground?.Dispose();
+        _music.Dispose();
         _stateMachine.Dispose();
     }
 }

@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Celah.App.Animation;
+using Celah.App.Music;
 using Celah.Core.Notch;
 using Celah.Platform.Display;
 
@@ -17,13 +18,14 @@ namespace Celah.App.Notch;
 public partial class NotchWindow : Window
 {
     private static readonly Size SlimSize = new(160, 4);
-    private static readonly Size CollapsedSize = new(200, 32);
+    private static readonly Size IdleSize = new(200, 32);
+    private static readonly Size MusicSize = new(260, 32);
     private static readonly Size PeekSize = new(320, 44);
     private static readonly Size ExpandedSize = new(560, 260);
 
     // Respons hover instan: pil sedikit menggembung sebelum panel terbuka.
     private static readonly Size SlimHoverSize = new(184, 6);
-    private static readonly Size CollapsedHoverSize = new(212, 34);
+    private static readonly Size HoverGrow = new(12, 2);
 
     private static readonly CornerRadius SlimRadius = new(0, 0, 2, 2);
     private static readonly CornerRadius CollapsedRadius = new(0, 0, 16, 16);
@@ -32,12 +34,23 @@ public partial class NotchWindow : Window
 
     private readonly DispatcherTimer _clockTimer = new(DispatcherPriority.Background);
     private NotchState _visualState = NotchState.Collapsed;
+    private CollapsedActivity _activity = CollapsedActivity.Idle;
+    private int _moduleIndex;
 
-    public NotchWindow()
+    public NotchWindow(MusicViewModel music)
     {
         InitializeComponent();
         _clockTimer.Tick += (_, _) => UpdateClock();
+        MusicPillView.DataContext = music;
+        MusicModuleView.DataContext = music;
     }
+
+    /// <summary>Lebar pil bergantung pada isinya: idle 200, musik 260 (Collapsed.dc.html).</summary>
+    private Size CollapsedSize => _activity == CollapsedActivity.Music ? MusicSize : IdleSize;
+
+    public MusicPill MusicPill => MusicPillView;
+
+    public MusicModule MusicModule => MusicModuleView;
 
     public IntPtr Handle { get; private set; }
 
@@ -90,7 +103,8 @@ public partial class NotchWindow : Window
     {
         var (normal, hover, radius) = _visualState switch
         {
-            NotchState.Collapsed => (CollapsedSize, CollapsedHoverSize, CollapsedRadius),
+            NotchState.Collapsed => (CollapsedSize,
+                new Size(CollapsedSize.Width + HoverGrow.Width, CollapsedSize.Height + HoverGrow.Height), CollapsedRadius),
             NotchState.Slim => (SlimSize, SlimHoverSize, SlimRadius),
             _ => (Size.Empty, Size.Empty, default),
         };
@@ -120,6 +134,7 @@ public partial class NotchWindow : Window
         FadeIn(ExpandedLayer, Motion.Ms(180), delayMs: 120);
         Slide(TabBarShift, TranslateTransform.YProperty, from: -6, Motion.Ms(180), delayMs: 120);
         Slide(ModuleShift, TranslateTransform.YProperty, from: 8, Motion.Ms(240), delayMs: 150);
+        MusicModuleView.SetActive(_moduleIndex == 0);
     }
 
     /// <summary>Kembali ke state istirahat: pil (Collapsed) atau garis tipis (Slim).</summary>
@@ -172,19 +187,96 @@ public partial class NotchWindow : Window
                 FadeIn(CollapsedLayer, Motion.Base, contentDelay);
                 ScaleCollapsed(1, Motion.Base, Motion.Out, contentDelay);
                 AnimateShoulders(1, Motion.Base, Motion.Out);
-                if (from == NotchState.Expanded) Kedip.Blink(delayMs: 520);
+                if (from == NotchState.Expanded && _activity == CollapsedActivity.Idle) Kedip.Blink(delayMs: 520);
             }
         }
 
-        if (slim)
-        {
-            Kedip.StopIdle();
-        }
-        else
+        MusicModuleView.SetActive(false);
+        UpdateKedipIdle();
+    }
+
+    /// <summary>Kedip hanya berkedip/bernapas saat ia benar-benar terlihat.</summary>
+    private void UpdateKedipIdle()
+    {
+        if (_visualState == NotchState.Collapsed && _activity == CollapsedActivity.Idle)
         {
             Kedip.StartIdle();
             Kedip.BreatheOnce();
         }
+        else
+        {
+            Kedip.StopIdle();
+        }
+    }
+
+    /// <summary>
+    /// Ganti isi pil (idle ↔ musik). Saat pil terlihat: lebar berubah 300 ms ease-spring-soft
+    /// dan isi crossfade 160 ms (Collapsed.dc.html).
+    /// </summary>
+    public void SetCollapsedActivity(CollapsedActivity activity)
+    {
+        if (_activity == activity) return;
+        _activity = activity;
+
+        UIElement show = activity == CollapsedActivity.Music ? MusicPillView : Kedip;
+        UIElement hide = activity == CollapsedActivity.Music ? Kedip : MusicPillView;
+
+        if (_visualState == NotchState.Collapsed)
+        {
+            AnimateShape(CollapsedSize, CollapsedRadius, Motion.Ms(300), Motion.SpringSoft, widthDelay: 0, heightDelay: 0);
+            FadeOut(hide, Motion.Ms(160));
+            FadeIn(show, Motion.Ms(160), delayMs: 80);
+        }
+        else
+        {
+            // Tidak terlihat sekarang; lapisan collapsed akan menampilkan isi yang benar saat kembali.
+            hide.BeginAnimation(OpacityProperty, null);
+            hide.Opacity = 0;
+            hide.Visibility = Visibility.Collapsed;
+            show.BeginAnimation(OpacityProperty, null);
+            show.Opacity = 1;
+            show.Visibility = Visibility.Visible;
+        }
+        UpdateKedipIdle();
+    }
+
+    /// <summary>Pilih tab sebelum panel terbuka (mis. buka tab Musik saat lagu diputar).</summary>
+    public void SelectModule(int index)
+    {
+        if (Tabs.Children[index] is System.Windows.Controls.RadioButton tab)
+            tab.IsChecked = true;
+    }
+
+    private void OnTabChecked(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.RadioButton tab || Tabs is null) return;
+        int index = Tabs.Children.IndexOf(tab);
+        if (index < 0 || index == _moduleIndex) return;
+
+        // Ganti tab (Motion.dc.html): isi lama keluar 120 ms ∓12 px, isi baru masuk 220 ms ±12 px.
+        int direction = index > _moduleIndex ? 1 : -1;
+        _moduleIndex = index;
+
+        bool music = index == 0;
+        PlaceholderTitle.Text = tab.ToolTip is string name ? $"Modul {name} menyusul" : "Modul menyusul";
+        UIElement show = music ? MusicModuleView : PlaceholderModule;
+        UIElement hide = music ? PlaceholderModule : MusicModuleView;
+
+        hide.BeginAnimation(OpacityProperty, null);
+        hide.Visibility = Visibility.Collapsed;
+        show.Visibility = Visibility.Visible;
+        if (!Motion.Reduced && _visualState == NotchState.Expanded)
+        {
+            show.Animate(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation(0, 1, Motion.Base) { EasingFunction = Motion.Out, BeginTime = Motion.Ms(90) });
+            Slide(ModuleShift, TranslateTransform.XProperty, from: 12 * direction, Motion.Base, delayMs: 90);
+        }
+        else
+        {
+            show.BeginAnimation(OpacityProperty, null);
+            show.Opacity = 1;
+        }
+
+        MusicModuleView.SetActive(music && _visualState == NotchState.Expanded);
     }
 
     private void ToPeek(NotchState from)
@@ -215,6 +307,7 @@ public partial class NotchWindow : Window
     {
         _clockTimer.Stop();
         Kedip.StopIdle();
+        MusicModuleView.SetActive(false);
 
         double distance = Body.ActualHeight + 12;
         var up = Motion.To(-distance, Reduced(Motion.Ms(260)), Motion.In);
