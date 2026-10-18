@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Celah — modul lirik</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#3B5F0A}a:hover{color:#24400A}
+button{font-family:inherit;border:0;padding:0;margin:0;cursor:pointer}
+.n{position:relative;background:#050506}
+.n::before,.n::after{content:"";position:absolute;top:0;width:10px;height:10px}
+.n::before{left:-10px;background:radial-gradient(circle at 0 100%,transparent 9.5px,#050506 10px)}
+.n::after{right:-10px;background:radial-gradient(circle at 100% 100%,transparent 9.5px,#050506 10px)}
+.xp{width:560px;height:260px;border-radius:0 0 28px 28px;box-shadow:0 8px 24px rgba(0,0,0,.45);padding:6px 20px 18px;display:flex;flex-direction:column;gap:10px;color:#F4F4F1}
+.tb{display:flex;align-items:center;justify-content:space-between;height:32px;flex:none}
+.tabs{display:flex;gap:2px}
+.tab{position:relative;width:32px;height:28px;border-radius:10px;background:transparent;color:#7A7A83;display:flex;align-items:center;justify-content:center}
+.tab.on{background:#141417;color:#F4F4F1}
+.tab.on::after{content:"";position:absolute;bottom:2px;left:14px;width:4px;height:2px;border-radius:1px;background:#C6F36B}
+.ib{width:32px;height:32px;border-radius:10px;background:transparent;color:#A6A6AD;display:flex;align-items:center;justify-content:center}
+.mini{display:flex;align-items:center;gap:10px;height:32px;flex:none}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+.sk{height:12px;border-radius:6px;background:#1D1D21;animation:pulse 1.2s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes search{0%,100%{transform:translateX(-3px)}50%{transform:translateX(3px)}}
+.search{display:flex;gap:10px;animation:search 1.4s cubic-bezier(.45,0,.55,1) infinite}
+</style>
+</helmet>
+<div style="width:1280px;height:1080px;padding:56px 48px;background:#F3F2EE;color:#141416;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;gap:24px">
+
+  <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px;padding:0 16px">
+    <div>
+      <div style="font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">21 · Expanded · Lirik</div>
+      <h1 style="margin:4px 0 0;font-size:40px;line-height:48px;font-weight:600">Lirik sinkron</h1>
+    </div>
+    <p style="margin:0;max-width:540px;font-size:14px;line-height:20px;color:#3A3A42">Baris kecil “sedang diputar” 32 px di atas, lalu jendela lirik dengan lima slot × 26 px. Baris aktif selalu berada di slot ketiga. Sumber: lrclib.net (LRC tersinkron, fallback teks biasa), di-cache lokal per lagu.</p>
+  </header>
+
+  <div style="display:grid;grid-template-columns:repeat(2,580px);gap:28px 24px">
+
+    <!-- Active -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div class="mini">
+            <div role="img" aria-label="Cover" style="width:28px;height:28px;border-radius:7px;background:#E8836B;position:relative;overflow:hidden"><span style="position:absolute;left:5px;top:5px;width:12px;height:12px;border-radius:6px;background:#3A1A12"></span></div>
+            <span style="font-size:13px;font-weight:600">Kertas Biru</span><span style="font-size:12px;color:#7A7A83">· Sela Nada</span>
+            <span style="margin-left:auto;font-size:11px;color:#7A7A83;font-variant-numeric:tabular-nums">1:24 / 3:18</span>
+          </div>
+          <div style="height:130px;overflow:hidden;display:flex;flex-direction:column;padding-left:2px">
+            <div style="height:26px;display:flex;align-items:center;font-size:14px;color:#7A7A83;opacity:.45;transform:scale(.86);transform-origin:left center;white-space:nowrap">Di meja ada kertas biru</div>
+            <div style="height:26px;display:flex;align-items:center;font-size:14px;color:#7A7A83;transform:scale(.86);transform-origin:left center;white-space:nowrap">kau lipat jadi perahu kecil</div>
+            <div style="height:26px;display:flex;align-items:center;gap:10px;font-size:18px;font-weight:600;color:#F4F4F1;white-space:nowrap"><span style="width:3px;height:18px;border-radius:2px;background:#C6F36B"></span>Kita menunggu lampu kota</div>
+            <div style="height:26px;display:flex;align-items:center;font-size:14px;color:#7A7A83;transform:scale(.86);transform-origin:left center;white-space:nowrap">menyala satu per satu</div>
+            <div style="height:26px;display:flex;align-items:center;font-size:14px;color:#7A7A83;opacity:.45;transform:scale(.86);transform-origin:left center;white-space:nowrap">lalu hujan datang terlambat</div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Tersinkron</b>. Baris aktif 18 Semibold dengan penanda accent 3 × 18. Tetangganya tertiary pada scale 0.86, dan baris di tepi ber-opacity 0.45. Baris yang terlalu panjang dibungkus menjadi dua baris, dan slotnya melebar ke 52 px. Klik sebuah baris untuk lompat ke timestamp-nya (jika sumber mendukung seek).</figcaption>
+    </figure>
+
+    <!-- Loading -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div class="mini">
+            <div role="img" aria-label="Cover" style="width:28px;height:28px;border-radius:7px;background:#5B7FD6;position:relative;overflow:hidden"><span style="position:absolute;right:-4px;bottom:-4px;width:18px;height:18px;border-radius:9px;background:#D9E3FA"></span></div>
+            <span style="font-size:13px;font-weight:600">Jalan Pulang</span><span style="font-size:12px;color:#7A7A83">· Rimba Sore</span>
+          </div>
+          <div style="flex-grow:1;display:flex;gap:28px;align-items:center;padding:0 4px">
+            <div style="flex-grow:1;display:flex;flex-direction:column;gap:14px">
+              <div class="sk" style="width:62%"></div>
+              <div class="sk" style="width:84%;height:16px;animation-delay:.15s"></div>
+              <div class="sk" style="width:48%;animation-delay:.3s"></div>
+            </div>
+            <div style="width:150px;display:flex;flex-direction:column;align-items:center;gap:10px">
+              <div class="search"><span style="display:block;width:6px;height:10px;border-radius:3px;background:#F4F4F1"></span><span style="display:block;width:6px;height:10px;border-radius:3px;background:#F4F4F1"></span></div>
+              <span style="font-size:12px;line-height:16px;color:#A6A6AD;text-align:center">Mencari lirik di lrclib.net…</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Memuat</b>. Kerangka baris berdenyut (opacity 0.45↔1, 1,2 s, stagger 150 ms), sementara Kedip melirik ke kiri dan kanan. Jika selesai dalam &lt; 250 ms, state ini dilewati. Batas waktu 6 s, lalu dianggap tidak ditemukan.</figcaption>
+    </figure>
+
+    <!-- Not found -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div class="mini">
+            <div role="img" aria-label="Cover" style="width:28px;height:28px;border-radius:7px;background:#5B7FD6;position:relative;overflow:hidden"><span style="position:absolute;right:-4px;bottom:-4px;width:18px;height:18px;border-radius:9px;background:#D9E3FA"></span></div>
+            <span style="font-size:13px;font-weight:600">Jalan Pulang</span><span style="font-size:12px;color:#7A7A83">· Rimba Sore</span>
+          </div>
+          <div style="flex-grow:1;display:flex;align-items:center;gap:20px;padding:0 4px">
+            <div style="width:88px;height:88px;flex:none;border-radius:14px;background:#141417;display:flex;align-items:center;justify-content:center;gap:10px">
+              <span style="display:block;width:6px;height:10px;border-radius:3px;background:#A6A6AD"></span>
+              <span style="display:block;width:6px;height:5px;border-radius:3px;background:#A6A6AD;margin-top:4px"></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;flex-grow:1">
+              <span style="font-size:16px;line-height:22px;font-weight:600">Lirik tidak ditemukan</span>
+              <span style="font-size:13px;line-height:18px;color:#A6A6AD">Belum ada lirik untuk lagu ini di lrclib.net.</span>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button style="height:32px;padding:0 14px;border-radius:16px;background:#141417;color:#F4F4F1;font-size:12px;font-weight:600">Cari lagi</button>
+                <button style="height:32px;padding:0 12px;border-radius:16px;background:transparent;color:#A6A6AD;font-size:12px;font-weight:600">Lihat di peramban</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Tidak ditemukan</b>. Kedip “bingung” dengan satu mata menyipit. Varian: <i>Instrumental</i> (ikon nada, tanpa tombol), dan <i>Internet dimatikan</i> dengan teks “Ambil lirik dari internet sedang mati” serta tombol “Buka pengaturan”.</figcaption>
+    </figure>
+
+    <!-- Plain unsynced -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div class="mini">
+            <div role="img" aria-label="Cover" style="width:28px;height:28px;border-radius:7px;background:#E8836B;position:relative;overflow:hidden"><span style="position:absolute;left:5px;top:5px;width:12px;height:12px;border-radius:6px;background:#3A1A12"></span></div>
+            <span style="font-size:13px;font-weight:600">Kertas Biru</span><span style="font-size:12px;color:#7A7A83">· Sela Nada</span>
+            <span style="margin-left:auto;height:22px;padding:0 9px;border-radius:11px;background:#141417;color:#A6A6AD;font-size:11px;font-weight:600;display:flex;align-items:center">Tidak tersinkron</span>
+          </div>
+          <div style="flex-grow:1;overflow:hidden;display:flex;gap:10px">
+            <div style="flex-grow:1;display:flex;flex-direction:column;font-size:14px;line-height:22px;color:#A6A6AD;-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent);mask-image:linear-gradient(180deg,#000 70%,transparent)">
+              <span>Di meja ada kertas biru</span>
+              <span>kau lipat jadi perahu kecil</span>
+              <span>Kita menunggu lampu kota</span>
+              <span>menyala satu per satu</span>
+              <span>lalu hujan datang terlambat</span>
+              <span>seperti kita, seperti biasa</span>
+            </div>
+            <div aria-hidden="true" style="width:3px;border-radius:2px;background:#141417;display:flex;flex-direction:column"><span style="height:38%;border-radius:2px;background:#3A3A42"></span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Hanya teks biasa</b>. Jika lrclib tidak punya versi berwaktu, lirik ditampilkan sebagai teks 14 secondary yang bisa di-scroll dengan roda mouse. Tanpa sorotan dan tanpa auto-scroll. Tepi bawah memudar 30%, dan scrollbar tipis 3 px muncul saat hover.</figcaption>
+    </figure>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

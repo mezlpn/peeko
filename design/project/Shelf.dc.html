@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Celah — rak file</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#3B5F0A}a:hover{color:#24400A}
+button{font-family:inherit;border:0;padding:0;margin:0;cursor:pointer}
+.n{position:relative;background:#050506}
+.n::before,.n::after{content:"";position:absolute;top:0;width:10px;height:10px}
+.n::before{left:-10px;background:radial-gradient(circle at 0 100%,transparent 9.5px,#050506 10px)}
+.n::after{right:-10px;background:radial-gradient(circle at 100% 100%,transparent 9.5px,#050506 10px)}
+.xp{width:560px;height:260px;border-radius:0 0 28px 28px;box-shadow:0 8px 24px rgba(0,0,0,.45);padding:6px 20px 18px;display:flex;flex-direction:column;gap:12px;color:#F4F4F1}
+.tb{display:flex;align-items:center;justify-content:space-between;height:32px;flex:none}
+.tabs{display:flex;gap:2px}
+.tab{position:relative;width:32px;height:28px;border-radius:10px;background:transparent;color:#7A7A83;display:flex;align-items:center;justify-content:center}
+.tab.on{background:#141417;color:#F4F4F1}
+.tab.on::after{content:"";position:absolute;bottom:2px;left:14px;width:4px;height:2px;border-radius:1px;background:#C6F36B}
+.ib{width:32px;height:32px;border-radius:10px;background:transparent;color:#A6A6AD;display:flex;align-items:center;justify-content:center}
+.fc{width:88px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 4px;border-radius:12px;position:relative}
+.fc .th{width:56px;height:56px;border-radius:10px;background:#141417;display:flex;align-items:center;justify-content:center}
+.fc .nm{font-size:11px;line-height:14px;text-align:center;color:#F4F4F1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+</style>
+</helmet>
+<div style="width:1280px;height:1080px;padding:56px 48px;background:#F3F2EE;color:#141416;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;gap:24px">
+
+  <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px;padding:0 16px">
+    <div>
+      <div style="font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">24 · Expanded · Rak</div>
+      <h1 style="margin:4px 0 0;font-size:40px;line-height:48px;font-weight:600">Rak file</h1>
+    </div>
+    <p style="margin:0;max-width:540px;font-size:14px;line-height:20px;color:#3A3A42">Tempat singgah file saat berpindah antar-jendela. Yang disimpan adalah tautan ke file, bukan salinan, kecuali sumbernya sementara (misalnya dari browser). Bisa diseret keluar ke aplikasi mana pun.</p>
+  </header>
+
+  <div style="display:grid;grid-template-columns:repeat(2,580px);gap:28px 24px">
+
+    <!-- Empty -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div style="flex-grow:1;border-radius:16px;border:1.5px dashed #3A3A42;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7A7A83" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg>
+            <span style="font-size:13px;line-height:18px;font-weight:600">Seret file ke sini</span>
+            <span style="font-size:11px;line-height:14px;color:#7A7A83">Simpan sementara, lalu seret keluar ke mana saja</span>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Kosong</b>. Zona drop 520 × 170 dengan garis putus stroke-strong 1.5 (dash 6 4) dan radius 16. Klik zona ini membuka dialog pilih file.</figcaption>
+    </figure>
+
+    <!-- Drag over -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div style="flex-grow:1;border-radius:16px;border:2px dashed #C6F36B;background:#202614;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C6F36B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="animation:bob .8s cubic-bezier(.45,0,.55,1) infinite"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>
+            <span style="font-size:13px;line-height:18px;font-weight:600;color:#C6F36B">Lepaskan untuk menyimpan</span>
+            <span style="font-size:11px;line-height:14px;color:#A6A6AD">3 file · 8,2 MB</span>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>File di atas zona</b>. Garis menjadi accent 2 px dan latar accent-muted (crossfade 120 ms). Panah naik-turun 4 px setiap 800 ms. Saat dilepas, zona “menelan” file: scale 1→0.98→1 dengan ease-spring 260 ms.</figcaption>
+    </figure>
+
+    <!-- Filled -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <span style="font-size:11px;color:#7A7A83;margin-right:4px">5 file · 12,4 MB</span>
+              <button style="height:28px;padding:0 10px;border-radius:14px;background:transparent;color:#A6A6AD;font-size:11px;font-weight:600">Bersihkan</button>
+            </div>
+          </div>
+          <div style="flex-grow:1;display:flex;gap:10px;align-items:flex-start;padding-top:6px">
+            <div class="fc">
+              <div class="th" style="color:#FF8A7A"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h7l4.5 4.5v12a.5.5 0 0 1-.5.5H7a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M14 3.5V8h4.5"/></svg></div>
+              <span class="nm">laporan-kuartal-3.pdf</span>
+            </div>
+            <div class="fc" style="background:#141417">
+              <div class="th" role="img" aria-label="Pratinjau foto" style="background:#4F6B5A;position:relative;overflow:hidden"><span style="position:absolute;left:-6px;bottom:-14px;width:44px;height:30px;border-radius:50%;background:#B8C9A0"></span><span style="position:absolute;right:10px;top:10px;width:10px;height:10px;border-radius:5px;background:#F2E3B3"></span></div>
+              <span class="nm">foto_rapat_senin.jpg</span>
+              <button aria-label="Hapus dari rak" style="position:absolute;top:2px;right:6px;width:20px;height:20px;border-radius:10px;background:#26262B;color:#F4F4F1;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </div>
+            <div class="fc">
+              <div class="th" style="color:#6CC8F2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h7l4.5 4.5v12a.5.5 0 0 1-.5.5H7a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M14 3.5V8h4.5M9.5 13h5M9.5 16h5"/></svg></div>
+              <span class="nm">anggaran 2027.xlsx</span>
+            </div>
+            <div class="fc">
+              <div class="th" style="color:#A6A6AD"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v8.5a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"/></svg></div>
+              <span class="nm">aset-desain</span>
+            </div>
+            <div class="fc">
+              <div class="th" style="background:transparent;box-shadow:inset 0 0 0 1.5px #2A2A30;font-size:13px;font-weight:600;color:#A6A6AD">+1</div>
+              <span class="nm" style="color:#7A7A83">catatan.txt</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Berisi file</b> (satu kartu di-hover). Kartu 88 lebar dengan thumbnail 56 (gambar memakai pratinjau asli, file lain memakai ikon tipe). Nama maksimal 2 baris. Lebih dari 5 file: kartu terakhir menjadi “+n” dan baris bisa di-scroll horizontal. Klik dua kali untuk membuka, Ctrl+klik untuk memilih banyak, seret keluar untuk memindahkan.</figcaption>
+    </figure>
+
+    <!-- Drag onto collapsed -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;flex-direction:column;align-items:center;gap:40px;position:relative">
+        <div class="n" style="width:340px;height:44px;border-radius:0 0 22px 22px;display:flex;align-items:center;gap:12px;padding:0 18px 0 16px;color:#F4F4F1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C6F36B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="animation:bob .8s cubic-bezier(.45,0,.55,1) infinite"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>
+          <span style="font-size:12px;font-weight:600">Simpan di rak</span>
+          <span style="margin-left:auto;font-size:11px;color:#A6A6AD">3 file</span>
+        </div>
+        <div aria-hidden="true" style="display:flex;flex-direction:column;align-items:center;gap:6px">
+          <div style="width:64px;height:76px;border-radius:8px;background:#F4F4F1;box-shadow:0 6px 16px rgba(0,0,0,.35);transform:rotate(-6deg);display:flex;align-items:center;justify-content:center;color:#5A5A62;font-size:11px;font-weight:600">PDF</div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F4F4F1" stroke="#141416" stroke-width="1.2" stroke-linejoin="round"><path d="M5 3l14 8-6 1.5-3 6z"/></svg>
+        </div>
+        <span style="position:absolute;left:20px;bottom:16px;font-size:11px;color:#C9CCD2">Seret dari Explorer ke tepi atas layar</span>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Seret ke notch yang collapsed</b>. Saat file yang diseret mendekat dalam 80 px dari notch, pil berubah ke bentuk peek “Simpan di rak”. Jika file ditahan 600 ms di atasnya, notch mengembang penuh ke tab Rak. Jika dilepas langsung, file tersimpan tanpa membuka panel.</figcaption>
+    </figure>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

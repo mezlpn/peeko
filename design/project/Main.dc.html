@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Celah — konsep</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#3B5F0A}a:hover{color:#24400A}
+.n{position:relative;background:#050506}
+.n::before,.n::after{content:"";position:absolute;top:0;width:10px;height:10px}
+.n::before{left:-10px;background:radial-gradient(circle at 0 100%,transparent 9.5px,#050506 10px)}
+.n::after{right:-10px;background:radial-gradient(circle at 100% 100%,transparent 9.5px,#050506 10px)}
+@keyframes kd-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.8)}}
+@keyframes kd-blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
+@keyframes kd-look{0%,40%,100%{transform:translateX(0)}50%,70%{transform:translateX(3px)}}
+.kd{display:flex;gap:10px;animation:kd-breathe 4s cubic-bezier(.45,0,.55,1) infinite}
+.kd i{display:block;width:6px;height:10px;border-radius:3px;background:#F4F4F1;animation:kd-blink 6s linear infinite}
+.kd2{display:flex;gap:20px}
+.kd2 i{display:block;width:12px;height:20px;border-radius:6px;background:#F4F4F1}
+.look{animation:kd-look 7s cubic-bezier(.16,1,.3,1) infinite}
+</style>
+</helmet>
+<div style="width:1280px;height:900px;padding:56px 64px;background:#F3F2EE;color:#141416;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;gap:28px">
+
+  <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">Design system · v0.1</div>
+      <h1 style="margin:0;font-size:84px;line-height:88px;font-weight:600;letter-spacing:-2px">Celah</h1>
+      <p style="margin:0;font-size:20px;line-height:28px;color:#3A3A42;max-width:640px">Notch yang tenang di tepi atas layar Windows. Ia diam saat tidak dibutuhkan dan bergerak saat ada yang perlu dilihat.</p>
+    </div>
+    <dl style="margin:0;display:grid;grid-template-columns:auto auto;gap:6px 20px;font-size:13px;line-height:18px">
+      <dt style="color:#5A5A62">Platform</dt><dd style="margin:0;font-weight:600">WPF · .NET 8 · Windows 10+</dd>
+      <dt style="color:#5A5A62">Target min.</dt><dd style="margin:0;font-weight:600">Intel HD 520 · tanpa blur/acrylic</dd>
+      <dt style="color:#5A5A62">Satuan</dt><dd style="margin:0;font-weight:600">px pada skala 100%</dd>
+      <dt style="color:#5A5A62">Font · ikon</dt><dd style="margin:0;font-weight:600">Segoe UI · Segoe MDL2 Assets</dd>
+    </dl>
+  </header>
+
+  <section aria-label="Notch idle di layar" style="position:relative;height:220px;border-radius:16px;background:#2E333B;display:flex;justify-content:center;overflow:hidden">
+    <div class="n" style="width:200px;height:32px;border-radius:0 0 16px 16px;display:flex;align-items:center;justify-content:center">
+      <div class="look"><div class="kd"><i></i><i></i></div></div>
+    </div>
+    <div style="position:absolute;left:24px;bottom:20px;font-size:12px;line-height:16px;color:#C9CCD2">Collapsed · idle — 200 × 32 px, ukuran asli. Bahu cekung 10 px menyatukan pil dengan tepi layar.</div>
+    <div style="position:absolute;right:24px;bottom:20px;font-size:12px;line-height:16px;color:#C9CCD2">Animasi: napas 4 s · kedip acak 4–9 s · melirik ke kursor</div>
+  </section>
+
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px;flex-grow:1">
+
+    <section style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">Empat prinsip</h2>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><div style="font-size:17px;font-weight:600;line-height:24px">1 · Hitam yang menyatu</div><div style="font-size:14px;line-height:20px;color:#3A3A42">Notch selalu #050506, nyaris sama dengan bezel. Tanpa border dan tanpa glow, hanya bentuk.</div></div>
+        <div><div style="font-size:17px;font-weight:600;line-height:24px">2 · Hidup lewat gerak</div><div style="font-size:14px;line-height:20px;color:#3A3A42">Kepribadian datang dari pegas, napas, dan stagger, bukan dari ornamen. Semua cukup dengan ukuran, posisi, opacity, scale, dan radius.</div></div>
+        <div><div style="font-size:17px;font-weight:600;line-height:24px">3 · Satu nyala</div><div style="font-size:14px;line-height:20px;color:#3A3A42">Aksen limau hanya untuk satu hal per layar: yang sedang aktif. Biru untuk air dan amber untuk istirahat.</div></div>
+        <div><div style="font-size:17px;font-weight:600;line-height:24px">4 · Ringan dulu</div><div style="font-size:14px;line-height:20px;color:#3A3A42">Permukaan solid, satu bayangan di panel expanded, dan animasi berhenti saat notch tersembunyi.</div></div>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">Karakter idle: “Kedip”</h2>
+      <p style="margin:0;font-size:14px;line-height:20px;color:#3A3A42">Sepasang mata 6 × 10 px yang tinggal di dalam pil. Ia tidak berbicara, hanya bereaksi. Digambar 2× di bawah.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+        <figure style="margin:0;display:flex;flex-direction:column;gap:6px">
+          <div style="height:64px;border-radius:12px;background:#050506;display:flex;align-items:center;justify-content:center"><div class="kd2"><i></i><i></i></div></div>
+          <figcaption style="font-size:12px;line-height:16px"><b>Napas</b> · default</figcaption>
+        </figure>
+        <figure style="margin:0;display:flex;flex-direction:column;gap:6px">
+          <div style="height:64px;border-radius:12px;background:#050506;display:flex;align-items:center;justify-content:center"><div class="kd2"><i style="height:3px;border-radius:2px"></i><i style="height:3px;border-radius:2px"></i></div></div>
+          <figcaption style="font-size:12px;line-height:16px"><b>Kedip</b> · 160 ms</figcaption>
+        </figure>
+        <figure style="margin:0;display:flex;flex-direction:column;gap:6px">
+          <div style="height:64px;border-radius:12px;background:#050506;display:flex;align-items:center;justify-content:center"><div class="kd2" style="transform:translateX(6px)"><i></i><i></i></div></div>
+          <figcaption style="font-size:12px;line-height:16px"><b>Melirik</b> · ikut kursor</figcaption>
+        </figure>
+        <figure style="margin:0;display:flex;flex-direction:column;gap:6px">
+          <div style="height:64px;border-radius:12px;background:#050506;display:flex;align-items:center;justify-content:center;gap:20px">
+            <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M2 10 Q8 0 14 10" fill="none" stroke="#C6F36B" stroke-width="3" stroke-linecap="round"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M2 10 Q8 0 14 10" fill="none" stroke="#C6F36B" stroke-width="3" stroke-linecap="round"/></svg>
+          </div>
+          <figcaption style="font-size:12px;line-height:16px"><b>Senang</b> · charger, target tercapai</figcaption>
+        </figure>
+        <figure style="margin:0;display:flex;flex-direction:column;gap:6px">
+          <div style="height:64px;border-radius:12px;background:#050506;display:flex;align-items:center;justify-content:center"><div class="kd2" style="opacity:.45;transform:translateY(5px)"><i style="height:3px;border-radius:2px"></i><i style="height:3px;border-radius:2px"></i></div></div>
+          <figcaption style="font-size:12px;line-height:16px"><b>Tidur</b> · idle &gt; 10 menit</figcaption>
+        </figure>
+        <figure style="margin:0;display:flex;flex-direction:column;gap:6px">
+          <div style="height:64px;border-radius:12px;background:#050506;display:flex;align-items:center;justify-content:center"><div class="kd2"><i style="width:14px;height:14px;border-radius:7px"></i><i style="width:14px;height:14px;border-radius:7px"></i></div></div>
+          <figcaption style="font-size:12px;line-height:16px"><b>Sigap</b> · tepat sebelum peek</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">Ikon aplikasi &amp; nama</h2>
+      <div style="display:flex;align-items:flex-end;gap:20px">
+        <div aria-label="Ikon aplikasi 96 px" role="img" style="width:96px;height:96px;border-radius:22px;background:#0B0B0D;display:flex;justify-content:center;overflow:hidden">
+          <div style="width:56px;height:24px;border-radius:0 0 12px 12px;background:#C6F36B;display:flex;align-items:center;justify-content:center;gap:8px">
+            <span style="display:block;width:5px;height:9px;border-radius:3px;background:#0B0F04"></span>
+            <span style="display:block;width:5px;height:9px;border-radius:3px;background:#0B0F04"></span>
+          </div>
+        </div>
+        <div aria-label="Ikon 48 px" role="img" style="width:48px;height:48px;border-radius:11px;background:#0B0B0D;display:flex;justify-content:center;overflow:hidden">
+          <div style="width:28px;height:12px;border-radius:0 0 6px 6px;background:#C6F36B;display:flex;align-items:center;justify-content:center;gap:4px">
+            <span style="display:block;width:3px;height:5px;border-radius:2px;background:#0B0F04"></span>
+            <span style="display:block;width:3px;height:5px;border-radius:2px;background:#0B0F04"></span>
+          </div>
+        </div>
+        <div aria-label="Ikon 16 px" role="img" style="width:16px;height:16px;border-radius:4px;background:#0B0B0D;display:flex;justify-content:center;overflow:hidden">
+          <div style="width:10px;height:5px;border-radius:0 0 3px 3px;background:#C6F36B"></div>
+        </div>
+      </div>
+      <p style="margin:0;font-size:14px;line-height:20px;color:#3A3A42">Pil limau menggantung dari tepi atas ubin gelap, dengan mata Kedip di dalamnya. Pada 16 px ia menyusut menjadi satu bilah terang, dan tetap terbaca di tray.</p>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:20px">
+        <div><b>Celah</b> (dipakai): ruang sempit tempat sesuatu mengintip.</div>
+        <div><b>Poni</b>: menggantung dari atas, jenaka, mudah diingat.</div>
+        <div><b>Kedip</b>: menonjolkan karakternya.</div>
+        <div><b>Ambang</b>: tenang, sedikit lebih serius.</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

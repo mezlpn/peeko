@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Celah — pengaturan &amp; tray</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#C6F36B}a:hover{color:#D3F785}
+button{font-family:inherit;border:0;padding:0;margin:0;cursor:pointer}
+.card{background:#232327;border:1px solid #34343A;border-radius:8px;display:flex;flex-direction:column}
+.r{min-height:46px;padding:8px 14px;display:flex;align-items:center;gap:12px;border-top:1px solid #2C2C31}
+.r:first-child{border-top:0}
+.lb{flex-grow:1;display:flex;flex-direction:column;min-width:0}
+.lb b{font-size:13px;line-height:18px;font-weight:400;color:#F4F4F1}
+.lb span{font-size:11px;line-height:14px;color:#A6A6AD}
+.sw{width:40px;height:20px;flex:none;border-radius:10px;display:flex;align-items:center;padding:0 4px}
+.sw.on{background:#C6F36B;justify-content:flex-end}
+.sw.on i{display:block;width:12px;height:12px;border-radius:6px;background:#0B0F04}
+.sw.off{box-shadow:inset 0 0 0 1.5px #A6A6AD}
+.sw.off i{display:block;width:12px;height:12px;border-radius:6px;background:#A6A6AD}
+.st{display:flex;align-items:center;height:30px;border-radius:6px;background:#1A1A1D;border:1px solid #34343A;flex:none}
+.st button{width:28px;height:28px;background:transparent;color:#F4F4F1;font-size:15px}
+.st span{min-width:56px;text-align:center;color:#F4F4F1;font-size:12px}
+.sh{font-size:11px;line-height:14px;font-weight:600;letter-spacing:.6px;color:#A6A6AD;margin:0 0 8px 2px}
+.mi{height:32px;padding:0 12px;display:flex;align-items:center;gap:12px;font-size:12px;color:#F4F4F1;border-radius:4px}
+</style>
+</helmet>
+<div style="width:1440px;height:1000px;padding:56px 64px;background:#F3F2EE;color:#141416;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;gap:24px">
+
+  <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px">
+    <div>
+      <div style="font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">30 · Jendela</div>
+      <h1 style="margin:4px 0 0;font-size:40px;line-height:48px;font-weight:600">Pengaturan &amp; menu tray</h1>
+    </div>
+    <p style="margin:0;max-width:600px;font-size:14px;line-height:20px;color:#3A3A42">Jendela biasa 960 × 720 (minimal 720 × 520) dengan title bar kustom gelap. Semua perubahan langsung diterapkan, tanpa tombol Simpan. Navigasi kiri berfungsi sebagai anchor ke tiap bagian di halaman yang sama.</p>
+  </header>
+
+  <div style="display:flex;gap:40px;align-items:flex-start">
+
+    <!-- Settings window -->
+    <section aria-label="Jendela Pengaturan" style="width:960px;height:720px;flex:none;border-radius:8px;overflow:hidden;background:#1A1A1D;border:1px solid #34343A;box-shadow:0 16px 40px rgba(0,0,0,.25);display:flex;flex-direction:column;color:#F4F4F1">
+      <div style="height:32px;background:#141416;display:flex;align-items:center;padding-left:12px;gap:10px;flex:none">
+        <span aria-hidden="true" style="width:16px;height:16px;border-radius:4px;background:#0B0B0D;display:flex;justify-content:center;overflow:hidden;box-shadow:inset 0 0 0 1px #2A2A30"><span style="width:10px;height:5px;border-radius:0 0 3px 3px;background:#C6F36B"></span></span>
+        <span style="font-size:12px;color:#A6A6AD">Pengaturan Celah</span>
+        <div style="margin-left:auto;display:flex">
+          <button aria-label="Minimalkan" style="width:46px;height:32px;background:transparent;color:#A6A6AD;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 5h10" stroke="currentColor"/></svg></button>
+          <button aria-label="Tutup" style="width:46px;height:32px;background:transparent;color:#A6A6AD;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 0l10 10M10 0L0 10" stroke="currentColor"/></svg></button>
+        </div>
+      </div>
+      <div style="flex-grow:1;display:flex;min-height:0">
+        <nav aria-label="Bagian pengaturan" style="width:208px;flex:none;padding:20px 10px;display:flex;flex-direction:column;gap:2px;border-right:1px solid #26262B">
+          <div style="display:flex;align-items:center;gap:10px;padding:0 10px 18px">
+            <div aria-hidden="true" style="width:36px;height:36px;border-radius:9px;background:#0B0B0D;display:flex;justify-content:center;overflow:hidden;box-shadow:inset 0 0 0 1px #2A2A30"><div style="width:22px;height:10px;border-radius:0 0 5px 5px;background:#C6F36B;display:flex;align-items:center;justify-content:center;gap:4px"><span style="width:2px;height:4px;border-radius:1px;background:#0B0F04"></span><span style="width:2px;height:4px;border-radius:1px;background:#0B0F04"></span></div></div>
+            <div style="display:flex;flex-direction:column"><span style="font-size:20px;line-height:26px;font-weight:600">Celah</span><span style="font-size:11px;color:#7A7A83">versi 0.1.0</span></div>
+          </div>
+          <a href="#umum" style="position:relative;height:36px;padding:0 12px;border-radius:6px;background:#232327;color:#F4F4F1;font-size:13px;display:flex;align-items:center;text-decoration:none"><span style="position:absolute;left:0;width:3px;height:16px;border-radius:2px;background:#C6F36B"></span>Umum</a>
+          <a href="#modul" style="height:36px;padding:0 12px;border-radius:6px;color:#A6A6AD;font-size:13px;display:flex;align-items:center;text-decoration:none">Modul</a>
+          <a href="#baterai" style="height:36px;padding:0 12px;border-radius:6px;color:#A6A6AD;font-size:13px;display:flex;align-items:center;text-decoration:none">Baterai</a>
+          <a href="#minum" style="height:36px;padding:0 12px;border-radius:6px;color:#A6A6AD;font-size:13px;display:flex;align-items:center;text-decoration:none">Minum air</a>
+          <a href="#fokus" style="height:36px;padding:0 12px;border-radius:6px;color:#A6A6AD;font-size:13px;display:flex;align-items:center;text-decoration:none">Timer fokus</a>
+          <a href="#lirik" style="height:36px;padding:0 12px;border-radius:6px;color:#A6A6AD;font-size:13px;display:flex;align-items:center;text-decoration:none">Lirik</a>
+          <div style="margin-top:auto;padding:0 12px;font-size:11px;line-height:15px;color:#7A7A83">Pintasan: Win + Alt + C membuka notch</div>
+        </nav>
+        <div style="flex-grow:1;padding:24px 28px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-content:start">
+
+          <div style="display:flex;flex-direction:column;gap:22px">
+            <section id="umum">
+              <h2 class="sh">UMUM</h2>
+              <div class="card">
+                <div class="r"><div class="lb"><b>Mulai bersama Windows</b><span>Berjalan diam-diam di tray</span></div><span class="sw on" role="switch" aria-checked="true" aria-label="Mulai bersama Windows"><i></i></span></div>
+                <div class="r"><div class="lb"><b>Posisi notch</b><span>Monitor dan titik tengah</span></div>
+                  <button style="height:30px;padding:0 10px;border-radius:6px;background:#1A1A1D;border:1px solid #34343A;color:#F4F4F1;font-size:12px;display:flex;align-items:center;gap:8px">Monitor utama · tengah<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A6A6AD" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+                </div>
+                <div class="r"><div class="lb"><b>Geser horizontal</b><span>Hindari webcam atau tombol jendela</span></div>
+                  <div style="width:120px;display:flex;align-items:center;gap:8px"><div style="flex-grow:1;height:4px;border-radius:2px;background:#34343A;position:relative"><span style="position:absolute;left:50%;top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:6px;background:#F4F4F1"></span></div><span style="font-size:11px;color:#A6A6AD;width:24px;text-align:right">0</span></div>
+                </div>
+                <div class="r"><div class="lb"><b>Sembunyikan saat layar penuh</b><span>Game, video, presentasi</span></div><span class="sw on" role="switch" aria-checked="true" aria-label="Sembunyikan saat layar penuh"><i></i></span></div>
+              </div>
+            </section>
+            <section id="modul">
+              <h2 class="sh">MODUL</h2>
+              <div class="card">
+                <div class="r" style="min-height:40px"><div class="lb"><b>Musik</b></div><span class="sw on" role="switch" aria-checked="true" aria-label="Modul musik"><i></i></span></div>
+                <div class="r" style="min-height:40px"><div class="lb"><b>Lirik</b></div><span class="sw on" role="switch" aria-checked="true" aria-label="Modul lirik"><i></i></span></div>
+                <div class="r" style="min-height:40px"><div class="lb"><b>Timer fokus</b></div><span class="sw on" role="switch" aria-checked="true" aria-label="Modul fokus"><i></i></span></div>
+                <div class="r" style="min-height:40px"><div class="lb"><b>Minum air</b></div><span class="sw on" role="switch" aria-checked="true" aria-label="Modul minum"><i></i></span></div>
+                <div class="r" style="min-height:40px"><div class="lb"><b>To-do</b></div><span class="sw off" role="switch" aria-checked="false" aria-label="Modul to-do"><i></i></span></div>
+                <div class="r" style="min-height:40px"><div class="lb"><b>Rak file</b></div><span class="sw on" role="switch" aria-checked="true" aria-label="Modul rak"><i></i></span></div>
+                <div class="r"><div class="lb"><b>Peek sistem</b><span>Volume, kecerahan, Caps Lock, jaringan…</span></div><span class="sw on" role="switch" aria-checked="true" aria-label="Peek sistem"><i></i></span></div>
+              </div>
+            </section>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:22px">
+            <section id="baterai">
+              <h2 class="sh">BATERAI</h2>
+              <div class="card">
+                <div class="r" style="flex-direction:column;align-items:stretch;gap:10px;padding:12px 14px">
+                  <div style="display:flex;justify-content:space-between"><div class="lb"><b>Ingatkan saat baterai di bawah</b><span>Peringatan kritis selalu muncul di 10%</span></div><span style="font-size:13px;font-weight:600;color:#C6F36B">20%</span></div>
+                  <div role="slider" aria-label="Ambang baterai" aria-valuenow="20" aria-valuemin="10" aria-valuemax="50" tabindex="0" style="height:16px;display:flex;align-items:center;position:relative"><div style="flex-grow:1;height:4px;border-radius:2px;background:#34343A;display:flex"><div style="width:25%;background:#C6F36B;border-radius:2px"></div></div><span style="position:absolute;left:calc(25% - 6px);width:12px;height:12px;border-radius:6px;background:#C6F36B"></span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:#7A7A83"><span>10%</span><span>50%</span></div>
+                </div>
+              </div>
+            </section>
+            <section id="minum">
+              <h2 class="sh">MINUM AIR</h2>
+              <div class="card">
+                <div class="r"><div class="lb"><b>Ingatkan setiap</b><span>Hanya antara 08.00 dan 21.00</span></div><div class="st"><button aria-label="Kurangi interval">−</button><span>60 mnt</span><button aria-label="Tambah interval">+</button></div></div>
+                <div class="r"><div class="lb"><b>Target harian</b><span>1 gelas = 250 ml</span></div><div class="st"><button aria-label="Kurangi target">−</button><span>8 gelas</span><button aria-label="Tambah target">+</button></div></div>
+              </div>
+            </section>
+            <section id="fokus">
+              <h2 class="sh">TIMER FOKUS</h2>
+              <div class="card">
+                <div class="r"><div class="lb"><b>Durasi fokus</b></div><div class="st"><button aria-label="Kurangi">−</button><span>25 mnt</span><button aria-label="Tambah">+</button></div></div>
+                <div class="r"><div class="lb"><b>Istirahat pendek</b></div><div class="st"><button aria-label="Kurangi">−</button><span>5 mnt</span><button aria-label="Tambah">+</button></div></div>
+                <div class="r"><div class="lb"><b>Istirahat panjang</b><span>Setelah 4 sesi</span></div><div class="st"><button aria-label="Kurangi">−</button><span>15 mnt</span><button aria-label="Tambah">+</button></div></div>
+              </div>
+            </section>
+            <section id="lirik">
+              <h2 class="sh">LIRIK</h2>
+              <div class="card">
+                <div class="r"><div class="lb"><b>Ambil lirik dari internet</b><span>Judul, artis, dan durasi dikirim ke <a href="https://lrclib.net">lrclib.net</a></span></div><span class="sw on" role="switch" aria-checked="true" aria-label="Ambil lirik dari internet"><i></i></span></div>
+              </div>
+            </section>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Tray -->
+    <div style="width:312px;display:flex;flex-direction:column;gap:14px">
+      <div style="height:520px;border-radius:12px;overflow:hidden;background:#2E333B;display:flex;flex-direction:column;justify-content:flex-end;position:relative">
+        <div role="menu" aria-label="Menu Celah" style="position:absolute;right:16px;bottom:52px;width:224px;padding:4px;background:#232327;border:1px solid #34343A;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.35);display:flex;flex-direction:column">
+          <div style="padding:8px 12px 6px;display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:3px;background:#C6F36B"></span><span style="font-size:11px;color:#A6A6AD">Celah aktif · 3 modul berjalan</span></div>
+          <div style="height:1px;background:#34343A;margin:4px 0"></div>
+          <button role="menuitem" class="mi" style="background:transparent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A6A6AD" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Pengaturan</button>
+          <button role="menuitem" aria-haspopup="true" class="mi" style="background:#2A2A2F"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F4F4F1" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><path d="M4 4l16 16"/></svg>Sembunyikan sementara<svg style="margin-left:auto" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A6A6AD" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <div style="height:1px;background:#34343A;margin:4px 0"></div>
+          <button role="menuitem" class="mi" style="background:transparent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A6A6AD" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v8M6.5 6.5a7.5 7.5 0 1 0 11 0"/></svg>Keluar</button>
+        </div>
+        <div role="menu" aria-label="Sembunyikan selama" style="position:absolute;right:16px;bottom:186px;width:180px;padding:4px;background:#232327;border:1px solid #34343A;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.35);display:flex;flex-direction:column">
+          <button role="menuitem" class="mi" style="background:transparent">30 menit</button>
+          <button role="menuitem" class="mi" style="background:transparent">1 jam</button>
+          <button role="menuitem" class="mi" style="background:transparent">Sampai besok pagi</button>
+          <button role="menuitem" class="mi" style="background:transparent">Sampai dinyalakan lagi</button>
+        </div>
+        <div style="height:40px;background:#101012;display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:0 14px;color:#A6A6AD;font-size:11px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+          <span aria-label="Ikon tray Celah" role="img" style="width:16px;height:16px;border-radius:4px;background:#0B0B0D;display:flex;justify-content:center;overflow:hidden;box-shadow:inset 0 0 0 1px #3A3A42;outline:1px solid #5A5A62;outline-offset:3px"><span style="width:10px;height:5px;border-radius:0 0 3px 3px;background:#C6F36B"></span></span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3.5 9.5a12 12 0 0 1 17 0M6.5 12.8a7.5 7.5 0 0 1 11 0M9.5 16a3 3 0 0 1 5 0"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/></svg>
+          <span style="display:flex;flex-direction:column;align-items:flex-end;line-height:13px;color:#E8E8E3"><span>14.05</span><span>18/10/2026</span></span>
+        </div>
+      </div>
+      <div style="font-size:13px;line-height:19px;color:#3A3A42;display:flex;flex-direction:column;gap:8px">
+        <span><b style="color:#141416">Menu tray</b>: lebar 224, item 32, radius 8, latar win-card dengan satu bayangan. Item hover memakai win-card-hover. Submenu muncul ke samping setelah 250 ms.</span>
+        <span><b style="color:#141416">Klik kiri</b> ikon membuka Pengaturan. <b style="color:#141416">Klik kanan</b> membuka menu ini.</span>
+        <span><b style="color:#141416">Saat disembunyikan</b>: ikon tray tampil redup (pil abu-abu), dan item kedua berubah menjadi “Tampilkan notch · kembali 14.35”.</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

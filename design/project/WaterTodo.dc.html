@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Celah — minum &amp; to-do</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#3B5F0A}a:hover{color:#24400A}
+button{font-family:inherit;border:0;padding:0;margin:0;cursor:pointer}
+input{font-family:inherit}
+.n{position:relative;background:#050506}
+.n::before,.n::after{content:"";position:absolute;top:0;width:10px;height:10px}
+.n::before{left:-10px;background:radial-gradient(circle at 0 100%,transparent 9.5px,#050506 10px)}
+.n::after{right:-10px;background:radial-gradient(circle at 100% 100%,transparent 9.5px,#050506 10px)}
+.xp{width:560px;height:260px;border-radius:0 0 28px 28px;box-shadow:0 8px 24px rgba(0,0,0,.45);padding:6px 20px 18px;display:flex;flex-direction:column;gap:12px;color:#F4F4F1}
+.tb{display:flex;align-items:center;justify-content:space-between;height:32px;flex:none}
+.tabs{display:flex;gap:2px}
+.tab{position:relative;width:32px;height:28px;border-radius:10px;background:transparent;color:#7A7A83;display:flex;align-items:center;justify-content:center}
+.tab.on{background:#141417;color:#F4F4F1}
+.tab.on::after{content:"";position:absolute;bottom:2px;left:14px;width:4px;height:2px;border-radius:1px;background:#C6F36B}
+.ib{width:32px;height:32px;border-radius:10px;background:transparent;color:#A6A6AD;display:flex;align-items:center;justify-content:center}
+.gl{display:flex;gap:6px;align-items:flex-end}
+.gl i{display:block;width:22px;height:36px;border-radius:4px 4px 8px 8px;box-shadow:inset 0 0 0 1.5px #3A3A42}
+.gl i.f{background:#6CC8F2;box-shadow:none}
+.row{height:32px;padding:0 8px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:13px}
+.cb{width:16px;height:16px;flex:none;border-radius:5px;border:1.5px solid #A6A6AD}
+.cb.on{border:0;background:#C6F36B;display:flex;align-items:center;justify-content:center}
+</style>
+</helmet>
+<div style="width:1280px;height:1080px;padding:56px 48px;background:#F3F2EE;color:#141416;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;gap:24px">
+
+  <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px;padding:0 16px">
+    <div>
+      <div style="font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">23 · Expanded · Minum &amp; Tugas</div>
+      <h1 style="margin:4px 0 0;font-size:40px;line-height:48px;font-weight:600">Minum air &amp; to-do</h1>
+    </div>
+    <p style="margin:0;max-width:540px;font-size:14px;line-height:20px;color:#3A3A42">Dua modul kecil yang dibuka berkali-kali sehari, jadi aksi utamanya harus bisa dijangkau dalam satu klik setelah hover. Penghitung minum direset setiap pukul 00.00 waktu lokal.</p>
+  </header>
+
+  <div style="display:grid;grid-template-columns:repeat(2,580px);gap:28px 24px">
+
+    <!-- Water progress -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div style="flex-grow:1;display:flex;flex-direction:column;justify-content:space-between;padding:4px 4px 0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <span style="font-size:44px;line-height:48px;font-weight:300;font-variant-numeric:tabular-nums">5</span>
+                <span style="font-size:16px;line-height:22px;font-weight:600;color:#A6A6AD">/ 8 gelas</span>
+              </div>
+              <div class="gl" role="img" aria-label="5 dari 8 gelas"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i></div>
+            </div>
+            <div style="height:1px;background:#1D1D21"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <span style="font-size:13px;line-height:18px;font-weight:600">Pengingat berikutnya 14:30</span>
+                <span style="font-size:11px;line-height:14px;color:#7A7A83">Setiap 60 menit · 1,25 L dari 2 L</span>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <button class="ib" aria-label="Kurangi satu gelas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg></button>
+                <button style="height:32px;padding:0 16px;border-radius:16px;background:#6CC8F2;color:#04141C;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>1 gelas</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Progress harian</b>. Delapan “gelas” 22 × 36. Saat +1, gelas berikutnya terisi dari bawah: scaleY 0→1 dengan origin bawah, 320 ms ease-spring. Di modul ini tombol utama memakai warna water, bukan limau, karena air adalah identitas modulnya.</figcaption>
+    </figure>
+
+    <!-- Water goal reached -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div style="flex-grow:1;display:flex;flex-direction:column;justify-content:space-between;padding:4px 4px 0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <div style="display:flex;align-items:center;gap:14px">
+                <span aria-hidden="true" style="display:flex;gap:6px">
+                  <svg width="14" height="10" viewBox="0 0 16 12"><path d="M2 10 Q8 0 14 10" fill="none" stroke="#6CC8F2" stroke-width="3" stroke-linecap="round"/></svg>
+                  <svg width="14" height="10" viewBox="0 0 16 12"><path d="M2 10 Q8 0 14 10" fill="none" stroke="#6CC8F2" stroke-width="3" stroke-linecap="round"/></svg>
+                </span>
+                <div style="display:flex;flex-direction:column">
+                  <span style="font-size:16px;line-height:22px;font-weight:600">Target hari ini tercapai</span>
+                  <span style="font-size:13px;line-height:18px;color:#A6A6AD">8 gelas · 2 L</span>
+                </div>
+              </div>
+              <div class="gl" role="img" aria-label="8 dari 8 gelas"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i></div>
+            </div>
+            <div style="height:1px;background:#1D1D21"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <span style="font-size:13px;line-height:18px;font-weight:600">Pengingat dijeda sampai besok</span>
+                <span style="font-size:11px;line-height:14px;color:#7A7A83">Gelas tambahan tetap dicatat</span>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <button class="ib" aria-label="Kurangi satu gelas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg></button>
+                <button style="height:32px;padding:0 16px;border-radius:16px;background:#132027;color:#6CC8F2;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>1 gelas</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Target tercapai</b>. Kedip tersenyum dengan warna biru, gelas-gelas “bergelombang” sekali (stagger 40 ms, translateY −3→0), dan tombol turun menjadi varian sekunder. Pengingat berhenti sampai besok.</figcaption>
+    </figure>
+
+    <!-- To-do list -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:#7A7A83">2 dari 5 selesai</span>
+              <button class="ib" aria-label="Tambah tugas" style="color:#F4F4F1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+            </div>
+          </div>
+          <div style="flex-grow:1;display:flex;flex-direction:column;gap:2px;overflow:hidden">
+            <label class="row"><span class="cb"></span>Kirim draf laporan ke Bu Rina</label>
+            <div class="row" style="background:#141417"><span class="cb"></span><span style="flex-grow:1">Bayar listrik sebelum tanggal 20</span><button aria-label="Hapus tugas" style="width:24px;height:24px;border-radius:8px;background:transparent;color:#A6A6AD;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+            <label class="row"><span class="cb"></span>Rapikan folder Unduhan</label>
+            <div class="row" style="color:#7A7A83"><span class="cb on"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0B0F04" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span style="text-decoration:line-through">Balas email Dimas</span></div>
+            <div class="row" style="color:#7A7A83"><span class="cb on"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0B0F04" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span style="text-decoration:line-through">Isi ulang galon</span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Daftar</b>. Tugas yang belum selesai di atas, yang selesai turun ke bawah (pindah posisi 260 ms ease-standard setelah jeda 600 ms, supaya centangnya sempat terlihat). Lebih dari 5 item: scroll. Tugas selesai dibersihkan otomatis keesokan harinya. Seret untuk mengurutkan ulang.</figcaption>
+    </figure>
+
+    <!-- To-do empty + add -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div style="flex-grow:1;display:flex;flex-direction:column;gap:14px">
+            <label style="height:36px;padding:0 6px 0 10px;border-radius:10px;background:#141417;box-shadow:inset 0 0 0 1.5px #C6F36B;display:flex;align-items:center;gap:10px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C6F36B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              <input type="text" value="Beli galon" aria-label="Tugas baru" style="flex-grow:1;min-width:0;background:transparent;border:0;outline:0;color:#F4F4F1;font-size:13px"/>
+              <span style="height:22px;padding:0 8px;border-radius:6px;background:#1D1D21;color:#A6A6AD;font-size:11px;display:flex;align-items:center">Enter</span>
+            </label>
+            <div style="flex-grow:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+              <div aria-hidden="true" style="display:flex;gap:10px"><span style="display:block;width:6px;height:10px;border-radius:3px;background:#7A7A83"></span><span style="display:block;width:6px;height:10px;border-radius:3px;background:#7A7A83"></span></div>
+              <span style="font-size:13px;line-height:18px;color:#A6A6AD">Belum ada tugas. Tulis satu hal kecil untuk hari ini.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Kosong + menambah</b>. Saat input fokus, notch tidak menyusut walau kursor keluar (ditahan sampai Esc, Enter, atau klik di luar). Item baru masuk dari atas: tinggi 0→32 dan opacity 0→1, 220 ms ease-out. Shift+Enter menambah lalu mengosongkan input untuk item berikutnya.</figcaption>
+    </figure>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

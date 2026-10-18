@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Celah — timer fokus</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#3B5F0A}a:hover{color:#24400A}
+button{font-family:inherit;border:0;padding:0;margin:0;cursor:pointer}
+.n{position:relative;background:#050506}
+.n::before,.n::after{content:"";position:absolute;top:0;width:10px;height:10px}
+.n::before{left:-10px;background:radial-gradient(circle at 0 100%,transparent 9.5px,#050506 10px)}
+.n::after{right:-10px;background:radial-gradient(circle at 100% 100%,transparent 9.5px,#050506 10px)}
+.xp{width:560px;height:260px;border-radius:0 0 28px 28px;box-shadow:0 8px 24px rgba(0,0,0,.45);padding:6px 20px 18px;display:flex;flex-direction:column;gap:14px;color:#F4F4F1}
+.tb{display:flex;align-items:center;justify-content:space-between;height:32px;flex:none}
+.tabs{display:flex;gap:2px}
+.tab{position:relative;width:32px;height:28px;border-radius:10px;background:transparent;color:#7A7A83;display:flex;align-items:center;justify-content:center}
+.tab.on{background:#141417;color:#F4F4F1}
+.tab.on::after{content:"";position:absolute;bottom:2px;left:14px;width:4px;height:2px;border-radius:1px;background:#C6F36B}
+.ib{width:32px;height:32px;border-radius:10px;background:transparent;color:#A6A6AD;display:flex;align-items:center;justify-content:center}
+.pt{position:relative;width:236px;height:120px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.pt svg{position:absolute;inset:0}
+.tm{font-size:44px;line-height:48px;font-weight:300;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.dots{display:flex;gap:6px;align-items:center}
+.dots i{display:block;width:8px;height:8px;border-radius:4px;background:#2A2A30}
+@keyframes blinkt{0%,100%{opacity:1}50%{opacity:.5}}
+</style>
+</helmet>
+<div style="width:1280px;height:1080px;padding:56px 48px;background:#F3F2EE;color:#141416;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;gap:24px">
+
+  <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px;padding:0 16px">
+    <div>
+      <div style="font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">22 · Expanded · Fokus</div>
+      <h1 style="margin:4px 0 0;font-size:40px;line-height:48px;font-weight:600">Timer fokus (Pomodoro)</h1>
+    </div>
+    <p style="margin:0;max-width:560px;font-size:14px;line-height:20px;color:#3A3A42">Progress berbentuk <b>pil</b>, bukan cincin. Garis tepi sebuah stadium 236 × 120 (radius 60) menyusut searah jarum jam, menggemakan bentuk notch itu sendiri. Di WPF ini cukup sebuah Rectangle dengan StrokeDashArray, dan diperbarui tiap 1 s dengan tween 300 ms.</p>
+  </header>
+
+  <div style="display:grid;grid-template-columns:repeat(2,580px);gap:28px 24px">
+
+    <!-- Ready -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div style="display:flex;gap:28px;align-items:center;flex-grow:1">
+            <div class="pt">
+              <svg width="236" height="120" viewBox="0 0 236 120" aria-hidden="true"><rect x="2" y="2" width="232" height="116" rx="58" fill="none" stroke="#1D1D21" stroke-width="4"/></svg>
+              <span style="font-size:10px;line-height:12px;font-weight:600;letter-spacing:.6px;color:#7A7A83">SIAP</span>
+              <span class="tm">25:00</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;flex-grow:1">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:10px;line-height:12px;font-weight:600;letter-spacing:.6px;color:#7A7A83">SESI 1 DARI 4</span>
+                <div class="dots" aria-label="Belum ada sesi selesai"><i></i><i></i><i></i><i></i></div>
+              </div>
+              <span style="font-size:12px;line-height:16px;color:#A6A6AD">Fokus 25 · istirahat 5 · panjang 15 menit</span>
+              <div style="display:flex;gap:8px">
+                <button style="height:32px;padding:0 16px;border-radius:16px;background:#C6F36B;color:#0B0F04;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Mulai fokus</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Siap</b>. Track pil berwarna surface-hover tanpa fill. Satu-satunya accent di layar ini ada pada tombol “Mulai fokus”.</figcaption>
+    </figure>
+
+    <!-- Running focus -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div style="display:flex;gap:28px;align-items:center;flex-grow:1">
+            <div class="pt" role="timer" aria-label="Sisa fokus 18 menit 42 detik">
+              <svg width="236" height="120" viewBox="0 0 236 120" aria-hidden="true"><rect x="2" y="2" width="232" height="116" rx="58" fill="none" stroke="#1D1D21" stroke-width="4"/><rect x="2" y="2" width="232" height="116" rx="58" fill="none" stroke="#C6F36B" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="75 100"/></svg>
+              <span style="font-size:10px;line-height:12px;font-weight:600;letter-spacing:.6px;color:#C6F36B">FOKUS</span>
+              <span class="tm">18:42</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;flex-grow:1">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:10px;line-height:12px;font-weight:600;letter-spacing:.6px;color:#7A7A83">SESI 3 DARI 4</span>
+                <div class="dots" aria-label="2 sesi selesai, sesi ke-3 berjalan"><i style="background:#C6F36B"></i><i style="background:#C6F36B"></i><i style="background:transparent;box-shadow:inset 0 0 0 2px #C6F36B"></i><i></i></div>
+              </div>
+              <span style="font-size:12px;line-height:16px;color:#A6A6AD">Selesai pukul 14:24</span>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button style="height:32px;padding:0 16px;border-radius:16px;background:#141417;color:#F4F4F1;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>Jeda</button>
+                <button class="ib" aria-label="Reset sesi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4"/></svg></button>
+                <button class="ib" aria-label="Lewati ke istirahat"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6v12l9-6z"/><rect x="16.8" y="6" width="2.2" height="12" rx="1"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Fokus berjalan</b>. Garis accent menyusut. Titik sesi: selesai berarti terisi, berjalan berarti cincin. Pada menit terakhir angka berkedip lembut, dan saat 0 muncul peek “Sesi selesai” dengan Kedip senang.</figcaption>
+    </figure>
+
+    <!-- Paused -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div style="display:flex;gap:28px;align-items:center;flex-grow:1">
+            <div class="pt" role="timer" aria-label="Dijeda, sisa 18 menit 42 detik">
+              <svg width="236" height="120" viewBox="0 0 236 120" aria-hidden="true"><rect x="2" y="2" width="232" height="116" rx="58" fill="none" stroke="#1D1D21" stroke-width="4"/><rect x="2" y="2" width="232" height="116" rx="58" fill="none" stroke="#7A7A83" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="75 100"/></svg>
+              <span style="font-size:10px;line-height:12px;font-weight:600;letter-spacing:.6px;color:#7A7A83">DIJEDA</span>
+              <span class="tm" style="color:#A6A6AD;animation:blinkt 2s cubic-bezier(.45,0,.55,1) infinite">18:42</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;flex-grow:1">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:10px;line-height:12px;font-weight:600;letter-spacing:.6px;color:#7A7A83">SESI 3 DARI 4</span>
+                <div class="dots"><i style="background:#7A7A83"></i><i style="background:#7A7A83"></i><i style="background:transparent;box-shadow:inset 0 0 0 2px #7A7A83"></i><i></i></div>
+              </div>
+              <span style="font-size:12px;line-height:16px;color:#A6A6AD">Dijeda 2 menit lalu</span>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button style="height:32px;padding:0 16px;border-radius:16px;background:#C6F36B;color:#0B0F04;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Lanjutkan</button>
+                <button class="ib" aria-label="Reset sesi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Dijeda</b>. Semua warna turun ke abu-abu, dan angka “bernapas” (opacity 1↔0.5, 2 s). Di collapsed, cincin menjadi abu-abu dengan dua garis jeda kecil.</figcaption>
+    </figure>
+
+    <!-- Break -->
+    <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+      <div style="height:310px;border-radius:14px;background:#2E333B;display:flex;justify-content:center">
+        <div class="n xp">
+          <div class="tb">
+            <div class="tabs" role="tablist" aria-label="Modul">
+              <button class="tab" role="tab" aria-selected="false" aria-label="Musik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Lirik"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></button>
+              <button class="tab on" role="tab" aria-selected="true" aria-label="Fokus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Minum"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Tugas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></button>
+              <button class="tab" role="tab" aria-selected="false" aria-label="Rak"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 13.5l2-7.5h12l2 7.5v4.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg></button>
+            </div>
+            <button class="ib" aria-label="Pengaturan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          </div>
+          <div style="display:flex;gap:28px;align-items:center;flex-grow:1">
+            <div class="pt" role="timer" aria-label="Sisa istirahat 3 menit 12 detik">
+              <svg width="236" height="120" viewBox="0 0 236 120" aria-hidden="true"><rect x="2" y="2" width="232" height="116" rx="58" fill="none" stroke="#1D1D21" stroke-width="4"/><rect x="2" y="2" width="232" height="116" rx="58" fill="none" stroke="#F2B866" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="64 100"/></svg>
+              <span style="font-size:10px;line-height:12px;font-weight:600;letter-spacing:.6px;color:#F2B866">ISTIRAHAT</span>
+              <span class="tm">03:12</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;flex-grow:1">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:10px;line-height:12px;font-weight:600;letter-spacing:.6px;color:#7A7A83">3 DARI 4 SELESAI</span>
+                <div class="dots"><i style="background:#C6F36B"></i><i style="background:#C6F36B"></i><i style="background:#C6F36B"></i><i></i></div>
+              </div>
+              <span style="font-size:12px;line-height:16px;color:#A6A6AD">Berdiri sebentar dan isi gelasmu.</span>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button style="height:32px;padding:0 16px;border-radius:16px;background:#261E13;color:#F2B866;font-size:12px;font-weight:600">Lewati istirahat</button>
+                <button class="ib" aria-label="Reset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size:13px;line-height:18px;padding:0 4px"><b>Istirahat</b>. Warna mode berganti ke amber, sementara titik sesi yang selesai tetap limau (pencapaian). Istirahat panjang (15 menit) berlaku setelah sesi ke-4, dengan label “ISTIRAHAT PANJANG”.</figcaption>
+    </figure>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

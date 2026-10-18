@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Celah — motion</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#3B5F0A}a:hover{color:#24400A}
+</style>
+</helmet>
+<div style="width:1280px;height:1900px;padding:56px 64px;background:#F3F2EE;color:#141416;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;gap:24px">
+
+  <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px">
+    <div>
+      <div style="font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">03 · Motion</div>
+      <h1 style="margin:4px 0 0;font-size:40px;line-height:48px;font-weight:600">Bentuk dulu, isi kemudian</h1>
+    </div>
+    <div style="display:flex;gap:16px;font-size:12px;align-items:center">
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:18px;height:10px;border-radius:3px;background:#141416"></span>Bentuk (ukuran, radius)</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:18px;height:10px;border-radius:3px;background:#C6F36B;border:1px solid #8DB43A"></span>Konten (opacity, posisi, scale)</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:18px;height:10px;border-radius:3px;background:#D6D4CD"></span>Jeda / tahan</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:18px;height:10px;border-radius:3px;background:#6CC8F2"></span>Loop idle</span>
+    </div>
+  </header>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start">
+    <sc-for list="{{cols}}" as="col" hint-placeholder-count="2">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <sc-for list="{{col.items}}" as="t" hint-placeholder-count="4">
+          <article style="background:#FFFFFF;border:1px solid #E3E1DA;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+              <h2 style="margin:0;font-size:17px;line-height:24px;font-weight:600">{{t.title}}</h2>
+              <span style="font-size:12px;color:#5A5A62;white-space:nowrap">{{t.total}}</span>
+            </div>
+            <p style="margin:0;font-size:12.5px;line-height:18px;color:#3A3A42">{{t.desc}}</p>
+            <div style="display:flex;flex-direction:column">
+              <div style="display:flex;gap:12px">
+                <span style="width:200px;flex:none"></span>
+                <div style="position:relative;height:16px;flex-grow:1;font-size:10px;color:#7A7A83">
+                  <sc-for list="{{t.ticks}}" as="k" hint-placeholder-count="5">
+                    <span style="position:absolute;left:{{k.pos}};transform:translateX({{k.shift}})">{{k.label}}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <sc-for list="{{t.tracks}}" as="r" hint-placeholder-count="6">
+                <div style="display:flex;gap:12px;height:30px;border-top:1px solid #F0EEE8">
+                  <div style="width:200px;flex:none;display:flex;flex-direction:column;justify-content:center;min-width:0">
+                    <span style="font-size:12px;line-height:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{r.label}}</span>
+                    <span style="font-size:10.5px;line-height:13px;color:#5A5A62;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{r.meta}}</span>
+                  </div>
+                  <div style="flex-grow:1;position:relative;background:linear-gradient(90deg,#ECEAE3 1px,transparent 1px) 0 0/25% 100%">
+                    <div style="position:absolute;top:8px;height:14px;border-radius:4px;left:{{r.left}};width:{{r.width}};background:{{r.bg}};border:{{r.border}}"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+
+  <section style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px">
+    <div style="background:#141416;color:#E8E8E3;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:19px">
+      <h2 style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:#F4F4F1">Implementasi di WPF</h2>
+      <span>• Jendela tetap 640 × 320, transparan, topmost, dan tidak pernah di-resize per frame. Yang dianimasikan adalah <b>Width/Height</b> sebuah Border di dalam Canvas, sehingga layout tetap murah.</span>
+      <span>• Konten tiap state berada di lapisan terpisah. Lapisan itu hanya menerima Opacity dan RenderTransform (Translate/Scale), yang tidak memicu layout.</span>
+      <span>• Bahu cekung digambar sebagai Path statis 10 × 10 di kiri dan kanan atas yang ikut bergeser bersama tepi Border.</span>
+      <span>• Pakai <code style="font-family:Consolas,monospace">HandoffBehavior.SnapshotAndReplace</code> agar hover cepat bisa membalik animasi dari posisinya saat itu.</span>
+    </div>
+    <div style="background:#141416;color:#E8E8E3;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:19px">
+      <h2 style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:#F4F4F1">Hemat untuk Intel HD 520</h2>
+      <span>• <code style="font-family:Consolas,monospace">Timeline.DesiredFrameRate</code>: 60 untuk transisi, 30 untuk loop idle dan visualizer.</span>
+      <span>• Semua loop berhenti saat notch tersembunyi (fullscreen), laptop memakai baterai &lt; 20%, atau Kedip tertidur. Saat tidur, napas melambat ke 6 s.</span>
+      <span>• Bayangan expanded memakai gambar 9-slice PNG yang di-fade, bukan DropShadowEffect yang dihitung ulang setiap frame.</span>
+      <span>• Visualizer menghitung ulang tinggi bar 12× per detik, lalu tiap bar di-tween 80 ms. Tidak perlu FFT setiap frame.</span>
+    </div>
+    <div style="background:#141416;color:#E8E8E3;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:19px">
+      <h2 style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:#F4F4F1">Animasi dikurangi</h2>
+      <span>Jika “Tampilkan animasi di Windows” mati (<code style="font-family:Consolas,monospace">SystemParameters.ClientAreaAnimation</code> = false):</span>
+      <span>• Bentuk langsung ke ukuran akhir. Konten hanya crossfade 120 ms ease-standard.</span>
+      <span>• Tanpa overshoot pegas, tanpa napas, tanpa melirik. Kedip tetap ada setiap 8 s karena sangat kecil.</span>
+      <span>• Lirik berganti dengan crossfade, tanpa menggeser daftar.</span>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const K = {
+      shape: { bg: '#141416', border: '0' },
+      content: { bg: '#C6F36B', border: '1px solid #8DB43A' },
+      wait: { bg: '#D6D4CD', border: '0' },
+      loop: { bg: '#6CC8F2', border: '1px solid #3E9CC6' }
+    };
+    const mk = (title, desc, total, tracks, unit) => {
+      const ticks = [0, 0.25, 0.5, 0.75, 1].map((f, i) => ({
+        pos: (f * 100) + '%',
+        shift: i === 0 ? '0' : (i === 4 ? '-100%' : '-50%'),
+        label: unit === 's' ? ((total * f) / 1000).toFixed(1) + ' s' : Math.round(total * f) + ' ms'
+      }));
+      return {
+        title, desc, ticks,
+        total: unit === 's' ? 'skala ' + (total / 1000) + ' s' : 'total ' + total + ' ms',
+        tracks: tracks.map(([label, s, d, meta, kind]) => ({
+          label, meta,
+          left: (s / total * 100) + '%',
+          width: Math.max(d / total * 100, 0.8) + '%',
+          bg: K[kind].bg, border: K[kind].border
+        }))
+      };
+    };
+    const a = mk('Collapsed → Expanded',
+      'Pil mengembang ke samping dulu, tinggi menyusul 50 ms kemudian dengan overshoot kecil. Isi muncul setelah bentuk hampir selesai, dari atas ke bawah.',
+      700, [
+        ['Jeda niat hover', 0, 120, 'delay-hover-open · batal jika kursor pergi', 'wait'],
+        ['Isi collapsed keluar', 120, 100, 'opacity 1→0, scale 1→0.96 · ease-in', 'content'],
+        ['Lebar 200 → 560', 120, 460, 'dur-shape-open · ease-spring', 'shape'],
+        ['Tinggi 32 → 260', 170, 460, 'dur-shape-open · ease-spring', 'shape'],
+        ['Radius bawah 16 → 28', 120, 460, 'ikut lebar · ease-spring', 'shape'],
+        ['Bayangan 0 → 1', 300, 220, 'opacity gambar 9-slice · ease-out', 'content'],
+        ['Bar tab masuk', 340, 220, 'opacity 0→1, Y −6→0 · ease-out', 'content'],
+        ['Isi modul (stagger 40)', 380, 300, '3 baris × 220 ms · Y 8→0 · ease-out', 'content']
+      ]);
+    const b = mk('Expanded → Collapsed',
+      'Dimulai 350 ms setelah kursor keluar, dan batal jika kursor kembali. Isi pergi lebih dulu dan cepat. Bentuk menyusut tanpa overshoot supaya terasa tenang.',
+      600, [
+        ['Isi modul + tab keluar', 0, 140, 'opacity →0, Y 0→−4 · ease-in', 'content'],
+        ['Bayangan 1 → 0', 0, 140, 'ease-in', 'content'],
+        ['Tinggi 260 → 32', 80, 340, 'dur-shape-close · ease-standard', 'shape'],
+        ['Lebar 560 → 200', 110, 340, 'dur-shape-close · ease-standard', 'shape'],
+        ['Radius 28 → 16', 110, 340, 'ikut lebar', 'shape'],
+        ['Isi collapsed masuk', 380, 220, 'opacity 0→1, scale 0.96→1 · ease-out', 'content'],
+        ['Kedip berkedip sekali', 520, 80, 'tanda “aku masih di sini”', 'loop']
+      ]);
+    const c = mk('Collapsed → Peek → Collapsed',
+      'Kedip “sigap” sesaat, pil menggembung ke ukuran peek (320 × 44), lalu bertahan 1,5 s. Peek baru selama masa tahan hanya crossfade isinya 120 ms dan mereset tahanan. Volume yang ditekan berulang hanya menggerakkan bar.',
+      2400, [
+        ['Mata sigap', 0, 120, 'mata 6×10 → 7×7 bulat · ease-out', 'loop'],
+        ['Isi collapsed keluar', 0, 100, 'opacity →0 · ease-in', 'content'],
+        ['Bentuk → 320 × 44', 40, 300, 'dur-peek-in · ease-spring-soft', 'shape'],
+        ['Isi peek masuk', 160, 220, 'opacity 0→1, X −6→0 · ease-out', 'content'],
+        ['Isi bar level', 200, 240, 'lebar fill ke nilai baru · ease-standard', 'content'],
+        ['Tahan', 380, 1500, 'dur-peek-hold · ditahan selama di-hover', 'wait'],
+        ['Isi peek keluar', 1880, 140, 'opacity →0 · ease-in', 'content'],
+        ['Bentuk kembali', 1940, 280, 'ease-standard, tanpa overshoot', 'shape'],
+        ['Isi collapsed masuk', 2120, 220, 'opacity 0→1 · ease-out', 'content']
+      ]);
+    const d = mk('Ganti tab di Expanded',
+      'Arah geser mengikuti urutan tab: ke kanan berarti isi lama ke kiri. Tinggi panel tetap 260. Modul yang lebih pendek tidak membuat panel mengecil, supaya pil tidak “bernapas” setiap ganti tab.',
+      320, [
+        ['Indikator meluncur', 0, 240, 'X & lebar · ease-standard', 'shape'],
+        ['Warna ikon', 0, 90, 'tertiary → primary · dur-instant', 'content'],
+        ['Isi lama keluar', 0, 120, 'opacity →0, X 0→∓12 · ease-in', 'content'],
+        ['Isi baru masuk', 90, 220, 'opacity 0→1, X ±12→0 · ease-out', 'content'],
+        ['Titik accent tab', 120, 180, 'scale 0→1 · ease-spring', 'content']
+      ]);
+    const e = mk('Fullscreen: menyingkir & kembali',
+      'Aplikasi fullscreen (game, video, presentasi) terdeteksi di monitor yang sama, lalu notch naik keluar layar. Ia kembali 400 ms setelah fullscreen berakhir. Peek penting (baterai kritis) tetap boleh turun sebentar.',
+      1100, [
+        ['Naik keluar', 0, 260, 'Y 0 → −(tinggi+12) · ease-in', 'shape'],
+        ['Memudar', 180, 80, 'opacity 1→0 · linear', 'content'],
+        ['Tunggu stabil', 260, 400, 'cegah kedip saat alt-tab', 'wait'],
+        ['Turun kembali', 660, 380, 'Y → 0 · ease-spring-soft', 'shape'],
+        ['Muncul', 660, 120, 'opacity 0→1 · ease-out', 'content']
+      ]);
+    const f = mk('Pergantian baris lirik',
+      'Lima slot baris setinggi 26 px. Seluruh daftar bergeser satu slot ke atas. Baris aktif membesar dari scale 0.86 ke 1 (titik asal di kiri) sehingga ukuran font tidak pernah berubah. Dipicu 120 ms sebelum timestamp agar terasa tepat waktu.',
+      400, [
+        ['Daftar geser Y −26', 0, 320, 'dur-slow · ease-standard', 'shape'],
+        ['Aktif lama → redup', 0, 320, 'opacity 1→0.45, scale 1→0.86', 'content'],
+        ['Baris baru → aktif', 40, 320, 'opacity 0.45→1, scale 0.86→1', 'content'],
+        ['Baris atas keluar', 0, 160, 'opacity 0.45→0 · ease-in', 'content'],
+        ['Baris bawah masuk', 160, 220, 'opacity 0→0.45 · ease-out', 'content']
+      ]);
+    const g = mk('Idle: Kedip bernapas',
+      'Pil tidak bergerak, hanya matanya. Napas adalah scaleY kecil yang terus berulang. Kedipan muncul pada interval acak 4–9 s, dan kadang dua kali berturut-turut. Mata melirik ke arah kursor dalam radius 240 px.',
+      4000, [
+        ['Napas', 0, 4000, 'scaleY 1→0.8→1 · 4000 · ease-sine · ulang', 'loop'],
+        ['Kedip', 2600, 160, 'scaleY →0.12 (70, ease-in) → 1 (90, ease-out)', 'loop'],
+        ['Melirik', 1200, 200, 'X ±3 px · ease-out, kembali 600 ms', 'content'],
+        ['Tertidur (10 mnt)', 3000, 800, 'scaleY →0.15, Y +2.5, opacity .45 · ease-sine', 'shape'],
+        ['Bangun saat hover', 3800, 200, 'kembali dengan ease-spring 280 ms', 'content']
+      ], 's');
+    return { cols: [ { items: [a, c, e, g] }, { items: [b, d, f] } ] };
+  }
+}
+</script>
+</body>
+</html>

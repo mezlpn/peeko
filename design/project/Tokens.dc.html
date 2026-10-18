@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Celah — design tokens</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#3B5F0A}a:hover{color:#24400A}
+</style>
+</helmet>
+<div style="width:1280px;height:1760px;padding:56px 64px;background:#F3F2EE;color:#141416;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;gap:36px">
+
+  <header style="display:flex;justify-content:space-between;align-items:flex-end">
+    <div>
+      <div style="font-size:13px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62">01 · Design tokens</div>
+      <h1 style="margin:4px 0 0;font-size:40px;line-height:48px;font-weight:600">Token untuk ResourceDictionary</h1>
+    </div>
+    <p style="margin:0;max-width:440px;font-size:14px;line-height:20px;color:#3A3A42">Nama kunci XAML: <code style="font-family:Consolas,ui-monospace,monospace">Celah.Brush.&lt;Peran&gt;</code>, <code style="font-family:Consolas,ui-monospace,monospace">Celah.Radius.*</code>, <code style="font-family:Consolas,ui-monospace,monospace">Celah.Space.*</code>, <code style="font-family:Consolas,ui-monospace,monospace">Celah.Dur.*</code>. Semua nilai dalam px @100%.</p>
+  </header>
+
+  <div style="display:grid;grid-template-columns:600px minmax(0,1fr);gap:48px">
+
+    <section aria-label="Warna" style="display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:20px;line-height:28px;font-weight:600">Warna</h2>
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;margin-bottom:10px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#5A5A62;padding:6px 0;border-bottom:1px solid #D6D4CD">{{g.name}}</div>
+          <sc-for list="{{g.rows}}" as="c" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:44px 150px 84px minmax(0,1fr);align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid #E3E1DA">
+              <div style="width:44px;height:26px;border-radius:6px;background:{{c.hex}};border:1px solid rgba(0,0,0,.12)"></div>
+              <code style="font-family:Consolas,ui-monospace,monospace;font-size:13px;font-weight:600">{{c.token}}</code>
+              <code style="font-family:Consolas,ui-monospace,monospace;font-size:13px;color:#3A3A42">{{c.hex}}</code>
+              <span style="font-size:13px;line-height:18px;color:#3A3A42">{{c.role}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+      <p style="margin:0;font-size:12px;line-height:17px;color:#5A5A62">Kontras pada notch-bg: text-primary 18,4:1 · text-secondary 8,4:1 · text-tertiary 4,7:1 (lolos AA) · text-disabled hanya untuk ikon nonaktif. Warna “-muted” sudah dicampur solid 14% di atas #050506, jadi tidak butuh alpha.</p>
+    </section>
+
+    <div style="display:flex;flex-direction:column;gap:36px">
+
+      <section aria-label="Radius" style="display:flex;flex-direction:column;gap:12px">
+        <h2 style="margin:0;font-size:20px;line-height:28px;font-weight:600">Radius</h2>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+          <sc-for list="{{radii}}" as="r" hint-placeholder-count="8">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="height:56px;background:#141417;border-radius:{{r.css}}"></div>
+              <code style="font-family:Consolas,ui-monospace,monospace;font-size:12px;font-weight:600">{{r.token}}</code>
+              <span style="font-size:12px;line-height:16px;color:#3A3A42">{{r.val}} · {{r.use}}</span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:12px;line-height:17px;color:#5A5A62">Sudut atas notch selalu 0. Bahu cekung 10 px di kiri dan kanan atas (Path ArcSegment) menyatukannya dengan tepi layar. Saat notch menyingkir ke atas, bahu ikut tersembunyi.</p>
+      </section>
+
+      <section aria-label="Spacing" style="display:flex;flex-direction:column;gap:12px">
+        <h2 style="margin:0;font-size:20px;line-height:28px;font-weight:600">Spacing</h2>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <sc-for list="{{spaces}}" as="s" hint-placeholder-count="9">
+            <div style="display:grid;grid-template-columns:110px 40px minmax(0,1fr);align-items:center;gap:12px">
+              <code style="font-family:Consolas,ui-monospace,monospace;font-size:12px;font-weight:600">{{s.token}}</code>
+              <span style="font-size:12px;color:#3A3A42">{{s.val}}</span>
+              <div style="display:flex;align-items:center;gap:10px"><div style="height:12px;width:{{s.w}};background:#C6F36B;border-radius:2px;border:1px solid #8DB43A"></div><span style="font-size:12px;color:#5A5A62">{{s.use}}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section aria-label="Tipografi" style="display:flex;flex-direction:column;gap:10px">
+        <h2 style="margin:0;font-size:20px;line-height:28px;font-weight:600">Tipografi · Segoe UI</h2>
+        <div style="background:#050506;border-radius:14px;padding:8px 18px;display:flex;flex-direction:column">
+          <sc-for list="{{type}}" as="t" hint-placeholder-count="10">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 150px;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #1D1D21">
+              <span style="color:#F4F4F1;font-size:{{t.size}};line-height:{{t.lh}};font-weight:{{t.w}};letter-spacing:{{t.ls}};font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{t.sample}}</span>
+              <span style="display:flex;flex-direction:column;font-size:11px;line-height:14px;color:#A6A6AD"><code style="font-family:Consolas,ui-monospace,monospace;color:#F4F4F1;font-weight:600">{{t.token}}</code>{{t.spec}}</span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:12px;line-height:17px;color:#5A5A62">Angka waktu memakai <code style="font-family:Consolas,ui-monospace,monospace">Typography.NumeralAlignment="Tabular"</code> agar tidak bergoyang saat berdetak. Teks di notch memakai <code style="font-family:Consolas,ui-monospace,monospace">TextOptions.TextFormattingMode="Display"</code> untuk ukuran ≤ 13 px.</p>
+      </section>
+    </div>
+  </div>
+
+  <section aria-label="Motion tokens" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:20px;line-height:28px;font-weight:600">Motion · durasi &amp; easing</h2>
+    <div style="display:grid;grid-template-columns:420px minmax(0,1fr);gap:40px">
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{durs}}" as="d" hint-placeholder-count="10">
+          <div style="display:grid;grid-template-columns:150px 64px minmax(0,1fr);gap:10px;padding:6px 0;border-bottom:1px solid #E3E1DA;font-size:13px;line-height:18px">
+            <code style="font-family:Consolas,ui-monospace,monospace;font-weight:600">{{d.token}}</code>
+            <span>{{d.val}}</span>
+            <span style="color:#3A3A42">{{d.use}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+          <sc-for list="{{eases}}" as="e" hint-placeholder-count="6">
+            <div style="display:flex;gap:12px;align-items:center;background:#FFFFFF;border:1px solid #E3E1DA;border-radius:12px;padding:10px">
+              <svg width="64" height="64" viewBox="-6 -26 112 132" role="img" aria-label="Kurva {{e.token}}" style="flex:none;background:#F3F2EE;border-radius:8px">
+                <path d="M0 100 H100 M0 0 H100" stroke="#D6D4CD" stroke-width="2" fill="none"/>
+                <path d="{{e.d}}" stroke="#141416" stroke-width="5" fill="none" stroke-linecap="round"/>
+              </svg>
+              <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                <code style="font-family:Consolas,ui-monospace,monospace;font-size:12px;font-weight:600">{{e.token}}</code>
+                <code style="font-family:Consolas,ui-monospace,monospace;font-size:11px;color:#3A3A42">{{e.val}}</code>
+                <span style="font-size:11px;line-height:14px;color:#5A5A62">{{e.use}}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#141416;color:#E8E8E3;border-radius:12px;padding:14px 16px;font-family:Consolas,ui-monospace,monospace;font-size:12px;line-height:18px;white-space:pre">&lt;!-- KeySpline WPF hanya menerima 0–1. Kurva pegas (y &gt; 1) memakai BackEase atau kelas kustom. --&gt;
+&lt;KeySpline x:Key="Celah.Ease.Standard"&gt;0.2,0 0,1&lt;/KeySpline&gt;
+&lt;KeySpline x:Key="Celah.Ease.Out"&gt;0.16,1 0.3,1&lt;/KeySpline&gt;
+&lt;BackEase   x:Key="Celah.Ease.Spring"     EasingMode="EaseOut" Amplitude="0.32"/&gt;
+&lt;BackEase   x:Key="Celah.Ease.SpringSoft" EasingMode="EaseOut" Amplitude="0.14"/&gt;
+&lt;Duration   x:Key="Celah.Dur.ShapeOpen"&gt;0:0:0.46&lt;/Duration&gt;
+&lt;SolidColorBrush x:Key="Celah.Brush.NotchBg" Color="#050506"/&gt;</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1760}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const groups = [
+      { name: 'Permukaan notch', rows: [
+        { token: 'notch-bg', hex: '#050506', role: 'Latar notch di semua state; menyatu dengan bezel' },
+        { token: 'surface-raised', hex: '#141417', role: 'Tile dalam expanded, indikator tab aktif, cover kosong' },
+        { token: 'surface-hover', hex: '#1D1D21', role: 'Hover tombol ikon / item list' },
+        { token: 'surface-pressed', hex: '#26262B', role: 'Pressed; track slider saat digeser' },
+        { token: 'stroke', hex: '#2A2A30', role: 'Track progress, pemisah 1 px' },
+        { token: 'stroke-strong', hex: '#3A3A42', role: 'Garis putus drop zone, border input' }
+      ]},
+      { name: 'Teks & ikon', rows: [
+        { token: 'text-primary', hex: '#F4F4F1', role: 'Judul, angka timer, baris lirik aktif' },
+        { token: 'text-secondary', hex: '#A6A6AD', role: 'Artis, label, ikon default' },
+        { token: 'text-tertiary', hex: '#7A7A83', role: 'Lirik redup, waktu progress, placeholder' },
+        { token: 'text-disabled', hex: '#4A4A52', role: 'Ikon/tombol nonaktif (bukan teks penting)' }
+      ]},
+      { name: 'Aksen “Nyala”', rows: [
+        { token: 'accent', hex: '#C6F36B', role: 'Satu hal aktif: progress, tab aktif, sesi fokus' },
+        { token: 'accent-hover', hex: '#D3F785', role: 'Hover tombol utama' },
+        { token: 'accent-pressed', hex: '#A9D84F', role: 'Pressed tombol utama' },
+        { token: 'accent-ink', hex: '#0B0F04', role: 'Teks/ikon di atas accent' },
+        { token: 'accent-muted', hex: '#202614', role: 'Latar chip aktif, drop zone saat di-drag' }
+      ]},
+      { name: 'Semantik', rows: [
+        { token: 'water', hex: '#6CC8F2', role: 'Modul minum, pengingat minum' },
+        { token: 'water-muted', hex: '#132027', role: 'Latar chip/tile air' },
+        { token: 'rest', hex: '#F2B866', role: 'Mode istirahat Pomodoro' },
+        { token: 'rest-muted', hex: '#261E13', role: 'Latar chip istirahat' },
+        { token: 'warning', hex: '#F5C84B', role: 'Baterai ≤ ambang (default 20%)' },
+        { token: 'danger', hex: '#FF6B5B', role: 'Baterai kritis ≤ 10%, putus koneksi, hapus' },
+        { token: 'danger-muted', hex: '#281312', role: 'Latar hover tombol hapus' }
+      ]},
+      { name: 'Jendela Pengaturan', rows: [
+        { token: 'win-titlebar', hex: '#141416', role: 'Title bar kustom' },
+        { token: 'win-bg', hex: '#1A1A1D', role: 'Latar jendela' },
+        { token: 'win-card', hex: '#232327', role: 'Kartu baris pengaturan' },
+        { token: 'win-card-hover', hex: '#2A2A2F', role: 'Hover kartu / item menu tray' },
+        { token: 'win-stroke', hex: '#34343A', role: 'Border kartu, pemisah menu' }
+      ]}
+    ];
+    const radii = [
+      { token: 'r-xs', val: '4', use: 'checkbox, bar visualizer', css: '4px' },
+      { token: 'r-sm', val: '6', use: 'cover mini 20 px, chip file', css: '6px' },
+      { token: 'r-md', val: '10', use: 'tombol, item list, tab', css: '10px' },
+      { token: 'r-lg', val: '14', use: 'tile, cover 88 px', css: '14px' },
+      { token: 'notch-pill', val: '0 0 16 16', use: 'collapsed & live', css: '0 0 16px 16px' },
+      { token: 'notch-peek', val: '0 0 22 22', use: 'peek 44 px', css: '0 0 22px 22px' },
+      { token: 'notch-xl', val: '0 0 28 28', use: 'expanded', css: '0 0 28px 28px' },
+      { token: 'r-pill', val: '999', use: 'chip, tombol pil, thumb', css: '999px' }
+    ];
+    const spaces = [
+      { token: 'space-2xs', val: '2', use: 'celah bar visualizer', w: '2px' },
+      { token: 'space-xs', val: '4', use: 'ikon ↔ teks rapat', w: '4px' },
+      { token: 'space-sm', val: '6', use: 'chip padding vertikal', w: '6px' },
+      { token: 'space-md', val: '8', use: 'antar tombol ikon', w: '8px' },
+      { token: 'space-lg', val: '12', use: 'padding horizontal collapsed', w: '12px' },
+      { token: 'space-xl', val: '16', use: 'antar blok dalam modul', w: '16px' },
+      { token: 'space-2xl', val: '20', use: 'padding sisi expanded', w: '20px' },
+      { token: 'space-3xl', val: '24', use: 'antar kolom expanded', w: '24px' },
+      { token: 'space-4xl', val: '32', use: 'section jendela pengaturan', w: '32px' }
+    ];
+    const type = [
+      { token: 'timer-display', spec: '44 / 48 · Light 300 · tabular', size: '44px', lh: '48px', w: 300, ls: '-0.5px', sample: '18:42' },
+      { token: 'lyric-active', spec: '18 / 26 · Semibold 600', size: '18px', lh: '26px', w: 600, ls: '0', sample: 'Kita menunggu lampu kota' },
+      { token: 'title', spec: '16 / 22 · Semibold 600', size: '16px', lh: '22px', w: 600, ls: '0', sample: 'Kertas Biru' },
+      { token: 'lyric-dim', spec: '14 / 22 · Regular 400', size: '14px', lh: '22px', w: 400, ls: '0', sample: 'menyala satu per satu' },
+      { token: 'body-strong', spec: '13 / 18 · Semibold 600', size: '13px', lh: '18px', w: 600, ls: '0', sample: '5 dari 8 gelas' },
+      { token: 'body', spec: '13 / 18 · Regular 400', size: '13px', lh: '18px', w: 400, ls: '0', sample: 'Sela Nada' },
+      { token: 'pill', spec: '12 / 16 · Semibold 600', size: '12px', lh: '16px', w: 600, ls: '0', sample: 'Waktunya minum' },
+      { token: 'caption', spec: '11 / 14 · Regular 400', size: '11px', lh: '14px', w: 400, ls: '0', sample: '1:24 · Spotify' },
+      { token: 'overline', spec: '10 / 12 · Semibold · +0.6 · KAPITAL', size: '10px', lh: '12px', w: 600, ls: '0.6px', sample: 'SESI 3 DARI 4' },
+      { token: 'win-title', spec: '20 / 28 · Semibold (Pengaturan)', size: '20px', lh: '28px', w: 600, ls: '0', sample: 'Pengaturan' }
+    ];
+    const durs = [
+      { token: 'dur-instant', val: '90 ms', use: 'hover warna, pressed' },
+      { token: 'dur-fast', val: '140 ms', use: 'fade konten keluar' },
+      { token: 'dur-base', val: '220 ms', use: 'fade/geser konten masuk, tab' },
+      { token: 'dur-slow', val: '320 ms', use: 'ganti baris lirik' },
+      { token: 'dur-shape-open', val: '460 ms', use: 'pil mengembang ke expanded' },
+      { token: 'dur-shape-close', val: '340 ms', use: 'expanded menyusut' },
+      { token: 'dur-peek-in', val: '300 ms', use: 'pil ke peek' },
+      { token: 'dur-peek-hold', val: '1500 ms', use: 'lama peek tampil' },
+      { token: 'dur-blink', val: '160 ms', use: 'kedip mata (70 turun + 90 naik)' },
+      { token: 'dur-breathe', val: '4000 ms', use: 'satu siklus napas idle' },
+      { token: 'delay-hover-open', val: '120 ms', use: 'jeda niat hover sebelum mengembang' },
+      { token: 'delay-leave-close', val: '350 ms', use: 'jeda sebelum menyusut' }
+    ];
+    const curve = (x1, y1, x2, y2) => `M0 100 C${x1*100} ${100-y1*100} ${x2*100} ${100-y2*100} 100 0`;
+    const eases = [
+      { token: 'ease-standard', val: '(0.2, 0, 0, 1)', use: 'Umum: tab, indikator, lirik', d: curve(0.2,0,0,1) },
+      { token: 'ease-out', val: '(0.16, 1, 0.3, 1)', use: 'Konten masuk', d: curve(0.16,1,0.3,1) },
+      { token: 'ease-in', val: '(0.4, 0, 1, 1)', use: 'Konten keluar, menyingkir', d: curve(0.4,0,1,1) },
+      { token: 'ease-spring', val: '(0.34, 1.32, 0.64, 1)', use: 'Pil mengembang · overshoot ≈ 6%', d: curve(0.34,1.32,0.64,1) },
+      { token: 'ease-spring-soft', val: '(0.3, 1.15, 0.55, 1)', use: 'Peek, kembali dari atas ≈ 2%', d: curve(0.3,1.15,0.55,1) },
+      { token: 'ease-sine', val: '(0.45, 0, 0.55, 1)', use: 'Napas idle, visualizer', d: curve(0.45,0,0.55,1) }
+    ];
+    return { groups, radii, spaces, type, durs, eases };
+  }
+}
+</script>
+</body>
+</html>

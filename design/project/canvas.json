@@ -1,0 +1,29 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-18T09:00:00Z"},
+  "title": "Celah — Design System",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1280, "h": 900, "title": "00 · Celah — konsep & identitas"},
+    "Tokens.dc.html": {"x": 1360, "y": 0, "w": 1280, "h": 1760, "title": "01 · Design tokens"},
+    "Components.dc.html": {"x": 2720, "y": 0, "w": 1280, "h": 1400, "title": "02 · Komponen & state"},
+    "Motion.dc.html": {"x": 4080, "y": 0, "w": 1280, "h": 1900, "title": "03 · Spesifikasi motion"},
+    "Collapsed.dc.html": {"x": 0, "y": 2400, "w": 1280, "h": 1040, "title": "10 · Collapsed — idle & live activity"},
+    "Peek.dc.html": {"x": 1360, "y": 2400, "w": 1280, "h": 1040, "title": "11 · Peek — event sesaat"},
+    "Music.dc.html": {"x": 0, "y": 3900, "w": 1280, "h": 1080, "title": "20 · Expanded — Musik & edge states"},
+    "Lyrics.dc.html": {"x": 1360, "y": 3900, "w": 1280, "h": 1080, "title": "21 · Expanded — Lirik"},
+    "Focus.dc.html": {"x": 2720, "y": 3900, "w": 1280, "h": 1080, "title": "22 · Expanded — Timer fokus"},
+    "WaterTodo.dc.html": {"x": 4080, "y": 3900, "w": 1280, "h": 1080, "title": "23 · Expanded — Minum & To-do"},
+    "Shelf.dc.html": {"x": 5440, "y": 3900, "w": 1280, "h": 1080, "title": "24 · Expanded — Rak file"},
+    "Settings.dc.html": {"x": 0, "y": 5440, "w": 1440, "h": 1000, "title": "30 · Pengaturan & menu tray"}
+  },
+  "order": ["Main.dc.html", "Tokens.dc.html", "Components.dc.html", "Motion.dc.html", "Collapsed.dc.html", "Peek.dc.html", "Music.dc.html", "Lyrics.dc.html", "Focus.dc.html", "WaterTodo.dc.html", "Shelf.dc.html", "Settings.dc.html"],
+  "notes": {
+    "rowA": {"x": 0, "y": -300, "text": "Fondasi — identitas, token, komponen, motion", "kind": "title1", "maxW": 5360},
+    "rowB": {"x": 0, "y": 2100, "text": "Notch ringkas — collapsed & peek", "kind": "title1", "maxW": 2640},
+    "rowC": {"x": 0, "y": 3600, "text": "Expanded — enam modul", "kind": "title1", "maxW": 6720},
+    "rowD": {"x": 0, "y": 5140, "text": "Jendela Pengaturan & menu tray", "kind": "title1", "maxW": 1440}
+  },
+  "designSystems": []
+}
