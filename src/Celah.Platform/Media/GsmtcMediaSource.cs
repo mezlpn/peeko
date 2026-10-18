@@ -10,20 +10,21 @@ namespace Celah.Platform.Media;
 /// <summary>
 /// Membaca sesi media Windows (Spotify, browser, Media Player, dll.) lewat
 /// GlobalSystemMediaTransportControlsSessionManager. Event dikirim dari thread latar.
+/// Sesi yang ditampilkan dipilih oleh <see cref="SessionSelector{T}"/>.
 /// </summary>
 public sealed class GsmtcMediaSource : IMediaSource
 {
     private static readonly TimeSpan Debounce = TimeSpan.FromMilliseconds(60);
+    private const int ThumbnailCacheSize = 8;
 
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
     private readonly List<Session> _watched = [];
+    private readonly SessionSelector<string> _selector = new();
+    private readonly Dictionary<string, byte[]> _thumbnails = [];
     private SessionManager? _manager;
     private Session? _session;
     private int _refreshQueued;
     private bool _disposed;
-
-    private string? _thumbnailKey;
-    private byte[]? _thumbnail;
 
     public MediaState? Current { get; private set; }
 
@@ -38,7 +39,7 @@ public sealed class GsmtcMediaSource : IMediaSource
         await RefreshAsync();
     }
 
-    /// <summary>Pantau semua sesi supaya bisa pindah ke sesi yang sedang diputar.</summary>
+    /// <summary>Pantau semua sesi supaya tahu kapan sesi lain mulai diputar.</summary>
     private void WatchSessions()
     {
         if (_manager is null) return;
@@ -71,40 +72,66 @@ public sealed class GsmtcMediaSource : IMediaSource
         _ = Task.Delay(Debounce).ContinueWith(_ => RefreshAsync(), TaskScheduler.Default).Unwrap();
     }
 
-    private Session? PickSession()
+    /// <summary>
+    /// Semua sesi beserta kunci yang stabil antar-refresh: AppUserModelId, ditambah nomor urut
+    /// jika satu aplikasi punya beberapa sesi.
+    /// </summary>
+    private List<(string Key, Session Session)> ListSessions()
     {
-        if (_manager is null) return null;
-        var current = _manager.GetCurrentSession();
-        if (current is not null && IsPlaying(current)) return current;
+        var result = new List<(string, Session)>();
+        if (_manager is null) return result;
 
-        // Utamakan sesi yang sedang diputar (mis. YouTube diputar saat Spotify dijeda).
-        var sessions = _manager.GetSessions();
-        return sessions.FirstOrDefault(IsPlaying) ?? current ?? sessions.FirstOrDefault();
-
-        static bool IsPlaying(Session s)
+        var seen = new Dictionary<string, int>();
+        foreach (var s in _manager.GetSessions())
         {
-            try
-            {
-                return s.GetPlaybackInfo().PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
-            }
-            catch (COMException)
-            {
-                return false; // aplikasi baru saja ditutup
-            }
+            var id = s.SourceAppUserModelId ?? "";
+            int n = seen.GetValueOrDefault(id);
+            seen[id] = n + 1;
+            result.Add((n == 0 ? id : $"{id}#{n}", s));
+        }
+        return result;
+    }
+
+    private static bool IsPlaying(Session s)
+    {
+        try
+        {
+            return s.GetPlaybackInfo().PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
+        }
+        catch (COMException)
+        {
+            return false; // aplikasi baru saja ditutup
         }
     }
 
-    private async Task RefreshAsync()
+    private async Task RefreshAsync(bool keepSelection = false)
     {
         await _refreshLock.WaitAsync();
         try
         {
             Interlocked.Exchange(ref _refreshQueued, 0);
-            if (_disposed) return;
+            if (_disposed || _manager is null) return;
 
-            var session = PickSession();
-            _session = session;
-            var state = session is null ? null : await ReadStateAsync(session);
+            var sessions = ListSessions();
+            string? selected;
+            if (keepSelection)
+            {
+                selected = _selector.Selected;
+            }
+            else
+            {
+                var currentId = _manager.GetCurrentSession()?.SourceAppUserModelId;
+                selected = _selector.Update(
+                    sessions.Select(s => (s.Key, IsPlaying(s.Session))).ToList(),
+                    currentId);
+            }
+
+            int index = sessions.FindIndex(s => s.Key == selected);
+            _session = index >= 0 ? sessions[index].Session : null;
+
+            MediaState? state = null;
+            if (_session is not null && await ReadStateAsync(_session) is { } read)
+                state = read with { SessionIndex = index, SessionCount = sessions.Count };
 
             Current = state;
             Changed?.Invoke(state);
@@ -130,16 +157,19 @@ public sealed class GsmtcMediaSource : IMediaSource
 
         var title = props.Title ?? "";
         var artist = string.IsNullOrEmpty(props.Artist) ? props.AlbumArtist ?? "" : props.Artist;
-        var key = $"{session.SourceAppUserModelId}\u001F{title}\u001F{artist}\u001F{props.AlbumTitle}";
+        var track = new MediaTrack(title, artist, props.AlbumTitle ?? "", session.SourceAppUserModelId, null);
 
-        if (key != _thumbnailKey)
-        {
-            _thumbnailKey = key;
-            _thumbnail = null;
-        }
+        // Cover di-cache per lagu supaya pindah sumber bolak-balik tidak memuat ulang gambar.
         // Spotify kadang mengirim judul dulu, cover menyusul di event berikutnya.
-        if (_thumbnail is null && props.Thumbnail is not null)
-            _thumbnail = await ReadThumbnailAsync(props.Thumbnail);
+        if (!_thumbnails.TryGetValue(track.Key, out var thumbnail) && props.Thumbnail is not null)
+        {
+            thumbnail = await ReadThumbnailAsync(props.Thumbnail);
+            if (thumbnail is not null)
+            {
+                if (_thumbnails.Count >= ThumbnailCacheSize) _thumbnails.Clear();
+                _thumbnails[track.Key] = thumbnail;
+            }
+        }
 
         var duration = timelineProps.EndTime - timelineProps.StartTime;
         MediaTimeline? timeline = duration > TimeSpan.Zero
@@ -154,8 +184,7 @@ public sealed class GsmtcMediaSource : IMediaSource
             CanSeek: controls.IsPlaybackPositionEnabled && timeline is not null,
             Rate: info.PlaybackRate ?? 1);
 
-        var track = new MediaTrack(title, artist, props.AlbumTitle ?? "", session.SourceAppUserModelId, _thumbnail);
-        return new MediaState(track, playback, timeline);
+        return new MediaState(track with { Thumbnail = thumbnail }, playback, timeline);
     }
 
     private static async Task<byte[]?> ReadThumbnailAsync(IRandomAccessStreamReference reference)
@@ -175,6 +204,20 @@ public sealed class GsmtcMediaSource : IMediaSource
         {
             return null;
         }
+    }
+
+    public async Task SwitchSessionAsync(int direction)
+    {
+        await _refreshLock.WaitAsync();
+        try
+        {
+            _selector.Cycle(ListSessions().Select(s => s.Key).ToList(), direction);
+        }
+        finally
+        {
+            _refreshLock.Release();
+        }
+        await RefreshAsync(keepSelection: true);
     }
 
     public Task TogglePlayPauseAsync() => Run(s => s.TryTogglePlayPauseAsync().AsTask());

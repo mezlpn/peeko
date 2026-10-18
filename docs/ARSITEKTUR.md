@@ -195,9 +195,11 @@ Revisi setelah dicoba langsung:
 
 7. **Hover lebih cepat.** Begitu kursor menyentuh notch, pil langsung menggembung ke 212 × 34 (90 ms) sebagai umpan balik. Jeda hover 120 → 60 ms. Bentuk mengembang 460 → 340 ms, dan isi panel muncul mulai 120 ms (sebelumnya 220 ms).
 8. **Mode tipis (state `Slim`).** Jika jendela aktif menempel ke tepi atas layar dan melintasi tengahnya (mis. Chrome di-maximize dengan tab di atas), notch menjadi garis 160 × 4 tanpa bahu dan tanpa Kedip. Hover pada garis ±150 ms membuka panel penuh, lalu kembali menjadi garis saat ditinggal. Peek tetap turun sebentar lalu kembali menjadi garis. Fullscreen tetap menang (notch disembunyikan). Nanti di Pengaturan: Otomatis / Selalu pil / Selalu garis.
-9. **Pil musik 104 px** (desain: 260 px). Cover dan visualizer terlalu berjauhan di 260 px.
+9. ~~Pil musik 104 px~~ → diganti #12.
 10. **Kedip kembali 1,5 dtk setelah musik dijeda** (desain: 30 dtk). Tidak 0 karena beberapa pemutar sempat melaporkan "dijeda" saat ganti lagu.
 11. **Klik cover di pil collapsed tidak dibuat.** Jeda hover 60 ms (revisi #7) membuat pil sudah mengembang sebelum sempat diklik; play/pause ada di panel.
+12. **Pil musik tetap 200 × 32** seperti pil idle (desain: 260 px dengan cover di kiri dan bar di kanan). Cover dan bar dirapatkan di tengah dengan jarak 10 px, sama seperti jarak kedua mata Kedip.
+13. **Pemilihan sumber media** (`SessionSelector`). Sesi yang tampil tidak ikut berpindah saat dijeda. Sesi lain yang baru mulai diputar mengambil alih, kecuali pengguna memilih sesi secara manual dan sesi itu masih diputar. Jika ada lebih dari satu sesi, chip sumber di modul Musik diberi panah "‹ ● Brave 1/2 ›".
 
 ## 11. Kontrak desain ↔ kode
 

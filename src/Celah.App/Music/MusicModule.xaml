@@ -10,6 +10,39 @@
         <Geometry x:Key="IconNext">M6,6 V18 L15,12 Z M16.8,6 H19 V18 H16.8 Z</Geometry>
         <Geometry x:Key="IconPlay">M8,5.5 V18.5 L19,12 Z</Geometry>
         <Geometry x:Key="IconPause">M6.5,5 H10.5 V19 H6.5 Z M13.5,5 H17.5 V19 H13.5 Z</Geometry>
+        <Geometry x:Key="IconChevronLeft">M14.5,6 L8.5,12 L14.5,18</Geometry>
+        <Geometry x:Key="IconChevronRight">M9.5,6 L15.5,12 L9.5,18</Geometry>
+
+        <!-- Panah kecil 22 × 22 di samping chip sumber. -->
+        <Style x:Key="ChevronButton" TargetType="Button">
+            <Setter Property="Width" Value="22" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Foreground" Value="{StaticResource Celah.Brush.TextSecondary}" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" CornerRadius="11" Background="Transparent">
+                            <Path Style="{StaticResource Celah.IconPath}" Data="{TemplateBinding Tag}" Stroke="{TemplateBinding Foreground}"
+                                  StrokeThickness="2.6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Path.LayoutTransform>
+                                    <ScaleTransform ScaleX="0.5" ScaleY="0.5" />
+                                </Path.LayoutTransform>
+                            </Path>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Celah.Brush.SurfaceHover}" />
+                                <Setter Property="Foreground" Value="{StaticResource Celah.Brush.TextPrimary}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Celah.Brush.SurfacePressed}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <!-- Tombol ikon 32 × 32, radius 10. Pressed: scale 0.94 (Components.dc.html). -->
         <Style x:Key="IconButton" TargetType="Button">
@@ -144,14 +177,24 @@
                 </Canvas>
                 <TextBlock Style="{StaticResource Celah.Text.Body}" Foreground="{StaticResource Celah.Brush.TextSecondary}"
                            Text="{Binding Artist}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
-                <Border Margin="0,8,0,0" Height="22" Padding="6,0,9,0" HorizontalAlignment="Left"
-                        CornerRadius="11" Background="{StaticResource Celah.Brush.SurfaceRaised}">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse Width="10" Height="10" Fill="{Binding SourceBrush}" />
-                        <TextBlock Style="{StaticResource Celah.Text.Caption}" FontWeight="SemiBold" Margin="5,0,0,0"
-                                   Foreground="{StaticResource Celah.Brush.TextSecondary}" Text="{Binding SourceName}" />
-                    </StackPanel>
-                </Border>
+                <!-- Chip sumber. Lebih dari satu sesi: "‹ ● Brave 1/2 ›" untuk memilih sumber (revisi #13). -->
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0" HorizontalAlignment="Left">
+                    <Button Style="{StaticResource ChevronButton}" Tag="{StaticResource IconChevronLeft}"
+                            Command="{Binding PreviousSessionCommand}" ToolTip="Sumber sebelumnya" Margin="0,0,2,0"
+                            Visibility="{Binding HasMultipleSessions, Converter={StaticResource Vis}}" />
+                    <Border Height="22" Padding="6,0,9,0" CornerRadius="11" Background="{StaticResource Celah.Brush.SurfaceRaised}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="10" Height="10" Fill="{Binding SourceBrush}" />
+                            <TextBlock Style="{StaticResource Celah.Text.Caption}" FontWeight="SemiBold" Margin="5,0,0,0"
+                                       Foreground="{StaticResource Celah.Brush.TextSecondary}" Text="{Binding SourceName}" />
+                            <TextBlock Style="{StaticResource Celah.Text.Caption}" Margin="6,0,0,0" Text="{Binding SessionLabel}"
+                                       Visibility="{Binding HasMultipleSessions, Converter={StaticResource Vis}}" />
+                        </StackPanel>
+                    </Border>
+                    <Button Style="{StaticResource ChevronButton}" Tag="{StaticResource IconChevronRight}"
+                            Command="{Binding NextSessionCommand}" ToolTip="Sumber berikutnya" Margin="2,0,0,0"
+                            Visibility="{Binding HasMultipleSessions, Converter={StaticResource Vis}}" />
+                </StackPanel>
             </StackPanel>
 
             <!-- Kosong -->

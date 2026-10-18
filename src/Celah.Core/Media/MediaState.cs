@@ -1,7 +1,14 @@
 namespace Celah.Core.Media;
 
-/// <summary>Potret lengkap sesi media yang sedang aktif (dari Windows media session/GSMTC).</summary>
-public sealed record MediaState(MediaTrack Track, MediaPlayback Playback, MediaTimeline? Timeline);
+/// <summary>Potret lengkap sesi media yang sedang ditampilkan (dari Windows media session/GSMTC).</summary>
+/// <param name="SessionIndex">Urutan sesi ini di antara semua sesi (0-based).</param>
+/// <param name="SessionCount">Jumlah sesi media yang terbuka; &gt; 1 memunculkan panah pemilih sumber.</param>
+public sealed record MediaState(
+    MediaTrack Track,
+    MediaPlayback Playback,
+    MediaTimeline? Timeline,
+    int SessionIndex = 0,
+    int SessionCount = 1);
 
 /// <param name="SourceAppId">AppUserModelId pemutar, mis. "Spotify.exe" atau "Chrome".</param>
 /// <param name="Thumbnail">Gambar cover mentah (PNG/JPEG), atau null jika tidak ada.</param>
@@ -47,4 +54,7 @@ public interface IMediaSource : IDisposable
     Task PreviousAsync();
 
     Task SeekAsync(TimeSpan position);
+
+    /// <summary>Tampilkan sesi sebelumnya (−1) atau berikutnya (+1).</summary>
+    Task SwitchSessionAsync(int direction);
 }

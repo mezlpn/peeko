@@ -45,7 +45,7 @@ public sealed class MusicController : IDisposable
         _dispatcher = dispatcher;
         _log = log;
 
-        ViewModel = new MusicViewModel(source.TogglePlayPauseAsync, source.NextAsync, source.PreviousAsync);
+        ViewModel = new MusicViewModel(source.TogglePlayPauseAsync, source.NextAsync, source.PreviousAsync, source.SwitchSessionAsync);
 
         _progressTimer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(250) };
         _progressTimer.Tick += (_, _) => UpdateProgress();
@@ -120,6 +120,7 @@ public sealed class MusicController : IDisposable
         {
             _clock.Reset();
             vm.HasSession = false;
+            vm.SessionCount = 0;
             vm.IsPlaying = false;
             vm.CanPlayPause = vm.CanNext = vm.CanPrevious = vm.CanSeek = vm.HasTimeline = false;
             vm.Cover = null;
@@ -139,6 +140,8 @@ public sealed class MusicController : IDisposable
 
         var app = MediaSourceApp.FromAppId(track.SourceAppId);
         vm.HasSession = true;
+        vm.SessionCount = state.SessionCount;
+        vm.SessionIndex = state.SessionIndex;
         vm.Title = string.IsNullOrWhiteSpace(track.Title) ? "Tanpa judul" : track.Title;
         vm.Artist = track.Artist;
         vm.SourceName = app.Name;

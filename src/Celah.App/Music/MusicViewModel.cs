@@ -7,16 +7,34 @@ namespace Celah.App.Music;
 /// <summary>Data tampilan untuk pil musik (collapsed) dan modul Musik (expanded).</summary>
 public sealed partial class MusicViewModel : ObservableObject
 {
-    public MusicViewModel(Func<Task> playPause, Func<Task> next, Func<Task> previous)
+    public MusicViewModel(Func<Task> playPause, Func<Task> next, Func<Task> previous, Func<int, Task> switchSession)
     {
         PlayPauseCommand = new AsyncRelayCommand(playPause, () => CanPlayPause);
         NextCommand = new AsyncRelayCommand(next, () => CanNext);
         PreviousCommand = new AsyncRelayCommand(previous, () => CanPrevious);
+        PreviousSessionCommand = new AsyncRelayCommand(() => switchSession(-1));
+        NextSessionCommand = new AsyncRelayCommand(() => switchSession(1));
     }
 
     public IAsyncRelayCommand PlayPauseCommand { get; }
     public IAsyncRelayCommand NextCommand { get; }
     public IAsyncRelayCommand PreviousCommand { get; }
+
+    /// <summary>Pindah sumber suara (mis. Brave ↔ Chrome) saat ada lebih dari satu sesi.</summary>
+    public IAsyncRelayCommand PreviousSessionCommand { get; }
+    public IAsyncRelayCommand NextSessionCommand { get; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasMultipleSessions), nameof(SessionLabel))]
+    private int _sessionCount;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SessionLabel))]
+    private int _sessionIndex;
+
+    public bool HasMultipleSessions => SessionCount > 1;
+
+    public string SessionLabel => $"{SessionIndex + 1}/{SessionCount}";
 
     [ObservableProperty] private bool _hasSession;
     [ObservableProperty] private string _title = "";
