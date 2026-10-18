@@ -4,6 +4,7 @@
         xmlns:controls="clr-namespace:Celah.App.Controls"
         xmlns:music="clr-namespace:Celah.App.Music"
         xmlns:lyrics="clr-namespace:Celah.App.Lyrics"
+        xmlns:peeks="clr-namespace:Celah.App.Peeks"
         Title="Celah"
         Width="640" Height="320"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
@@ -78,32 +79,13 @@
                         <music:MusicPill x:Name="MusicPillView" Opacity="0" Visibility="Collapsed" />
                     </Grid>
 
-                    <!-- ── Peek (sementara: contoh volume untuk uji coba dari menu tray) ── -->
+                    <!-- ── Peek: tinggi 44, lebar 280–340 sesuai isi (Peek.dc.html) ── -->
                     <Grid x:Name="PeekLayer" Width="320" Height="44" HorizontalAlignment="Center" VerticalAlignment="Top"
                           Opacity="0" Visibility="Collapsed">
                         <Grid.RenderTransform>
                             <TranslateTransform x:Name="PeekShift" />
                         </Grid.RenderTransform>
-                        <Grid Margin="16,0,18,0" VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="24" />
-                            </Grid.ColumnDefinitions>
-                            <Path Style="{StaticResource Celah.IconPath}" Data="{StaticResource Celah.Icon.Volume}"
-                                  Stroke="{StaticResource Celah.Brush.TextPrimary}">
-                                <Path.LayoutTransform>
-                                    <ScaleTransform ScaleX="0.75" ScaleY="0.75" />
-                                </Path.LayoutTransform>
-                            </Path>
-                            <Border Grid.Column="1" Height="4" Margin="12,0" CornerRadius="2"
-                                    Background="{StaticResource Celah.Brush.Stroke}">
-                                <Border x:Name="PeekFill" Width="0" HorizontalAlignment="Left" CornerRadius="2"
-                                        Background="{StaticResource Celah.Brush.TextPrimary}" />
-                            </Border>
-                            <TextBlock x:Name="PeekValue" Grid.Column="2" Style="{StaticResource Celah.Text.Pill}"
-                                       TextAlignment="Right" VerticalAlignment="Center" Text="64" />
-                        </Grid>
+                        <peeks:PeekView x:Name="PeekContent" />
                     </Grid>
 
                     <!-- ── Expanded 560 × 260 ── -->
@@ -155,6 +137,13 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
+
+                        <!-- Peek saat panel terbuka: baris 32 px di bawah bar tab (Peek.dc.html → aturan antrian) -->
+                        <Border x:Name="PeekBanner" Grid.Row="3" Height="32" Margin="20,0" VerticalAlignment="Top"
+                                CornerRadius="{StaticResource Celah.Radius.Md}" Background="{StaticResource Celah.Brush.SurfaceRaised}"
+                                Opacity="0" Visibility="Collapsed" IsHitTestVisible="False">
+                            <peeks:PeekView x:Name="PeekBannerContent" Compact="True" />
+                        </Border>
                     </Grid>
                 </Grid>
             </Border>

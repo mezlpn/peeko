@@ -202,6 +202,13 @@ Revisi setelah dicoba langsung:
 13. **Pemilihan sumber media** (`SessionSelector`). Sesi yang tampil tidak ikut berpindah saat dijeda. Sesi lain yang baru mulai diputar mengambil alih, kecuali pengguna memilih sesi secara manual dan sesi itu masih diputar. Jika ada lebih dari satu sesi, chip sumber di modul Musik diberi panah "‹ ● Brave 1/2 ›".
 14. **Lirik:** baris yang terlalu panjang dipotong dengan elipsis (desain: dibungkus jadi 2 baris dengan slot 52 px). Slot bervariasi membuat pergeseran daftar lebih rumit; ditinjau ulang jika sering terjadi. Varian "Ambil lirik dari internet sedang mati" menunggu jendela Pengaturan (tahap 6). Teks biasa bisa di-scroll dengan roda mouse, tapi tanpa scrollbar tipis.
 15. **Pencarian lirik** mengutamakan lirik tersinkron. Hasil teks biasa dari pencocokan persis hanya dijadikan cadangan, lalu dicari lagi dengan judul dasar tanpa keterangan versi seperti "(Alternate Version)". Maksimal 3 kandidat kueri.
+16. **Peek sistem (tahap 4).**
+    - Hook keyboard berjalan di thread sendiri (tidak ikut terhambat thread UI) dan hanya membaca tombol Caps Lock serta tombol pengubah bahasa.
+    - Bahasa dicek 150 ms setelah Shift/Alt/Ctrl/Win/Spasi dilepas. Saat jendela aktif berganti, bahasa dicatat diam-diam karena bisa berbeda per aplikasi. Ganti bahasa lewat klik ikon di taskbar belum terdeteksi.
+    - "Perangkat terputus" hanya untuk perangkat output yang sedang dipakai.
+    - Saat panel terbuka, peek tampil sebagai baris 32 px di bawah bar tab.
+    - Klik peek belum membuka modul terkait karena modulnya belum ada; hover tetap membuka panel.
+    - Argumen `--demo-peeks` memutar semua contoh peek, untuk mengecek tampilan.
 
 ## 11. Kontrak desain ↔ kode
 

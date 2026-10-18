@@ -7,6 +7,7 @@ using Celah.App.Animation;
 using Celah.App.Lyrics;
 using Celah.App.Music;
 using Celah.Core.Notch;
+using Celah.Core.Peeks;
 using Celah.Platform.Display;
 
 namespace Celah.App.Notch;
@@ -35,6 +36,8 @@ public partial class NotchWindow : Window
     private static readonly CornerRadius ExpandedRadius = new(0, 0, 28, 28);
 
     private readonly DispatcherTimer _clockTimer = new(DispatcherPriority.Background);
+    private readonly DispatcherTimer _bannerTimer = new();
+    private Size _peekSize = PeekSize;
     private NotchState _visualState = NotchState.Collapsed;
     private CollapsedActivity _activity = CollapsedActivity.Idle;
     private int _moduleIndex;
@@ -46,6 +49,7 @@ public partial class NotchWindow : Window
     {
         InitializeComponent();
         _clockTimer.Tick += (_, _) => UpdateClock();
+        _bannerTimer.Tick += (_, _) => HideBanner();
         MusicPillView.DataContext = music;
         MusicModuleView.DataContext = music;
         LyricsModuleView.DataContext = lyrics;
@@ -126,6 +130,13 @@ public partial class NotchWindow : Window
             case NotchState.Slim: ToRest(from, slim: true); break;
             case NotchState.Peek: ToPeek(from); break;
             case NotchState.Hidden: ToHidden(); break;
+        }
+        if (from == NotchState.Expanded)
+        {
+            _bannerTimer.Stop();
+            PeekBanner.BeginAnimation(OpacityProperty, null);
+            PeekBanner.Opacity = 0;
+            PeekBanner.Visibility = Visibility.Collapsed;
         }
         if (from == NotchState.Expanded || to == NotchState.Expanded)
             NotifyVisibleModule();
@@ -324,16 +335,58 @@ public partial class NotchWindow : Window
 
         FadeOut(CollapsedLayer, Motion.Ms(100));
         AnimateShoulders(1, Motion.Base, Motion.Out);
-        AnimateShape(PeekSize, PeekRadius, Motion.PeekIn, Motion.SpringSoft, widthDelay: 40, heightDelay: 40);
+        AnimateShape(_peekSize, PeekRadius, Motion.PeekIn, Motion.SpringSoft, widthDelay: 40, heightDelay: 40);
+        PeekContent.BeginAnimation(OpacityProperty, null);
+        PeekContent.Opacity = 1;
 
         PeekLayer.Visibility = Visibility.Visible;
         FadeIn(PeekLayer, Motion.Base, delayMs: 160);
         Slide(PeekShift, TranslateTransform.XProperty, from: -6, Motion.Base, delayMs: 160);
+    }
 
-        // Contoh isi bar level (nanti diisi data volume sungguhan).
-        int value = Random.Shared.Next(10, 100);
-        PeekValue.Text = value.ToString();
-        PeekFill.Animate(WidthProperty, Motion.To(value / 100.0 * 232, Motion.Ms(240), Motion.Standard, delayMs: 200));
+    /// <summary>
+    /// Isi peek berikutnya. Dipanggil sebelum state berpindah ke Peek, atau saat peek sedang tampil:
+    /// sejenis → hanya nilai yang bergerak; beda jenis → crossfade 120 ms lalu lebar menyesuaikan.
+    /// </summary>
+    public void SetPeek(PeekRequest request)
+    {
+        _peekSize = new Size(request.Width, PeekSize.Height);
+        PeekLayer.Width = request.Width;
+
+        bool showing = _visualState == NotchState.Peek;
+        if (!showing || PeekContent.Kind == request.Kind || Motion.Reduced)
+        {
+            PeekContent.Show(request);
+            if (showing) AnimateShape(_peekSize, PeekRadius, Motion.Base, Motion.SpringSoft, 0, 0);
+            return;
+        }
+
+        var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(0, Motion.ReducedCrossfade) { EasingFunction = Motion.In };
+        fadeOut.Completed += (_, _) =>
+        {
+            PeekContent.Show(request);
+            PeekContent.Animate(OpacityProperty, Motion.To(1, Motion.ReducedCrossfade, Motion.Out));
+        };
+        PeekContent.Animate(OpacityProperty, fadeOut);
+        AnimateShape(_peekSize, PeekRadius, Motion.Base, Motion.SpringSoft, 60, 60);
+    }
+
+    /// <summary>Peek saat panel terbuka: baris 32 px di bawah bar tab, hilang setelah masa tahan.</summary>
+    public void ShowBanner(PeekRequest request)
+    {
+        PeekBannerContent.Show(request);
+        PeekBanner.Visibility = Visibility.Visible;
+        PeekBanner.Animate(OpacityProperty, Motion.To(1, Motion.Fast, Motion.Out));
+        _bannerTimer.Stop();
+        _bannerTimer.Interval = request.Hold;
+        _bannerTimer.Start();
+    }
+
+    private void HideBanner()
+    {
+        _bannerTimer.Stop();
+        if (PeekBanner.Visibility != Visibility.Visible) return;
+        FadeOut(PeekBanner, Motion.Fast);
     }
 
     private void ToHidden()

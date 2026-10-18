@@ -8,6 +8,7 @@ using Celah.App.Lyrics;
 using Celah.App.Music;
 using Celah.Core.Lyrics;
 using Celah.App.Notch;
+using Celah.App.Peeks;
 using Celah.Core.Media;
 using Celah.Core.Notch;
 using Celah.Platform.Media;
@@ -75,12 +76,22 @@ public partial class App : Application
         });
         builder.Services.AddSingleton<LyricsController>();
         builder.Services.AddSingleton(sp => sp.GetRequiredService<LyricsController>().ViewModel);
+        builder.Services.AddSingleton<SystemPeekController>();
         builder.Services.AddSingleton<NotchWindow>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
 
-        _host.Services.GetRequiredService<NotchController>().Start();
+        var controller = _host.Services.GetRequiredService<NotchController>();
+        controller.Start();
         CreateTray();
+
+        // Alat pengembang: putar semua contoh peek bergantian (dipakai untuk mengecek tampilan).
+        if (e.Args.Contains("--demo-peeks"))
+        {
+            var demo = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2.5) };
+            demo.Tick += (_, _) => controller.ShowTestPeek();
+            demo.Start();
+        }
     }
 
     private void CreateTray()

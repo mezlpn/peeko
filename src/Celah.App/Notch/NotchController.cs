@@ -1,7 +1,9 @@
 using System.Windows.Input;
 using Celah.App.Lyrics;
 using Celah.App.Music;
+using Celah.App.Peeks;
 using Celah.Core.Notch;
+using Celah.Core.Peeks;
 using Celah.Platform.Display;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -17,16 +19,18 @@ public sealed class NotchController : IDisposable
     private readonly NotchStateMachine _stateMachine;
     private readonly MusicController _music;
     private readonly LyricsController _lyrics;
+    private readonly SystemPeekController _peeks;
     private readonly ILogger<NotchController> _log;
     private ForegroundWindowWatcher? _foreground;
 
     public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music,
-        LyricsController lyrics, ILogger<NotchController> log)
+        LyricsController lyrics, SystemPeekController peeks, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
         _music = music;
         _lyrics = lyrics;
+        _peeks = peeks;
         _log = log;
     }
 
@@ -53,13 +57,17 @@ public sealed class NotchController : IDisposable
         lyricsView.LineClicked += _lyrics.SeekToLine;
         _window.VisibleModuleChanged += module => _lyrics.SetVisible(module == NotchWindow.LyricsTab);
 
+        _peeks.PeekRequested += ShowPeek;
+
         _window.Show();
         _ = _music.StartAsync();
+        _ = _peeks.StartAsync();
 
         _foreground = new ForegroundWindowWatcher(() => NotchWindowInterop.GetMonitorOf(_window.Handle));
         _foreground.FullscreenChanged += OnFullscreenChanged;
         _foreground.CoversTopChanged += OnCoversTopChanged;
         _foreground.ForegroundChanged += _window.EnsureTopmost;
+        _foreground.ForegroundChanged += _peeks.OnForegroundChanged;
         _foreground.Start();
 
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
@@ -68,7 +76,25 @@ public sealed class NotchController : IDisposable
 
     public void SetSuspended(bool suspended) => _stateMachine.SetSuspended(suspended);
 
-    public void ShowTestPeek() => _stateMachine.ShowPeek();
+    public void ShowTestPeek() => _peeks.RaiseSample();
+
+    /// <summary>
+    /// Tampilkan event sesaat. Saat panel terbuka, peek menjadi baris di bawah bar tab; saat
+    /// fullscreen hanya baterai kritis yang boleh turun.
+    /// </summary>
+    private void ShowPeek(PeekRequest request)
+    {
+        _log.LogDebug("Peek {Kind}", request.Kind);
+        if (_stateMachine.State == NotchState.Expanded)
+        {
+            _window.ShowBanner(request);
+            return;
+        }
+        if (_stateMachine.State == NotchState.Hidden && !request.BypassHidden) return;
+
+        _window.SetPeek(request);
+        _stateMachine.ShowPeek(request.Hold, request.BypassHidden);
+    }
 
     private void OnStateChanged(NotchState from, NotchState to)
     {
@@ -123,6 +149,7 @@ public sealed class NotchController : IDisposable
     {
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
         _foreground?.Dispose();
+        _peeks.Dispose();
         _lyrics.Dispose();
         _music.Dispose();
         _stateMachine.Dispose();
