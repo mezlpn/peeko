@@ -5,3 +5,6 @@ obj/
 TestResults/
 publish/
 celah-design.zip
+
+# Video promosi (render lokal, tidak diunggah)
+video/
