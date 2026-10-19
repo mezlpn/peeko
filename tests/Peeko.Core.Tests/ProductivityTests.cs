@@ -338,6 +338,16 @@ public class ActivityArbiterTests
     {
         Assert.Equal(expected, ActivityArbiter.Pick(music, focus, water));
     }
+
+    [Theory]
+    [InlineData(false, FocusStatus.Ready, false, CollapsedActivity.Update)]
+    [InlineData(true, FocusStatus.Ready, false, CollapsedActivity.Update)]   // menggantikan musik
+    [InlineData(true, FocusStatus.Running, false, CollapsedActivity.MusicAndFocus)] // timer tetap tampil
+    [InlineData(false, FocusStatus.Ready, true, CollapsedActivity.Water)]
+    public void Update_interrupts_everything_but_timer_and_water(bool music, FocusStatus focus, bool water, CollapsedActivity expected)
+    {
+        Assert.Equal(expected, ActivityArbiter.Pick(music, focus, water, updateAvailable: true));
+    }
 }
 
 public sealed class JsonFileStoreTests : IDisposable

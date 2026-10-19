@@ -9,6 +9,8 @@ layar, dan Peeko terbuka menampilkan:
 - 🔔 Info singkat saat volume, kecerahan, Caps Lock, baterai, Wi-Fi, atau headphone berubah
 
 Gratis, ringan (± 55 MB RAM, hampir 0% CPU saat diam), dan semua data tersimpan di laptopmu sendiri.
+Peeko hanya terhubung ke internet untuk mengambil lirik ([lrclib.net](https://lrclib.net), bisa
+dimatikan) dan mengecek versi baru di GitHub.
 
 ---
 
@@ -54,10 +56,23 @@ Butuh **Windows 10 atau 11**. Tidak perlu memasang apa-apa lagi.
 Klik ikon Peeko di tray → **Pengaturan** → nyalakan **Mulai bersama Windows**.
 Kalau nanti folder Peeko dipindah, matikan lalu nyalakan lagi pilihan ini.
 
-### Update ke versi baru
+### Update ke versi baru (otomatis)
 
-Keluar dari Peeko (klik kanan ikon tray → **Keluar**), unduh zip versi terbaru, lalu ganti
-`Peeko.exe` yang lama dengan yang baru. Pengaturan, to-do, dan data lainnya tidak hilang.
+Mulai versi **0.1.2**, Peeko mengecek versi baru sendiri setiap kali dinyalakan (dan tiap 6 jam).
+Kalau ada, mata di notch berganti menjadi **"Update 0.x.x"** dan sesekali bergoyang minta perhatian 😄
+
+1. Klik tombol **Pasang** di notch. Tombol yang sama juga ada di samping jam saat panel terbuka,
+   dan di menu tray.
+2. Peeko mengunduh, memasang, lalu menyala lagi sendiri. Muncul **"Peeko diperbarui"**. Selesai!
+
+Pengaturan, to-do, dan data lainnya tidak hilang.
+
+> Masih memakai versi **0.1.1 atau lebih lama**? Update manual sekali saja: keluar dari Peeko,
+> unduh zip terbaru dari [Releases](https://github.com/mezlpn/peeko/releases/latest), lalu ganti
+> `Peeko.exe` yang lama. Setelah itu update berikutnya otomatis.
+>
+> Jika Peeko disimpan di folder yang butuh izin admin (mis. `C:\Program Files`), tombol Pasang
+> membuka halaman unduhan saja. Simpan Peeko di **Documents** supaya update otomatis bekerja.
 
 ### Uninstall
 

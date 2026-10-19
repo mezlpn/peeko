@@ -7,6 +7,7 @@ using Peeko.App.Music;
 using Peeko.App.Peeks;
 using Peeko.App.Productivity;
 using Peeko.App.Settings;
+using Peeko.App.Updates;
 using Peeko.Core.Settings;
 using Peeko.Core.Notch;
 using Peeko.Core.Peeks;
@@ -30,6 +31,7 @@ public sealed class NotchController : IDisposable
     private readonly WaterController _water;
     private readonly ListsController _lists;
     private readonly SettingsService _settings;
+    private readonly UpdateController _updates;
     private bool _rawFullscreen;
     private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
@@ -41,7 +43,7 @@ public sealed class NotchController : IDisposable
 
     public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music,
         LyricsController lyrics, SystemPeekController peeks, FocusController focus, WaterController water,
-        ListsController lists, SettingsService settings, ILogger<NotchController> log)
+        ListsController lists, SettingsService settings, UpdateController updates, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -52,6 +54,7 @@ public sealed class NotchController : IDisposable
         _water = water;
         _lists = lists;
         _settings = settings;
+        _updates = updates;
         _log = log;
     }
 
@@ -139,6 +142,20 @@ public sealed class NotchController : IDisposable
         UpdateActivity();
 
         _window.HotkeyPressed += ToggleFromHotkey;
+
+        // ── Update otomatis ──
+        _updates.Changed += () =>
+        {
+            _window.UpdatePill.Update(_updates.State, _updates.Latest?.Version.ToString(3) ?? "", _updates.Progress);
+            _window.SetUpdateHighlight(_updates.State is UpdateState.Available or UpdateState.Failed
+                ? _updates.Latest?.Version.ToString(3)
+                : null);
+            if (_updates.State == UpdateState.Failed && _updates.Error is { } error) _log.LogWarning("{Error}", error);
+            UpdateActivity();
+        };
+        _updates.Found += release => ShowPeek(new PeekRequest(PeekKind.UpdateAvailable) { Text = release.Version.ToString(3) });
+        _window.UpdatePill.InstallClicked += () => _ = _updates.InstallAsync();
+        _window.UpdateButton.Click += (_, _) => _ = _updates.InstallAsync();
         _lyrics.OpenSettingsRequested += () => OpenSettingsRequested?.Invoke();
         _settings.Changed += ApplySettings;
 
@@ -162,6 +179,9 @@ public sealed class NotchController : IDisposable
     public void SetSuspended(bool suspended) => _stateMachine.SetSuspended(suspended);
 
     public void ShowTestPeek() => _peeks.RaiseSample();
+
+    /// <summary>Peeko baru saja diperbarui (dinyalakan oleh versi lama).</summary>
+    public void ShowUpdated(string version) => ShowPeek(new PeekRequest(PeekKind.Updated) { Text = version });
 
     /// <summary>
     /// Tampilkan event sesaat. Saat panel terbuka, peek menjadi baris di bawah bar tab; saat
@@ -195,6 +215,7 @@ public sealed class NotchController : IDisposable
         _window.TransitionTo(from, to);
         _music.SetNotchState(to);
         _window.WaterPill.SetPulsing(to == NotchState.Collapsed && _window.CollapsedActivity == CollapsedActivity.Water);
+        _window.UpdatePill.SetVisible(to == NotchState.Collapsed && _window.CollapsedActivity == CollapsedActivity.Update);
         if (to != NotchState.Collapsed) _window.FocusPill.StopAnimations();
         UpdateFocusDisplay();
     }
@@ -206,7 +227,8 @@ public sealed class NotchController : IDisposable
         _window.SetCollapsedActivity(ActivityArbiter.Pick(
             _musicLive && s.MusicEnabled,
             s.FocusEnabled ? _focus.Timer.Status : Core.Productivity.FocusStatus.Ready,
-            _water.ReminderActive && s.WaterEnabled));
+            _water.ReminderActive && s.WaterEnabled,
+            _updates.State != UpdateState.None));
         UpdateFocusDisplay();
     }
 
@@ -280,7 +302,8 @@ public sealed class NotchController : IDisposable
         // Umpan balik instan sebelum panel mengembang (revisi: hover terasa telat).
         _window.ShowHoverAck(true);
         // Pengingat minum punya chip "+1 gelas" yang bisa diklik: beri waktu sebelum mengembang.
-        _stateMachine.PointerEntered(_window.CollapsedActivity == CollapsedActivity.Water
+        // Pengingat minum dan pil update punya tombol yang bisa diklik: beri waktu sebelum mengembang.
+        _stateMachine.PointerEntered(_window.CollapsedActivity is CollapsedActivity.Water or CollapsedActivity.Update
             ? TimeSpan.FromMilliseconds(450)
             : null);
     }

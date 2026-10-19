@@ -63,7 +63,7 @@ public partial class NotchWindow : Window
     /// </summary>
     private Size CollapsedSize => _activity switch
     {
-        CollapsedActivity.Water => WaterSize,
+        CollapsedActivity.Water or CollapsedActivity.Update => WaterSize,
         CollapsedActivity.Music => MusicSize,
         _ => IdleSize,
     };
@@ -77,6 +77,29 @@ public partial class NotchWindow : Window
     public FocusPill FocusPill => FocusPillView;
 
     public WaterPill WaterPill => WaterPillView;
+
+    public Updates.UpdatePill UpdatePill => UpdatePillView;
+
+    public System.Windows.Controls.Button UpdateButton => UpdateChip;
+
+    private bool _updateHighlight;
+
+    /// <summary>
+    /// Ada update: tombol di sebelah jam muncul, dan garis tipis berwarna limau supaya tetap
+    /// terlihat walau notch sedang berupa garis (mis. di atas tab Chrome).
+    /// </summary>
+    public void SetUpdateHighlight(string? version)
+    {
+        _updateHighlight = version is not null;
+        UpdateChip.Visibility = _updateHighlight ? Visibility.Visible : Visibility.Collapsed;
+        UpdateChip.Content = $"Update {version}";
+        UpdateBodyTint();
+    }
+
+    private void UpdateBodyTint() =>
+        Body.Background = (Brush)FindResource(_updateHighlight && _visualState == NotchState.Slim
+            ? "Peeko.Brush.Accent"
+            : "Peeko.Brush.NotchBg");
 
     public FocusModule FocusModule => FocusModuleView;
 
@@ -251,6 +274,7 @@ public partial class NotchWindow : Window
         }
         if (from == NotchState.Expanded || to == NotchState.Expanded)
             NotifyVisibleModule();
+        UpdateBodyTint();
     }
 
     /// <summary>Umpan balik langsung saat kursor menyentuh notch, sebelum jeda hover selesai.</summary>
@@ -377,6 +401,7 @@ public partial class NotchWindow : Window
         FocusPillView.HorizontalAlignment = combined ? HorizontalAlignment.Right : HorizontalAlignment.Center;
         FocusPillView.Margin = new Thickness(0, 0, combined ? 12 : 0, 0);
         WaterPillView.SetPulsing(activity == CollapsedActivity.Water && _visualState == NotchState.Collapsed);
+        UpdatePillView.SetVisible(activity == CollapsedActivity.Update && _visualState == NotchState.Collapsed);
 
         var wanted = new HashSet<UIElement>(activity switch
         {
@@ -384,6 +409,7 @@ public partial class NotchWindow : Window
             CollapsedActivity.Focus => [FocusPillView],
             CollapsedActivity.MusicAndFocus => [MusicPillView, FocusPillView],
             CollapsedActivity.Water => [WaterPillView],
+            CollapsedActivity.Update => [UpdatePillView],
             _ => new UIElement[] { Kedip },
         });
 
@@ -391,7 +417,7 @@ public partial class NotchWindow : Window
         if (visible)
             AnimateShape(CollapsedSize, CollapsedRadius, Motion.Ms(300), Motion.SpringSoft, widthDelay: 0, heightDelay: 0);
 
-        foreach (var element in new UIElement[] { Kedip, MusicPillView, FocusPillView, WaterPillView })
+        foreach (var element in new UIElement[] { Kedip, MusicPillView, FocusPillView, WaterPillView, UpdatePillView })
         {
             bool show = wanted.Contains(element);
             if (visible)

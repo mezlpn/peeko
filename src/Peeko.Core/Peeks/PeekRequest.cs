@@ -20,6 +20,10 @@ public enum PeekKind
     BreakDone,
     /// <summary>File diseret ke notch: "Simpan di rak".</summary>
     ShelfDrop,
+    /// <summary>Versi baru ditemukan (Text = versi).</summary>
+    UpdateAvailable,
+    /// <summary>Baru saja diperbarui (Text = versi sekarang).</summary>
+    Updated,
 }
 
 /// <summary>Isi satu peek. Arti tiap field bergantung pada <see cref="Kind"/>.</summary>
@@ -49,7 +53,7 @@ public sealed record PeekRequest(PeekKind Kind)
         PeekKind.CapsLock when !Flag => TimeSpan.FromSeconds(1),
         PeekKind.BatteryLow => TimeSpan.FromSeconds(3),
         PeekKind.BatteryCritical => TimeSpan.FromSeconds(5),
-        PeekKind.FocusDone or PeekKind.BreakDone => TimeSpan.FromSeconds(4),
+        PeekKind.FocusDone or PeekKind.BreakDone or PeekKind.UpdateAvailable or PeekKind.Updated => TimeSpan.FromSeconds(4),
         // Ditahan selama file masih diseret di atas notch; setelah tersimpan (Flag) hanya sebentar.
         PeekKind.ShelfDrop => Flag ? TimeSpan.FromMilliseconds(1500) : TimeSpan.FromSeconds(30),
         _ => TimeSpan.FromMilliseconds(1500),

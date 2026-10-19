@@ -246,6 +246,14 @@ Belum ada: bayangan 9-slice di panel expanded, serta animasi indikator tab yang 
 - **Pintasan Win + Alt + C** (`RegisterHotKey`) membuka/menutup panel.
 - **Mulai bersama Windows** lewat `HKCU\...\Run` (tanpa hak admin).
 - **Rilis** (`scripts/publish.ps1`): self-contained single file, tanpa kompresi. Dengan kompresi memori ±130 MB; tanpa kompresi ±55 MB (exe ±180 MB, zip tetap ±70 MB). Setelah tenang, CPU 0,1–0,3% di T470.
-- **Belum dibuat:** installer, auto-update, tanda tangan kode (SmartScreen akan memperingatkan), notch di monitor selain monitor utama.
+- **Belum dibuat:** installer, tanda tangan kode (SmartScreen akan memperingatkan), notch di monitor selain monitor utama.
+
+## 14. Update otomatis (0.1.2)
+
+- `UpdateChecker` (Core, teruji) membaca `api.github.com/repos/mezlpn/peeko/releases/latest`, mengambil versi dari tag (`v0.1.2`) dan aset `*-win-x64.zip`. Dicek 10 dtk setelah start lalu tiap 6 jam; gagal jaringan → diam, coba lagi nanti.
+- **Sengaja mengganggu:** `CollapsedActivity.Update` menggantikan mata dan musik (tapi tidak menyembunyikan timer fokus yang berjalan atau pengingat minum). Pil bergoyang dan panahnya memantul tiap 20 dtk; animasinya sekali jalan, bukan loop, supaya CPU tetap ≈ 0%. Saat notch berupa garis tipis, garisnya berwarna limau. Tombol "Update" juga ada di samping jam di panel dan di menu tray. Ada juga peek "Versi baru tersedia".
+- **Pasang:** unduh zip ke `%TEMP%` (progres di pil) → ambil `Peeko.exe` (dicek: ≥ 1 MB, diawali "MZ") → exe yang berjalan diganti nama jadi `Peeko.old.exe` → exe baru di tempatnya → jalankan dengan `--updated=<versi lama>` → keluar. Versi baru menunggu mutex satu-instance dilepas versi lama, menghapus `Peeko.old.exe`, lalu menampilkan peek "Peeko diperbarui".
+- Hanya untuk `Peeko.exe` satu-file (versi rilis). Dari `dotnet run`, atau jika folder tidak bisa ditulis (mis. Program Files), tombol membuka halaman rilis.
+- Diuji ujung-ke-ujung dengan sumber rilis lokal (`--update-feed=<url>`): 0.1.2 → 0.1.3, termasuk restart dan peek.
 
 Karena itu, prompt desain meminta token dan ukuran dalam piksel pada skala 100%, tanpa efek yang tidak bisa dibuat di WPF/Windows 10.

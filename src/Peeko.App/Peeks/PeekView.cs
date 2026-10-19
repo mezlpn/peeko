@@ -128,6 +128,16 @@ public sealed class PeekView : Grid
                 AddLabel("Istirahat selesai");
                 AddValue(r.Detail ?? "", "TextSecondary", small: true);
                 break;
+            case PeekKind.UpdateAvailable:
+                AddIcon(Geometry.Parse("M12,19 V5 M6,11 L12,5 L18,11"), "Accent");
+                AddLabel("Versi baru tersedia");
+                AddValue($"Peeko {r.Text}", "TextSecondary", small: true);
+                break;
+            case PeekKind.Updated:
+                AddHappyEyes();
+                AddLabel("Peeko diperbarui");
+                AddValue($"versi {r.Text}", "TextSecondary", small: true);
+                break;
             case PeekKind.ShelfDrop:
                 AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Shelf"], "TextPrimary");
                 AddLabel(r.Flag ? "Tersimpan di rak" : "Simpan di rak");

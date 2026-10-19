@@ -11,6 +11,7 @@ using Peeko.App.Notch;
 using Peeko.App.Peeks;
 using Peeko.App.Productivity;
 using Peeko.App.Settings;
+using Peeko.App.Updates;
 using System.Windows.Media;
 using Ellipse = System.Windows.Shapes.Ellipse;
 using Peeko.Core.Media;
@@ -40,6 +41,18 @@ public partial class App : Application
         base.OnStartup(e);
 
         _singleInstance = new Mutex(initiallyOwned: true, SingleInstanceName, out bool isFirst);
+        if (!isFirst && e.Args.Any(a => a.StartsWith(UpdateController.UpdatedArg)))
+        {
+            // Dinyalakan oleh versi lama setelah update: tunggu sampai versi lama selesai keluar.
+            try
+            {
+                isFirst = _singleInstance.WaitOne(TimeSpan.FromSeconds(20));
+            }
+            catch (AbandonedMutexException)
+            {
+                isFirst = true;
+            }
+        }
         if (!isFirst)
         {
             Shutdown();
@@ -106,6 +119,9 @@ public partial class App : Application
         builder.Services.AddSingleton<FocusController>();
         builder.Services.AddSingleton<WaterController>();
         builder.Services.AddSingleton<ListsController>();
+        // Alat pengembang: --update-feed=<url> mengganti sumber rilis (untuk menguji update tanpa GitHub).
+        var feed = e.Args.FirstOrDefault(a => a.StartsWith("--update-feed="))?["--update-feed=".Length..];
+        builder.Services.AddSingleton(sp => new UpdateController(sp.GetRequiredService<ILogger<UpdateController>>(), feed));
         builder.Services.AddSingleton<SettingsService>();
         builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddSingleton<NotchWindow>();
@@ -116,6 +132,19 @@ public partial class App : Application
         controller.OpenSettingsRequested += OpenSettings;
         controller.Start();
         CreateTray();
+
+        var updates = _host.Services.GetRequiredService<UpdateController>();
+        updates.Start();
+        if (e.Args.Any(a => a.StartsWith(UpdateController.UpdatedArg)))
+        {
+            var welcome = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
+            welcome.Tick += (_, _) =>
+            {
+                welcome.Stop();
+                controller.ShowUpdated(UpdateController.CurrentVersion.ToString(3));
+            };
+            welcome.Start();
+        }
 
         if (e.Args.Contains("--settings")) OpenSettings();
 
@@ -243,9 +272,13 @@ public partial class App : Application
         hide.Items.Add(Item("Sampai dinyalakan lagi", () => Suspend(null, "sampai dinyalakan lagi")));
         foreach (MenuItem sub in hide.Items) sub.Style = itemStyle;
 
+        var updates = _host.Services.GetRequiredService<UpdateController>();
+        var installUpdate = Item("Pasang update", () => _ = updates.InstallAsync());
+
         var menu = new ContextMenu { Style = (Style)Resources["Peeko.TrayMenu"] };
         menu.Items.Add(status);
         menu.Items.Add(new Separator { Style = (Style)Resources["Peeko.TraySeparator"] });
+        menu.Items.Add(installUpdate);
         menu.Items.Add(Item("Pengaturan", OpenSettings));
         menu.Items.Add(hide);
         menu.Items.Add(show);
@@ -254,7 +287,13 @@ public partial class App : Application
 #endif
         menu.Items.Add(new Separator { Style = (Style)Resources["Peeko.TraySeparator"] });
         menu.Items.Add(Item("Keluar", Shutdown));
-        menu.Opened += (_, _) => RefreshStatus();
+        menu.Opened += (_, _) =>
+        {
+            RefreshStatus();
+            bool available = updates.State is UpdateState.Available or UpdateState.Failed;
+            installUpdate.Visibility = available ? Visibility.Visible : Visibility.Collapsed;
+            installUpdate.Header = $"Pasang update {updates.Latest?.Version.ToString(3)}";
+        };
 
         _tray = new TaskbarIcon
         {
