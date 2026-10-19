@@ -1,0 +1,42 @@
+name: Laporan bug
+description: Sesuatu tidak berjalan seperti seharusnya
+labels: ["bug"]
+body:
+  - type: textarea
+    id: apa
+    attributes:
+      label: Apa yang terjadi?
+      description: Jelaskan masalahnya. Screenshot atau video sangat membantu.
+    validations:
+      required: true
+  - type: textarea
+    id: langkah
+    attributes:
+      label: Langkah untuk memunculkan masalah
+      placeholder: |
+        1. Putar lagu di Spotify
+        2. Arahkan kursor ke notch
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: harapan
+    attributes:
+      label: Seharusnya bagaimana?
+  - type: input
+    id: versi
+    attributes:
+      label: Versi Celah
+      description: Lihat di Pengaturan, di bawah logo.
+      placeholder: "0.1.0"
+  - type: input
+    id: windows
+    attributes:
+      label: Versi Windows dan skala layar
+      placeholder: "Windows 10 22H2, skala 125%"
+  - type: textarea
+    id: log
+    attributes:
+      label: Log (opsional)
+      description: Isi `%AppData%\Celah\logs\celah-<tanggal>.log` di sekitar waktu kejadian. Hapus judul lagu jika tidak ingin dibagikan.
+      render: text

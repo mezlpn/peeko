@@ -1,0 +1,22 @@
+name: Usulan fitur
+description: Ide baru atau perubahan perilaku/tampilan
+labels: ["usulan"]
+body:
+  - type: textarea
+    id: masalah
+    attributes:
+      label: Masalah atau kebutuhan apa yang ingin diselesaikan?
+      placeholder: "Saat memakai dua monitor, notch hanya muncul di monitor utama..."
+    validations:
+      required: true
+  - type: textarea
+    id: usulan
+    attributes:
+      label: Usulan solusinya
+      description: Seperti apa sebaiknya? Sketsa atau contoh dari aplikasi lain boleh dilampirkan.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatif
+    attributes:
+      label: Alternatif yang sudah dipertimbangkan (opsional)

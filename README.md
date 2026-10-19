@@ -1,9 +1,15 @@
 # Celah
 
-Notch interaktif di tepi atas layar Windows 10/11 (WPF, .NET 8).
+Notch interaktif di tepi atas layar Windows 10/11 (WPF, .NET 8): musik dan lirik sinkron,
+timer fokus, pengingat minum, to-do, rak file, serta info sistem singkat (volume, baterai,
+Wi-Fi, headphone…).
+
+**Unduh:** [Releases](https://github.com/mezlpn/celah/releases/latest) → `Celah-<versi>-win-x64.zip`.
 
 - Rancangan sistem: [docs/ARSITEKTUR.md](docs/ARSITEKTUR.md)
 - Desain (handoff Claude Design): [design/README.md](design/README.md)
+- Ingin melapor bug atau mengusulkan fitur? Lihat [CONTRIBUTING.md](CONTRIBUTING.md).
+- Lisensi: [MIT](LICENSE)
 
 ## Memakai versi rilis
 

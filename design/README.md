@@ -1,7 +1,7 @@
 # Celah — paket desain (handoff)
 
 Design system dan mockup untuk **Celah**, aplikasi notch WPF (.NET 8, Windows 10+).
-Kanvas aslinya: https://claude.ai/artifact/DZ6bFdykNV1HT8z21itJox
+Dibuat dengan Claude Design.
 
 ## Isi
 
