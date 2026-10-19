@@ -37,7 +37,21 @@ public partial class WaterModule : UserControl
         DoneView.Visibility = reached ? Visibility.Visible : Visibility.Collapsed;
         DoneDetail.Text = $"{glasses} gelas · {WaterTracker.Liters(glasses * d.GlassMl)}";
 
-        BuildGlasses(Math.Min(glasses, t.Goal), t.Goal, animateNew: glasses == _shownGlasses + 1 && _shownGlasses >= 0);
+        // Gelas di atas target tetap dicatat, tapi tidak menganimasikan ulang gelas terakhir;
+        // kelebihannya tampil sebagai "+n" di samping gelas.
+        BuildGlasses(Math.Min(glasses, t.Goal), t.Goal,
+            animateNew: glasses == _shownGlasses + 1 && _shownGlasses >= 0 && glasses <= t.Goal);
+        if (glasses > t.Goal)
+        {
+            Glasses.Children.Add(new TextBlock
+            {
+                Text = $"+{glasses - t.Goal}",
+                Style = (Style)FindResource("Celah.Text.BodyStrong"),
+                Foreground = B("Water"),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(8, 0, 0, 0),
+            });
+        }
         if (reached && !_wasReached && _shownGlasses >= 0) Wave();
         _shownGlasses = glasses;
         _wasReached = reached;

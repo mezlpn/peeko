@@ -31,6 +31,7 @@ public sealed class NotchController : IDisposable
     private readonly DispatcherTimer _dragExpand = new() { Interval = TimeSpan.FromMilliseconds(600) };
     private readonly DispatcherTimer _dragLeave = new() { Interval = TimeSpan.FromMilliseconds(120) };
     private bool _musicLive;
+    private bool _expandingForShelf;
     private ForegroundWindowWatcher? _foreground;
 
     public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music,
@@ -119,7 +120,9 @@ public sealed class NotchController : IDisposable
             // File ditahan 600 ms di atas notch: buka penuh ke tab Rak (Shelf.dc.html).
             _dragExpand.Stop();
             _window.SelectModule(NotchWindow.ShelfTab);
+            _expandingForShelf = true;
             _stateMachine.ExpandNow();
+            _expandingForShelf = false;
         };
         _dragLeave.Tick += (_, _) => EndDrag(dropped: false);
         UpdateActivity();
@@ -167,7 +170,8 @@ public sealed class NotchController : IDisposable
 
         // Hover membuka tab aktivitas terkait (Collapsed.dc.html → Interaksi). Tab Lirik dibiarkan
         // jika terakhir dipilih, supaya pengguna yang membaca lirik tidak dilempar balik ke Musik.
-        if (to == NotchState.Expanded && _musicLive
+        // Dibuka karena file diseret: tetap di tab Rak walau musik sedang diputar.
+        if (to == NotchState.Expanded && _musicLive && !_expandingForShelf
             && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.LyricsTab))
             _window.SelectModule(NotchWindow.MusicTab);
 
