@@ -1,9 +1,6 @@
 # Prompt video launching Peeko untuk Claude Design
 
-Salin semua teks di bawah garis ke Claude Design. Supaya bentuk notch-nya akurat, lampirkan juga:
-
-- folder `design/project/` (board desain asli), atau minimal `Main.dc.html`, `Collapsed.dc.html`, `Peek.dc.html`, dan `Motion.dc.html`;
-- 3–5 screenshot Peeko asli di laptopmu: notch idle dengan mata, panel Musik, Lirik, Fokus, dan Rak.
+Salin semua teks di bawah garis ke Claude Design, lalu lampirkan isi folder `board-desain/` dan `screenshot/` dari paket zip `Peeko-video-brief.zip`.
 
 ---
 
@@ -29,6 +26,13 @@ Detail lain yang bisa ditonjolkan:
 - Ringan: ±55 MB RAM, hampir 0% CPU saat diam. Jalan lancar di laptop tua (ThinkPad T470).
 - **Update otomatis**: kalau ada versi baru, mata berganti jadi tombol "Update" yang bergoyang minta perhatian.
 - Gratis, open source, data tersimpan di laptop sendiri.
+
+## Lampiran
+
+- **`screenshot/`**: tangkapan layar Peeko asli. `01–05` notch tertutup (mata, musik diputar, timer, ada update, garis tipis), `10–17` panel terbuka tiap tab, `20` semua jenis peek. Latar di sekitar notch sudah diganti abu-abu polos; itu bukan bagian desain.
+- **`board-desain/`**: board desain awal (file `.dc.html`). Di sana aplikasinya masih bernama lama, **"Celah"**; di video selalu pakai nama **Peeko**.
+- Buat ulang tampilannya serapi mungkin mengikuti screenshot, jangan sekadar menempel gambarnya, supaya bisa dianimasikan.
+- **Judul lagu, artis, cover album, dan lirik di video harus fiktif** (karangan sendiri), karena video akan dipublikasikan. Contoh: "Senja di Kota" oleh "Nadira", dengan cover gradasi abstrak.
 
 ## Identitas visual (pakai persis)
 
