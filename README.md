@@ -6,11 +6,13 @@ layar, dan Peeko terbuka menampilkan:
 - 🎵 **Musik** yang sedang diputar (Spotify, YouTube, dll.) + **lirik yang ikut berjalan**
 - ⏱️ **Timer fokus** (Pomodoro) dan 💧 **pengingat minum air**
 - ✅ **To-do** singkat dan 📁 **rak file** (tempat menaruh file sementara)
+- 🔄 **Ubah format file**: seret foto, PDF, atau dokumen ke notch, lalu pilih PNG, JPG, PDF, Word… (ditenagai [Filee](https://github.com/KnifeLemon/Filee))
 - 🔔 Info singkat saat volume, kecerahan, Caps Lock, baterai, Wi-Fi, atau headphone berubah
 
 Gratis, ringan (± 55 MB RAM, hampir 0% CPU saat diam), dan semua data tersimpan di laptopmu sendiri.
 Peeko hanya terhubung ke internet untuk mengambil lirik ([lrclib.net](https://lrclib.net), bisa
-dimatikan) dan mengecek versi baru di GitHub.
+dimatikan), mengecek versi baru di GitHub, dan mengunduh Filee sekali saat kamu memasang fitur
+Ubah format. File yang diubah tidak pernah diunggah ke mana pun.
 
 ---
 
@@ -45,7 +47,11 @@ Butuh **Windows 10 atau 11**. Tidak perlu memasang apa-apa lagi.
 
 - **Arahkan kursor** ke notch di tengah atas layar untuk membukanya. Jauhkan kursor untuk menutup.
 - Klik **ikon-ikon di bagian atas** panel untuk pindah antara Musik, Lirik, Fokus, Minum, Tugas, dan Rak.
-- **Seret file** dari Explorer ke notch untuk menyimpannya sementara di Rak.
+- **Seret file** dari Explorer ke notch. Tahan sebentar sampai panel terbuka, lalu lepaskan di:
+  - **Simpan di rak** (kiri) untuk menyimpannya sementara, atau
+  - **Ubah format** (kanan) untuk mengubahnya, mis. foto HEIC → JPG, gambar → PDF, PDF → Word.
+    Pertama kali, Peeko meminta izin mengunduh Filee (±160 MB, sekali saja). Hasilnya tersimpan
+    di sebelah file asli dan muncul di Rak.
 - Pintasan keyboard: **Win + Alt + C** membuka/menutup notch.
 - Ikon Peeko ada di **pojok kanan bawah**, dekat jam. Kalau tidak terlihat, klik panah **˄** di sana.
   - **Klik** ikonnya untuk membuka **Pengaturan**.
@@ -80,6 +86,7 @@ Pengaturan, to-do, dan data lainnya tidak hilang.
 2. Jika "Mulai bersama Windows" sempat dinyalakan, matikan dulu di Pengaturan sebelum keluar.
 3. Hapus folder Peeko.
 4. (Opsional) Hapus datanya: tekan **Win + R**, ketik `%AppData%\Peeko`, Enter, lalu hapus folder itu.
+   Jika fitur Ubah format pernah dipasang, hapus juga `%LocalAppData%\Peeko` (berisi Filee, ±280 MB).
 
 ### ❓ Masalah umum
 
@@ -90,6 +97,7 @@ Pengaturan, to-do, dan data lainnya tidak hilang.
 | Lagu tidak muncul | Peeko membaca pemutar yang mendukung kontrol media Windows (Spotify, Chrome, Edge, Brave, Media Player…). Coba putar ulang lagunya. |
 | Lirik tidak muncul | Lirik diambil dari [lrclib.net](https://lrclib.net) dan butuh internet. Tidak semua lagu tersedia. |
 | Antivirus memblokir | Peeko membaca tombol Caps Lock dan pergantian bahasa keyboard, jadi beberapa antivirus curiga. Kode sumbernya terbuka di repo ini; tambahkan Peeko ke pengecualian jika kamu percaya. |
+| Video atau audio tidak bisa diubah | Butuh mesin FFmpeg. Pengaturan → Ubah format → **Buka Filee**, lalu pasang FFmpeg di menu *Engines*. |
 | Masih bermasalah | Buka **[Issues](https://github.com/mezlpn/peeko/issues/new/choose)** → *Laporan bug*. |
 
 ---
@@ -100,7 +108,14 @@ Pengaturan, to-do, dan data lainnya tidak hilang.
 - Desain (handoff Claude Design): [design/README.md](design/README.md)
 - Ingin berkontribusi? Lihat [CONTRIBUTING.md](CONTRIBUTING.md).
 - Lisensi: [MIT](LICENSE)
-- Data aplikasi: `%AppData%\Peeko\` (settings.json, to-do, rak, cache lirik, log).
+- Data aplikasi: `%AppData%\Peeko\` (settings.json, to-do, rak, cache lirik, log); Filee di `%LocalAppData%\Peeko\filee\`.
+
+## Terima kasih
+
+- **[Filee](https://github.com/KnifeLemon/Filee)** oleh KnifeLemon (lisensi MIT) mengerjakan semua konversi di
+  fitur Ubah format. Peeko tidak membundelnya: paket portable resminya diunduh dari rilis Filee saat fitur itu
+  dipasang, dicek dengan SHA-256 dari rilis yang sama, lalu dijalankan sebagai program terpisah.
+- **[LRCLIB](https://lrclib.net)** untuk lirik tersinkron.
 
 ## Menjalankan dari kode
 
@@ -134,7 +149,8 @@ Untuk menjalankan Peeko "normal" dari sesi Claude Code, buat prosesnya lewat WMI
 powershell -Command "Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = '\"<path>\\Peeko.exe\"' }"
 ```
 
-Argumen pengembang: `--demo-peeks` memutar semua contoh peek; `--settings` langsung membuka Pengaturan.
+Argumen pengembang: `--demo-peeks` memutar semua contoh peek; `--settings` langsung membuka Pengaturan;
+`--convert=<file>` membuka panel Ubah format untuk file itu.
 
 ## Test
 

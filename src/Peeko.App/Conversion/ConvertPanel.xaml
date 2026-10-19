@@ -1,0 +1,102 @@
+<!-- Panel "Ubah format" di tab Rak: menimpa isi rak selama ada file yang sedang diubah.
+     Tinggi area modul ±190 px; baris judul 28 px seperti modul Rak dan Tugas. -->
+<UserControl x:Class="Peeko.App.Conversion.ConvertPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource Peeko.Brush.NotchBg}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Judul: ikon · UBAH FORMAT · nama file · tutup -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,0,0">
+                <Path Style="{StaticResource Peeko.IconPath}" Data="{StaticResource Peeko.Icon.Convert}" Stroke="{StaticResource Peeko.Brush.Accent}"
+                      VerticalAlignment="Center">
+                    <Path.LayoutTransform><ScaleTransform ScaleX="0.5833" ScaleY="0.5833" /></Path.LayoutTransform>
+                </Path>
+                <TextBlock Style="{StaticResource Peeko.Text.Overline}" Foreground="{StaticResource Peeko.Brush.TextTertiary}"
+                           VerticalAlignment="Center" Margin="6,0,0,0" Text="UBAH FORMAT" />
+            </StackPanel>
+            <TextBlock x:Name="FileText" Grid.Column="1" Style="{StaticResource Peeko.Text.Caption}" Foreground="{StaticResource Peeko.Brush.TextSecondary}"
+                       VerticalAlignment="Center" Margin="10,0,8,0" TextTrimming="CharacterEllipsis" />
+            <Button x:Name="CloseButton" Grid.Column="2" Style="{StaticResource Peeko.Button.Icon}" Width="26" Height="26"
+                    Tag="{StaticResource Peeko.Icon.Close}" ToolTip="Tutup" Click="OnClose" />
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,6,0,0">
+            <!-- Memuat -->
+            <TextBlock x:Name="LoadingView" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Text="Mencari format yang cocok…" Visibility="Collapsed" />
+
+            <!-- Pilih format -->
+            <Grid x:Name="ChooseView" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel x:Name="CommonView" VerticalAlignment="Center" Margin="4,0">
+                    <TextBlock Style="{StaticResource Peeko.Text.BodyStrong}" Text="Ubah ke" />
+                    <WrapPanel x:Name="CommonChips" Margin="0,10,0,0" />
+                    <Button x:Name="EngineHint" Style="{StaticResource Peeko.Button.Text}" HorizontalAlignment="Left" Margin="-10,0,0,0"
+                            Visibility="Collapsed" Click="OnOpenEngines" ToolTip="Buka Filee → Engines" />
+                </StackPanel>
+                <ScrollViewer x:Name="AllScroll" Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled"
+                              Visibility="Collapsed" Margin="0,4,0,0">
+                    <WrapPanel x:Name="AllChips" Margin="4,0" />
+                </ScrollViewer>
+            </Grid>
+
+            <!-- Belum dipasang / sedang dipasang -->
+            <StackPanel x:Name="InstallView" VerticalAlignment="Center" Margin="4,0" Visibility="Collapsed">
+                <TextBlock Style="{StaticResource Peeko.Text.BodyStrong}" Text="Pasang fitur Ubah format" />
+                <TextBlock Style="{StaticResource Peeko.Text.Caption}" Foreground="{StaticResource Peeko.Brush.TextSecondary}" TextWrapping="Wrap"
+                           Margin="0,4,0,0" MaxWidth="440" HorizontalAlignment="Left"
+                           Text="Peeko memakai Filee (gratis, open source) untuk mengubah 200+ format: gambar, PDF, Word, Excel, dan lainnya. Unduh ±160 MB sekali saja." />
+                <StackPanel x:Name="InstallButtons" Orientation="Horizontal" Margin="0,14,0,0">
+                    <Button Style="{StaticResource Peeko.Button.Pill}" Content="Pasang" Tag="{StaticResource Peeko.Fill.Download}" Click="OnInstall" />
+                    <Button Style="{StaticResource Peeko.Button.Text}" Content="Nanti" Margin="6,0,0,0" Click="OnClose" />
+                </StackPanel>
+                <StackPanel x:Name="InstallProgressView" Margin="0,14,0,0" Visibility="Collapsed">
+                    <Border Height="4" CornerRadius="2" Background="{StaticResource Peeko.Brush.Stroke}" Width="440" HorizontalAlignment="Left">
+                        <Border x:Name="InstallFill" CornerRadius="2" Background="{StaticResource Peeko.Brush.Accent}" HorizontalAlignment="Left" Width="0" />
+                    </Border>
+                    <TextBlock x:Name="InstallText" Style="{StaticResource Peeko.Text.Caption}" Margin="0,8,0,0" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Sedang mengubah -->
+            <StackPanel x:Name="WorkView" VerticalAlignment="Center" Margin="4,0" Visibility="Collapsed">
+                <TextBlock x:Name="WorkTitle" Style="{StaticResource Peeko.Text.BodyStrong}" />
+                <Border x:Name="WorkTrack" Height="4" CornerRadius="2" Background="{StaticResource Peeko.Brush.Stroke}" Margin="0,14,0,0"
+                        Width="440" HorizontalAlignment="Left" ClipToBounds="True">
+                    <Border x:Name="WorkBar" Width="90" CornerRadius="2" Background="{StaticResource Peeko.Brush.Accent}" HorizontalAlignment="Left">
+                        <Border.RenderTransform>
+                            <TranslateTransform x:Name="WorkShift" />
+                        </Border.RenderTransform>
+                    </Border>
+                </Border>
+                <TextBlock Style="{StaticResource Peeko.Text.Caption}" Margin="0,8,0,0" Text="Boleh ditinggal, nanti Peeko kabari." />
+            </StackPanel>
+
+            <!-- Selesai / gagal -->
+            <StackPanel x:Name="ResultView" VerticalAlignment="Center" Margin="4,0" Visibility="Collapsed">
+                <TextBlock x:Name="ResultTitle" Style="{StaticResource Peeko.Text.BodyStrong}" />
+                <TextBlock x:Name="ResultDetail" Style="{StaticResource Peeko.Text.Caption}" Foreground="{StaticResource Peeko.Brush.TextSecondary}"
+                           TextWrapping="Wrap" MaxWidth="440" HorizontalAlignment="Left" Margin="0,4,0,0" />
+                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                    <Button x:Name="ShowButton" Style="{StaticResource Peeko.Button.PillSecondary}" Content="Tampilkan di folder" Click="OnShowInFolder" />
+                    <Button x:Name="EnginesButton" Style="{StaticResource Peeko.Button.PillSecondary}" Content="Buka Filee" Click="OnOpenEngines" />
+                    <Button x:Name="RetryButton" Style="{StaticResource Peeko.Button.Text}" Content="Pilih format lain" Margin="6,0,0,0" Click="OnRetry" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

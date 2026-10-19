@@ -132,6 +132,8 @@
     <Geometry x:Key="Peeko.Icon.Water">M12,3.5 C15.2,7.5 18,10.7 18,14 A6,6 0 0 1 6,14 C6,10.7 8.8,7.5 12,3.5 Z</Geometry>
     <Geometry x:Key="Peeko.Icon.Todo">M4,7 L5.8,8.8 L9,5.5 M4,15 L5.8,16.8 L9,13.5 M12.5,7.5 H20 M12.5,15.5 H20</Geometry>
     <Geometry x:Key="Peeko.Icon.Shelf">M4,13.5 L6,6 H18 L20,13.5 V18 A1,1 0 0 1 19,19 H5 A1,1 0 0 1 4,18 Z M4,13.5 H8.5 L9.5,15.5 H14.5 L15.5,13.5 H20</Geometry>
+    <!-- Ubah format: dua panah berlawanan -->
+    <Geometry x:Key="Peeko.Icon.Convert">M4,9 H18 M14.5,5.5 L18,9 L14.5,12.5 M20,15 H6 M9.5,11.5 L6,15 L9.5,18.5</Geometry>
     <Geometry x:Key="Peeko.Icon.Volume">M4,9.5 H7.5 L12,5.5 V18.5 L7.5,14.5 H4 Z M15.5,9 A4,4 0 0 1 15.5,15 M18,6.5 A7.5,7.5 0 0 1 18,17.5</Geometry>
 
     <!-- Digambar di kanvas 24 × 24 seperti viewBox SVG-nya, lalu diskalakan ke 16 px. -->

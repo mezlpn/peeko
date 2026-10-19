@@ -53,6 +53,10 @@ public partial class SettingsWindow : Window
         e.Handled = true;
     }
 
+    private void OnFilee(object sender, RoutedEventArgs e) => _vm.ToggleFilee();
+
+    private void OnEngines(object sender, RoutedEventArgs e) => _vm.OpenEngines();
+
     private void OnMinimize(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     private void OnClose(object sender, RoutedEventArgs e) => Close();

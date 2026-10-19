@@ -257,3 +257,13 @@ Belum ada: bayangan 9-slice di panel expanded, serta animasi indikator tab yang 
 - Diuji ujung-ke-ujung dengan sumber rilis lokal (`--update-feed=<url>`): 0.1.2 → 0.1.3, termasuk restart dan peek.
 
 Karena itu, prompt desain meminta token dan ukuran dalam piksel pada skala 100%, tanpa efek yang tidak bisa dibuat di WPF/Windows 10.
+
+## 15. Ubah format dengan Filee (0.2.0)
+
+- **Sumber:** [Filee](https://github.com/KnifeLemon/Filee) karya KnifeLemon (MIT), konverter file offline 200+ format. Peeko tidak membundel atau menyalin kodenya: `filee-cli.exe` dijalankan sebagai proses terpisah, jadi Peeko tetap ±55 MB saat diam dan Filee hanya hidup selama konversi (prioritas *below normal*).
+- **Mencari Filee** (`FileeLocator`, Core): salinan milik Peeko di `%LocalAppData%\Peeko\filee`, lalu Filee Setup (`%LocalAppData%\Programs\Filee`, `Program Files\Filee`), lalu perintah `filee` di PATH (`cli\filee.cmd` → `..\filee-cli.exe`).
+- **Memasang** (`FileeService`): rilis terbaru `KnifeLemon/Filee` → `Filee-x.y.z-win-Portable.zip` (±160 MB) diunduh sambil dihitung SHA-256, dicocokkan dengan `Filee-x.y.z-SHA256SUMS.txt` dari rilis yang sama, diekstrak ke folder `.new`, file `.pdb` (±110 MB) dibuang, baru folder lama ditukar. Hasil ±283 MB di disk. Hapus dari Pengaturan hanya menyentuh salinan milik Peeko.
+- **Perintah yang dipakai:** `filee formats <ext>` (teks, di-cache per ekstensi; baris "With optional engines" = butuh FFmpeg/LibreOffice/…) dan `filee convert <file…> --to <fmt> --json`. Hasil disimpan di sebelah file asli, lalu dimasukkan ke rak.
+- **Alur di notch:** saat file diseret, zona tab Rak terbelah: "Simpan di rak" | "Ubah format". Dilepas di kanan → panel `ConvertPanel` menimpa isi rak: memuat → chip 5 format favorit (`ConvertSuggestions`, per jenis file) + "Lainnya (n)" → bar berjalan → "Selesai! Hasilnya masuk rak" (2,5 dtk, lalu kembali ke rak). Kartu rak juga punya tombol ⇄. Saat panel tertutup, hasil diberi tahu lewat peek. Selama ada konversi, hover tidak melempar ke tab Musik.
+- **Belum dibuat:** memasang mesin tambahan (FFmpeg, LibreOffice, …) dari Peeko. Tombol "Buka Filee" membuka aplikasi Filee yang ikut terunduh, lalu pengguna memasangnya di menu *Engines*.
+- Argumen pengembang `--convert=<file>` membuka panel untuk file itu.

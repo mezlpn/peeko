@@ -19,6 +19,7 @@ public partial class ShelfModule : UserControl
     private readonly Dictionary<string, ImageSource?> _thumbs = [];
     private Shelf? _shelf;
     private bool _dragOver;
+    private bool _overConvert;
 
     public ShelfModule()
     {
@@ -27,6 +28,31 @@ public partial class ShelfModule : UserControl
 
     /// <summary>Sedang menyeret file keluar dari rak atau membuka dialog: panel harus tetap terbuka.</summary>
     public event Action<bool>? BusyChanged;
+
+    /// <summary>Tombol "Ubah format" di kartu rak.</summary>
+    public event Action<string>? ConvertRequested;
+
+    public Conversion.ConvertPanel ConvertPanel => ConvertPanelView;
+
+    /// <summary>Zona "Ubah format" ikut tampil saat file diseret (Pengaturan → Ubah format).</summary>
+    public bool ConvertAvailable { get; set; } = true;
+
+    /// <summary>Saat file dilepas: apakah kursor di atas zona "Ubah format"?</summary>
+    public bool IsOverConvert(DragEventArgs e)
+    {
+        if (!_dragOver || ConvertZone.Visibility != Visibility.Visible || !ConvertZone.IsVisible) return false;
+        var p = e.GetPosition(ConvertZone);
+        return p.X >= -5 && p.Y >= -5 && p.X <= ConvertZone.ActualWidth + 5 && p.Y <= ConvertZone.ActualHeight + 5;
+    }
+
+    /// <summary>Sorot zona yang sedang di bawah kursor selama file diseret.</summary>
+    public void UpdateDragTarget(DragEventArgs e)
+    {
+        bool over = IsOverConvert(e);
+        if (over == _overConvert) return;
+        _overConvert = over;
+        StyleZones();
+    }
 
     public void Attach(Shelf shelf)
     {
@@ -40,7 +66,7 @@ public partial class ShelfModule : UserControl
         if (_shelf is null) return;
         var items = _shelf.Items;
         bool empty = items.Count == 0;
-        DropZone.Visibility = empty || _dragOver ? Visibility.Visible : Visibility.Collapsed;
+        Zones.Visibility = empty || _dragOver ? Visibility.Visible : Visibility.Collapsed;
         FilledView.Visibility = empty || _dragOver ? Visibility.Collapsed : Visibility.Visible;
         SummaryText.Text = $"{items.Count} file · {Shelf.FormatSize(_shelf.TotalBytes)}";
 
@@ -55,23 +81,16 @@ public partial class ShelfModule : UserControl
     public void SetDragOver(bool over, int count = 0, long bytes = 0, bool dropped = false)
     {
         _dragOver = over;
+        _overConvert = false;
+        bool split = over && ConvertAvailable;
+        ConvertColumn.Width = split ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+        ConvertZone.Visibility = split ? Visibility.Visible : Visibility.Collapsed;
+        ConvertPanelView.Suppressed = over;
         if (over)
         {
-            ZoneBorder.Stroke = B("Accent");
-            ZoneBorder.StrokeThickness = 2;
-            ZoneBorder.StrokeDashArray = [3, 2];
-            ZoneFill.Fill = B("AccentMuted");
-            ZoneIcon.Stroke = B("Accent");
-            ZoneTitle.Text = "Lepaskan untuk menyimpan";
-            ZoneTitle.Foreground = B("Accent");
+            ZoneTitle.Text = split ? "Simpan di rak" : "Lepaskan untuk menyimpan";
             ZoneDetail.Text = bytes > 0 ? $"{count} file · {Shelf.FormatSize(bytes)}" : $"{count} file";
-            ZoneDetail.Foreground = B("TextSecondary");
-            if (!Motion.Reduced)
-            {
-                var bob = new DoubleAnimation(0, 4, TimeSpan.FromMilliseconds(400)) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever, EasingFunction = Motion.Sine };
-                Timeline.SetDesiredFrameRate(bob, 30);
-                ZoneIconBob.BeginAnimation(TranslateTransform.YProperty, bob);
-            }
+            StyleZones();
         }
         else
         {
@@ -95,6 +114,36 @@ public partial class ShelfModule : UserControl
             }
         }
         Rebuild();
+    }
+
+    /// <summary>
+    /// Zona aktif: garis accent 2 px + latar accent-muted + ikon naik-turun 4 px tiap 800 ms. Zona
+    /// lainnya kembali netral. Tanpa zona Ubah format, zona rak selalu aktif.
+    /// </summary>
+    private void StyleZones()
+    {
+        bool shelfActive = !_overConvert;
+        StyleZone(ZoneBorder, ZoneFill, ZoneIcon, ZoneTitle, shelfActive);
+        StyleZone(ConvertBorder, ConvertFill, ConvertIcon, ConvertTitle, _overConvert);
+        ZoneDetail.Foreground = B(shelfActive ? "TextSecondary" : "TextTertiary");
+
+        ZoneIconBob.BeginAnimation(TranslateTransform.YProperty, null);
+        if (shelfActive && !Motion.Reduced)
+        {
+            var bob = new DoubleAnimation(0, 4, TimeSpan.FromMilliseconds(400)) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever, EasingFunction = Motion.Sine };
+            Timeline.SetDesiredFrameRate(bob, 30);
+            ZoneIconBob.BeginAnimation(TranslateTransform.YProperty, bob);
+        }
+    }
+
+    private static void StyleZone(System.Windows.Shapes.Rectangle border, System.Windows.Shapes.Rectangle fill, System.Windows.Shapes.Path icon, TextBlock title, bool active)
+    {
+        border.Stroke = B(active ? "Accent" : "StrokeStrong");
+        border.StrokeThickness = active ? 2 : 1.5;
+        border.StrokeDashArray = active ? [3, 2] : [4, 2.67];
+        fill.Fill = active ? B("AccentMuted") : Brushes.Transparent;
+        icon.Stroke = B(active ? "Accent" : "TextSecondary");
+        title.Foreground = B(active ? "Accent" : "TextPrimary");
     }
 
     // ── Kartu ───────────────────────────────────────────────────────────────
@@ -164,15 +213,38 @@ public partial class ShelfModule : UserControl
         remove.Click += (_, _) => _shelf?.Remove(item.Id);
         card.Children.Add(remove);
 
+        // Ubah format (file saja, bukan folder).
+        Button? convert = null;
+        if (ConvertAvailable && File.Exists(item.Path))
+        {
+            convert = new Button
+            {
+                Style = (Style)FindResource("Peeko.Button.Icon"),
+                Tag = FindResource("Peeko.Icon.Convert"),
+                Width = 20,
+                Height = 20,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(6, 2, 0, 0),
+                Opacity = 0,
+                ToolTip = "Ubah format",
+                Background = B("SurfacePressed"),
+            };
+            convert.Click += (_, _) => ConvertRequested?.Invoke(item.Path);
+            card.Children.Add(convert);
+        }
+
         card.MouseEnter += (_, _) =>
         {
             bg.Background = B("SurfaceRaised");
             remove.Animate(OpacityProperty, Motion.To(1, Motion.Fast, Motion.Out));
+            convert?.Animate(OpacityProperty, Motion.To(1, Motion.Fast, Motion.Out));
         };
         card.MouseLeave += (_, _) =>
         {
             bg.Background = Brushes.Transparent;
             remove.Animate(OpacityProperty, Motion.To(0, Motion.Fast, Motion.Out));
+            convert?.Animate(OpacityProperty, Motion.To(0, Motion.Fast, Motion.Out));
         };
 
         // Klik dua kali membuka; seret keluar memindahkan/menyalin ke aplikasi tujuan.

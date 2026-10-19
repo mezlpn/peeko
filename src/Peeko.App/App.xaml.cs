@@ -119,6 +119,8 @@ public partial class App : Application
         builder.Services.AddSingleton<FocusController>();
         builder.Services.AddSingleton<WaterController>();
         builder.Services.AddSingleton<ListsController>();
+        builder.Services.AddSingleton<Conversion.FileeService>();
+        builder.Services.AddSingleton<Conversion.ConvertController>();
         // Alat pengembang: --update-feed=<url> mengganti sumber rilis (untuk menguji update tanpa GitHub).
         var feed = e.Args.FirstOrDefault(a => a.StartsWith("--update-feed="))?["--update-feed=".Length..];
         builder.Services.AddSingleton(sp => new UpdateController(sp.GetRequiredService<ILogger<UpdateController>>(), feed));
@@ -147,6 +149,10 @@ public partial class App : Application
         }
 
         if (e.Args.Contains("--settings")) OpenSettings();
+
+        // Alat pengembang: --convert=<file> membuka panel Ubah format untuk file itu.
+        var convertArgs = e.Args.Where(a => a.StartsWith("--convert=")).Select(a => a["--convert=".Length..]).ToList();
+        if (convertArgs.Count > 0) controller.ConvertFiles(convertArgs);
 
         // Alat pengembang: putar semua contoh peek bergantian (dipakai untuk mengecek tampilan).
         if (e.Args.Contains("--demo-peeks"))

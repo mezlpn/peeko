@@ -75,6 +75,35 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!-- Tombol bergaris di dalam kartu (Pasang, Hapus, Buka Filee) -->
+        <Style x:Key="CardButton" TargetType="Button">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="MinWidth" Value="88" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextPrimary}" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" CornerRadius="6" BorderThickness="1" BorderBrush="{StaticResource Peeko.Brush.WinStroke}"
+                                Background="{StaticResource Peeko.Brush.WinBg}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Peeko.Brush.WinCardHover}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextDisabled}" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="CaptionButton" TargetType="Button" BasedOn="{StaticResource Peeko.Button.Flat}">
             <Setter Property="Width" Value="46" />
             <Setter Property="Height" Value="32" />
@@ -136,6 +165,7 @@
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Minum" Content="Minum air" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Fokus" Content="Timer fokus" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Lirik" Content="Lirik" Checked="OnNav" />
+                        <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Ubah" Content="Ubah format" Checked="OnNav" />
                     </StackPanel>
                 </DockPanel>
             </Border>
@@ -338,6 +368,44 @@
                                     <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding FetchLyrics}" />
                                 </Grid>
                             </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="Ubah" Margin="0,0,0,22">
+                            <TextBlock Style="{StaticResource SectionHeader}" Text="UBAH FORMAT" />
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Zona Ubah format" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Seret file ke notch, lalu lepaskan di zona kanan" />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ConvertEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,104,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="{Binding FileeStatus}" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="{Binding FileeDetail}" />
+                                        </StackPanel>
+                                        <Button Style="{StaticResource CardButton}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                Content="{Binding FileeButtonText}" IsEnabled="{Binding FileeButtonEnabled}" Click="OnFilee" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,104,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Mesin tambahan" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Video &amp; audio (FFmpeg), dokumen lama (LibreOffice): pasang dari menu Engines di Filee" />
+                                        </StackPanel>
+                                        <Button Style="{StaticResource CardButton}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                Content="Buka Filee" IsEnabled="{Binding EnginesEnabled}" Click="OnEngines" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            <TextBlock Style="{StaticResource Hint}" Margin="2,8,0,0" Foreground="{StaticResource Peeko.Brush.TextTertiary}">
+                                Konversi dikerjakan oleh
+                                <Hyperlink NavigateUri="https://github.com/KnifeLemon/Filee" RequestNavigate="OnLink" Foreground="{StaticResource Peeko.Brush.Accent}">Filee</Hyperlink>
+                                karya KnifeLemon (lisensi MIT), sepenuhnya di laptopmu tanpa unggah ke internet.
+                            </TextBlock>
                         </StackPanel>
                     </StackPanel>
                 </WrapPanel>

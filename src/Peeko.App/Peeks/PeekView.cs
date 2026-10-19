@@ -27,6 +27,7 @@ public sealed class PeekView : Grid
     private static readonly Geometry HeadphoneIcon = Geometry.Parse("M4,15 V12 A8,8 0 0 1 20,12 V15 M5,14 H6 A1.5,1.5 0 0 1 7.5,15.5 V18.5 A1.5,1.5 0 0 1 6,20 H5 A1.5,1.5 0 0 1 3.5,18.5 V15.5 A1.5,1.5 0 0 1 5,14 Z M18,14 H19 A1.5,1.5 0 0 1 20.5,15.5 V18.5 A1.5,1.5 0 0 1 19,20 H18 A1.5,1.5 0 0 1 16.5,18.5 V15.5 A1.5,1.5 0 0 1 18,14 Z");
     private static readonly Geometry BoltIcon = Geometry.Parse("M13,2 L5,13.5 H11 L10,22 L18,10.5 H12 Z");
     private static readonly Geometry HappyEye = Geometry.Parse("M2,10 Q8,0 14,10");
+    private static Geometry ConvertIcon => (Geometry)Application.Current.Resources["Peeko.Icon.Convert"];
 
     private Border? _fill;
     private PeekKind? _kind;
@@ -137,6 +138,21 @@ public sealed class PeekView : Grid
                 AddHappyEyes();
                 AddLabel("Peeko diperbarui");
                 AddValue($"versi {r.Text}", "TextSecondary", small: true);
+                break;
+            case PeekKind.ConvertDone:
+                AddHappyEyes();
+                AddLabel(r.Text ?? "Selesai");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true);
+                break;
+            case PeekKind.ConvertFailed:
+                AddIcon(ConvertIcon, "Danger");
+                AddLabel("Gagal mengubah format");
+                AddValue(r.Text ?? "", "TextSecondary", small: true, maxWidth: 130);
+                break;
+            case PeekKind.ConvertReady:
+                AddIcon(ConvertIcon, "Accent");
+                AddLabel("Ubah format siap");
+                AddValue($"Filee {r.Text}", "TextSecondary", small: true);
                 break;
             case PeekKind.ShelfDrop:
                 AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Shelf"], "TextPrimary");

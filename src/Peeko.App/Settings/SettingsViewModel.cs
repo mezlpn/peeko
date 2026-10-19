@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Peeko.App.Conversion;
 using Peeko.Core.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -8,10 +9,20 @@ namespace Peeko.App.Settings;
 public sealed class SettingsViewModel : ObservableObject
 {
     private readonly SettingsService _service;
+    private readonly ConvertController _convert;
 
-    public SettingsViewModel(SettingsService service)
+    public SettingsViewModel(SettingsService service, ConvertController convert)
     {
         _service = service;
+        _convert = convert;
+        convert.Changed += () =>
+        {
+            OnPropertyChanged(nameof(FileeStatus));
+            OnPropertyChanged(nameof(FileeDetail));
+            OnPropertyChanged(nameof(FileeButtonText));
+            OnPropertyChanged(nameof(FileeButtonEnabled));
+            OnPropertyChanged(nameof(EnginesEnabled));
+        };
     }
 
     private AppSettings S => _service.Current;
@@ -70,4 +81,34 @@ public sealed class SettingsViewModel : ObservableObject
 
     // ── Lirik ──
     public bool FetchLyrics { get => S.FetchLyrics; set => Set(value, s => s.FetchLyrics, (s, v) => s.FetchLyrics = v); }
+
+    // ── Ubah format (Filee) ──
+    public bool ConvertEnabled { get => S.ConvertEnabled; set => Set(value, s => s.ConvertEnabled, (s, v) => s.ConvertEnabled = v); }
+
+    private FileeService Filee => _convert.Filee;
+
+    public string FileeStatus => _convert.Installing
+        ? (_convert.InstallProgress >= 1 ? "Memasang Filee…" : $"Mengunduh Filee · {Math.Round(_convert.InstallProgress * 100)}%")
+        : Filee.IsReady ? $"Filee {Filee.Version} terpasang" : "Filee belum dipasang";
+
+    public string FileeDetail => _convert.Message is { } error && !_convert.Installing && _convert.Stage == ConvertStage.Idle
+        ? error
+        : Filee.IsReady
+            ? Filee.IsOwnCopy ? "Disimpan di folder data Peeko" : "Memakai Filee yang sudah ada di laptop ini"
+            : "Unduh ±160 MB sekali saja dari rilis resmi Filee";
+
+    /// <summary>Pasang / Hapus. Filee yang dipasang sendiri oleh pengguna tidak dihapus Peeko.</summary>
+    public string FileeButtonText => Filee.IsReady ? "Hapus" : "Pasang";
+
+    public bool FileeButtonEnabled => !_convert.Installing && (!Filee.IsReady || Filee.IsOwnCopy);
+
+    public bool EnginesEnabled => Filee.AppPath is not null;
+
+    public void ToggleFilee()
+    {
+        if (Filee.IsReady) _ = _convert.UninstallAsync();
+        else _ = _convert.InstallAsync();
+    }
+
+    public void OpenEngines() => _convert.OpenEngines();
 }

@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Peeko.App.Conversion;
 using Peeko.App.Lyrics;
 using Peeko.App.Music;
 using Peeko.App.Peeks;
@@ -32,6 +33,7 @@ public sealed class NotchController : IDisposable
     private readonly ListsController _lists;
     private readonly SettingsService _settings;
     private readonly UpdateController _updates;
+    private readonly ConvertController _convert;
     private bool _rawFullscreen;
     private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
@@ -43,7 +45,8 @@ public sealed class NotchController : IDisposable
 
     public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music,
         LyricsController lyrics, SystemPeekController peeks, FocusController focus, WaterController water,
-        ListsController lists, SettingsService settings, UpdateController updates, ILogger<NotchController> log)
+        ListsController lists, SettingsService settings, UpdateController updates, ConvertController convert,
+        ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -55,6 +58,7 @@ public sealed class NotchController : IDisposable
         _lists = lists;
         _settings = settings;
         _updates = updates;
+        _convert = convert;
         _log = log;
     }
 
@@ -117,6 +121,17 @@ public sealed class NotchController : IDisposable
 
         _window.ShelfModule.Attach(_lists.Shelf);
         _window.ShelfModule.BusyChanged += _stateMachine.SetHoldOpen;
+
+        // ── Ubah format (Filee) ──
+        _window.ShelfModule.ConvertPanel.Attach(_convert);
+        _window.ShelfModule.ConvertRequested += path => BeginConvert([path]);
+        _convert.PeekRequested += request =>
+        {
+            // Tab Rak sedang terlihat: panel Ubah format sudah menampilkan hasilnya sendiri.
+            if (_stateMachine.State == NotchState.Expanded && _window.VisibleModule == NotchWindow.ShelfTab
+                && request.Kind is PeekKind.ConvertDone or PeekKind.ConvertFailed) return;
+            ShowPeek(request);
+        };
         _window.VisibleModuleChanged += _ => UpdateFocusDisplay();
 
         var drop = _window.DropTarget;
@@ -208,7 +223,8 @@ public sealed class NotchController : IDisposable
         // Hover membuka tab aktivitas terkait (Collapsed.dc.html → Interaksi). Tab Lirik dibiarkan
         // jika terakhir dipilih, supaya pengguna yang membaca lirik tidak dilempar balik ke Musik.
         // Dibuka karena file diseret: tetap di tab Rak walau musik sedang diputar.
-        if (to == NotchState.Expanded && _musicLive && !_expandingForShelf
+        // Sedang mengubah format: tetap di tab Rak.
+        if (to == NotchState.Expanded && _musicLive && !_expandingForShelf && !_window.ShelfModule.ConvertPanel.IsActive
             && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.LyricsTab))
             _window.SelectModule(NotchWindow.MusicTab);
 
@@ -272,29 +288,51 @@ public sealed class NotchController : IDisposable
         _dragLeave.Stop();
         e.Effects = _settings.Current.ShelfEnabled && DraggedFiles(e) is { Length: > 0 } ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
+        _window.ShelfModule.UpdateDragTarget(e);
     }
 
     private void OnDrop(object sender, DragEventArgs e)
     {
         e.Handled = true;
         var files = _settings.Current.ShelfEnabled ? DraggedFiles(e) : null;
-        int added = files is null ? 0 : _lists.Shelf.Add(files);
         bool expanded = _stateMachine.State == NotchState.Expanded;
+        // Dilepas di zona "Ubah format": panel tetap terbuka untuk memilih format.
+        if (files is { Length: > 0 } && expanded && _settings.Current.ConvertEnabled && _window.ShelfModule.IsOverConvert(e))
+        {
+            EndDrag(dropped: true, keepOpen: true);
+            BeginConvert(files);
+            return;
+        }
+        int added = files is null ? 0 : _lists.Shelf.Add(files);
         EndDrag(dropped: true);
         // Dilepas langsung tanpa membuka panel: konfirmasi singkat.
         if (!expanded && added > 0)
             ShowPeek(new PeekRequest(PeekKind.ShelfDrop) { Flag = true, Text = $"{added} file" });
     }
 
-    private void EndDrag(bool dropped)
+    private void EndDrag(bool dropped, bool keepOpen = false)
     {
         _dragLeave.Stop();
         _dragExpand.Stop();
         _window.ShelfModule.SetDragOver(false, dropped: dropped);
         _stateMachine.EndPeek();
         // Dibuka lewat seretan (tanpa hover): tutup lagi jika kursor tidak di atas notch.
-        if (_stateMachine.State == NotchState.Expanded && !_window.HoverTarget.IsMouseOver)
+        if (!keepOpen && _stateMachine.State == NotchState.Expanded && !_window.HoverTarget.IsMouseOver)
             _stateMachine.PointerExited();
+    }
+
+    /// <summary>Alat pengembang (--convert=file): buka panel Ubah format seperti saat file dijatuhkan.</summary>
+    public void ConvertFiles(IEnumerable<string> files)
+    {
+        BeginConvert(files);
+        _stateMachine.ExpandNow();
+    }
+
+    /// <summary>Buka tab Rak dan mulai alur Ubah format untuk file ini.</summary>
+    private void BeginConvert(IEnumerable<string> files)
+    {
+        _window.SelectModule(NotchWindow.ShelfTab);
+        _convert.Begin(files);
     }
 
     private void OnPointerEnter(object sender, MouseEventArgs e)
@@ -351,6 +389,12 @@ public sealed class NotchController : IDisposable
         _window.SetModuleEnabled(NotchWindow.WaterTab, s.WaterEnabled);
         _window.SetModuleEnabled(NotchWindow.TodoTab, s.TodoEnabled);
         _window.SetModuleEnabled(NotchWindow.ShelfTab, s.ShelfEnabled);
+        if (_window.ShelfModule.ConvertAvailable != s.ConvertEnabled)
+        {
+            _window.ShelfModule.ConvertAvailable = s.ConvertEnabled;
+            _window.ShelfModule.Rebuild();
+            if (!s.ConvertEnabled) _convert.Close();
+        }
 
         _lyrics.SetFetchEnabled(s.LyricsEnabled && s.FetchLyrics);
         _peeks.SetBatteryThreshold(s.BatteryThreshold);
