@@ -125,7 +125,7 @@
                                        HorizontalAlignment="Right" VerticalAlignment="Center" Text="00:00" />
                         </Grid>
 
-                        <Grid x:Name="ModuleHost" Grid.Row="3" Margin="20,0">
+                        <Grid x:Name="ModuleHost" Grid.Row="3" Margin="20,0" ClipToBounds="True">
                             <Grid.RenderTransform>
                                 <TranslateTransform x:Name="ModuleShift" />
                             </Grid.RenderTransform>

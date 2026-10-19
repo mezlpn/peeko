@@ -366,32 +366,68 @@ public partial class NotchWindow : Window
         int index = Tabs.Children.IndexOf(tab);
         if (index < 0 || index == _moduleIndex) return;
 
-        // Ganti tab (Motion.dc.html): isi lama keluar 120 ms ∓12 px, isi baru masuk 220 ms ±12 px.
+        // Ganti tab (revisi #18): geser seperti umumnya. Isi lama bergeser keluar searah tab sambil
+        // memudar, isi baru masuk dari sisi lain sambil muncul; keduanya bergerak bersamaan.
         int direction = index > _moduleIndex ? 1 : -1;
-        UIElement hide = ModuleView(_moduleIndex);
-        UIElement show = ModuleView(index);
+        var hide = (FrameworkElement)ModuleView(_moduleIndex);
+        var show = (FrameworkElement)ModuleView(index);
         _moduleIndex = index;
 
         PlaceholderTitle.Text = tab.ToolTip is string name ? $"Modul {name} menyusul" : "Modul menyusul";
 
+        bool animate = !Motion.Reduced && _visualState == NotchState.Expanded && hide != show;
+        const double distance = 48;
+
         if (hide != show)
         {
-            hide.BeginAnimation(OpacityProperty, null);
-            hide.Visibility = Visibility.Collapsed;
+            if (animate)
+            {
+                var shiftOut = ModuleTransform(hide);
+                shiftOut.Animate(TranslateTransform.XProperty, Motion.To(-distance * direction, Motion.Base, Motion.Standard));
+                var fadeOut = Motion.To(0, Motion.Base, Motion.Standard);
+                fadeOut.Completed += (_, _) =>
+                {
+                    // Bisa saja pengguna sudah kembali ke tab ini sebelum animasi selesai.
+                    if (ModuleView(_moduleIndex) != hide) hide.Visibility = Visibility.Collapsed;
+                };
+                hide.Animate(OpacityProperty, fadeOut);
+            }
+            else
+            {
+                hide.BeginAnimation(OpacityProperty, null);
+                hide.Visibility = Visibility.Collapsed;
+            }
         }
+
         show.Visibility = Visibility.Visible;
-        if (!Motion.Reduced && _visualState == NotchState.Expanded)
+        var shiftIn = ModuleTransform(show);
+        if (animate)
         {
-            show.Animate(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation(0, 1, Motion.Base) { EasingFunction = Motion.Out, BeginTime = Motion.Ms(90) });
-            Slide(ModuleShift, TranslateTransform.XProperty, from: 12 * direction, Motion.Base, delayMs: 90);
+            var slide = Motion.To(0, Motion.Ms(280), Motion.Out);
+            slide.From = distance * direction;
+            shiftIn.Animate(TranslateTransform.XProperty, slide);
+            var fadeIn = Motion.To(1, Motion.Ms(280), Motion.Out);
+            fadeIn.From = 0;
+            show.Animate(OpacityProperty, fadeIn);
         }
         else
         {
+            shiftIn.BeginAnimation(TranslateTransform.XProperty, null);
+            shiftIn.X = 0;
             show.BeginAnimation(OpacityProperty, null);
             show.Opacity = 1;
         }
 
         NotifyVisibleModule();
+    }
+
+    /// <summary>Tiap modul punya geseran sendiri supaya yang keluar dan yang masuk bisa bergerak bersamaan.</summary>
+    private static TranslateTransform ModuleTransform(FrameworkElement module)
+    {
+        if (module.RenderTransform is TranslateTransform t) return t;
+        t = new TranslateTransform();
+        module.RenderTransform = t;
+        return t;
     }
 
     private void ToPeek(NotchState from)

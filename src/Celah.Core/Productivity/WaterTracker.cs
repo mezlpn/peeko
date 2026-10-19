@@ -9,6 +9,9 @@ public sealed class WaterData
     public int Goal { get; set; } = 8;
     public int GlassMl { get; set; } = 250;
     public int IntervalMinutes { get; set; } = 60;
+    /// <summary>Pengingat hanya antara jam ini (waktu lokal), sesuai Settings.dc.html.</summary>
+    public int ActiveFromHour { get; set; } = 8;
+    public int ActiveUntilHour { get; set; } = 21;
 }
 
 /// <summary>
@@ -41,9 +44,18 @@ public sealed class WaterTracker
         get
         {
             if (GoalReached) return null;
-            // Dihitung dari minum terakhir atau pengingat terakhir, mana yang lebih baru.
-            var from = Max(Max(_d.LastDrink, _d.LastReminder) ?? StartOfToday(), StartOfToday());
+            var activeFrom = TodayAt(_d.ActiveFromHour);
+            var activeUntil = TodayAt(_d.ActiveUntilHour);
+
+            // Dihitung dari minum terakhir atau pengingat terakhir, mana yang lebih baru;
+            // tanpa catatan hari ini, pengingat pertama tepat saat jam aktif dimulai.
+            var from = Max(_d.LastDrink, _d.LastReminder) ?? activeFrom - Interval;
             var next = from + Interval;
+
+            // Hanya di jam aktif (default 08.00–21.00): sebelum → tunggu jam mulai, sesudah → besok pagi.
+            if (next < activeFrom) next = activeFrom;
+            if (next >= activeUntil) next = activeFrom.AddDays(1);
+
             var now = _time.GetUtcNow();
             return next < now ? now : next;
         }
@@ -95,9 +107,9 @@ public sealed class WaterTracker
         Changed?.Invoke();
     }
 
-    private DateTimeOffset StartOfToday()
+    private DateTimeOffset TodayAt(int hour)
     {
         var local = _time.GetLocalNow();
-        return new DateTimeOffset(local.Date, local.Offset);
+        return new DateTimeOffset(local.Date.AddHours(hour), local.Offset);
     }
 }

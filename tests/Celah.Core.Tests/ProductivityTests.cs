@@ -169,6 +169,29 @@ public class WaterTrackerTests
         Assert.Equal(0, water.Glasses);
     }
 
+    [Fact]
+    public void Reminders_only_during_active_hours()
+    {
+        var water = new WaterTracker(_time); // 08:00 WIB, belum minum: pengingat pertama sekarang
+        Assert.True(water.IsDue);
+
+        water.Drink();
+        _time.Advance(TimeSpan.FromHours(12.5)); // 20:30 WIB
+        water.Drink();
+        // 21:30 di luar jam aktif → besok 08:00 WIB (= 01:00 UTC).
+        Assert.Equal(new DateTimeOffset(2026, 10, 20, 1, 0, 0, TimeSpan.Zero), water.NextReminder!.Value.ToUniversalTime());
+    }
+
+    [Fact]
+    public void First_reminder_waits_for_active_hours()
+    {
+        var early = new FakeTimeProvider(new DateTimeOffset(2026, 10, 18, 22, 0, 0, TimeSpan.Zero)); // 05:00 WIB
+        early.SetLocalTimeZone(TimeZoneInfo.CreateCustomTimeZone("WIB", TimeSpan.FromHours(7), "WIB", "WIB"));
+        var water = new WaterTracker(early);
+        Assert.False(water.IsDue);
+        Assert.Equal(new DateTimeOffset(2026, 10, 19, 1, 0, 0, TimeSpan.Zero), water.NextReminder!.Value.ToUniversalTime());
+    }
+
     [Theory]
     [InlineData(1250, "1,25 L")]
     [InlineData(2000, "2 L")]

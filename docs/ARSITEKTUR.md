@@ -216,6 +216,7 @@ Revisi setelah dicoba langsung:
     - Kotak input to-do: jendela notch sementara dibuat bisa aktif (tanpa `WS_EX_NOACTIVATE`) dan panel ditahan terbuka; kembali normal saat input selesai atau jendela kehilangan fokus.
     - Rak: file dari folder sementara disalin; file lain hanya ditautkan dan file asli tidak pernah dihapus. Seret file ke pil: peek "Simpan di rak", ditahan 600 ms → panel terbuka ke tab Rak.
     - Belum dibuat: seret untuk mengurutkan to-do, pilih banyak file di rak (Ctrl+klik), kartu "+n" (diganti gulir horizontal), dan pengaturan durasi/target (menunggu jendela Pengaturan).
+18. **Ganti tab** (desain: isi lama hilang cepat, isi baru masuk ±12 px): sekarang geser penuh 48 px. Isi lama keluar searah tab sambil memudar dan isi baru masuk dari sisi lain, bersamaan, dalam 220–280 ms. Area modul memotong isinya supaya geseran tidak melewati tepi panel.
 
 ## 11. Kontrak desain ↔ kode
 
