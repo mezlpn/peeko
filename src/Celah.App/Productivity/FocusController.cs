@@ -57,6 +57,16 @@ public sealed class FocusController : IDisposable
 
     public event Action<PeekRequest>? PeekRequested;
 
+    /// <summary>Durasi baru dari Pengaturan; sesi yang sedang berjalan tetap memakai waktu selesainya.</summary>
+    public void Apply(int focusMinutes, int shortBreakMinutes, int longBreakMinutes)
+    {
+        var s = Timer.Settings;
+        s.FocusMinutes = focusMinutes;
+        s.ShortBreakMinutes = shortBreakMinutes;
+        s.LongBreakMinutes = longBreakMinutes;
+        Updated?.Invoke();
+    }
+
     public void SetDisplayVisible(bool visible)
     {
         _displayVisible = visible;

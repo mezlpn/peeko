@@ -99,6 +99,215 @@
         <Setter Property="Foreground" Value="{StaticResource Celah.Brush.TextSecondary}" />
     </Style>
 
+    <!-- ── Jendela Pengaturan ── -->
+
+    <!-- Toggle 40 × 20, knob 12 px bergeser 20 px (Components.dc.html). -->
+    <Style x:Key="Celah.Toggle" TargetType="CheckBox">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Border x:Name="Track" Width="40" Height="20" CornerRadius="10" Background="Transparent"
+                            BorderBrush="{StaticResource Celah.Brush.TextSecondary}" BorderThickness="1.5">
+                        <Ellipse x:Name="Knob" Width="12" Height="12" HorizontalAlignment="Left" Margin="2.5,0,0,0"
+                                 Fill="{StaticResource Celah.Brush.TextSecondary}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Track" Property="Background" Value="{StaticResource Celah.Brush.Accent}" />
+                            <Setter TargetName="Track" Property="BorderThickness" Value="0" />
+                            <Setter TargetName="Knob" Property="Fill" Value="{StaticResource Celah.Brush.AccentInk}" />
+                            <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
+                            <Setter TargetName="Knob" Property="Margin" Value="0,0,4,0" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Track" Property="Opacity" Value="0.9" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Slider: track 4 px, isi accent, thumb 12 px. -->
+    <Style x:Key="Celah.SliderThumb" TargetType="Thumb">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Ellipse Width="12" Height="12" Fill="{StaticResource Celah.Brush.TextPrimary}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Celah.SliderRepeat" TargetType="RepeatButton">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RepeatButton">
+                    <Border Height="4" CornerRadius="2" Background="{TemplateBinding Background}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="Celah.Slider" TargetType="Slider">
+        <Setter Property="Height" Value="16" />
+        <Setter Property="IsMoveToPointEnabled" Value="True" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Track x:Name="PART_Track" VerticalAlignment="Center">
+                        <Track.DecreaseRepeatButton>
+                            <RepeatButton Style="{StaticResource Celah.SliderRepeat}" Background="{StaticResource Celah.Brush.Accent}"
+                                          Command="Slider.DecreaseLarge" />
+                        </Track.DecreaseRepeatButton>
+                        <Track.IncreaseRepeatButton>
+                            <RepeatButton Style="{StaticResource Celah.SliderRepeat}" Background="{StaticResource Celah.Brush.WinStroke}"
+                                          Command="Slider.IncreaseLarge" />
+                        </Track.IncreaseRepeatButton>
+                        <Track.Thumb>
+                            <Thumb Style="{StaticResource Celah.SliderThumb}" />
+                        </Track.Thumb>
+                    </Track>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Slider dua arah (geser horizontal): tanpa isi, karena 0 ada di tengah. -->
+    <Style x:Key="Celah.SliderCentered" TargetType="Slider" BasedOn="{StaticResource Celah.Slider}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid>
+                        <Border Height="4" CornerRadius="2" VerticalAlignment="Center" Background="{StaticResource Celah.Brush.WinStroke}" />
+                        <Border Width="2" Height="10" CornerRadius="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Background="{StaticResource Celah.Brush.TextTertiary}" />
+                        <Track x:Name="PART_Track" VerticalAlignment="Center">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource Celah.SliderRepeat}" Background="Transparent" Command="Slider.DecreaseLarge" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource Celah.SliderRepeat}" Background="Transparent" Command="Slider.IncreaseLarge" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource Celah.SliderThumb}" />
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Tombol kecil di stepper dan title bar -->
+    <Style x:Key="Celah.Button.Flat" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource Celah.Brush.TextPrimary}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" Background="Transparent"
+                            CornerRadius="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Celah.Brush.WinCardHover}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource Celah.Brush.TextDisabled}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ── Menu tray (Settings.dc.html): lebar 224, item 32, radius 8, latar win-card ── -->
+    <Style x:Key="Celah.TrayMenu" TargetType="ContextMenu">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border MinWidth="224" Padding="4" CornerRadius="8" Background="{StaticResource Celah.Brush.WinCard}"
+                            BorderBrush="{StaticResource Celah.Brush.WinStroke}" BorderThickness="1">
+                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Celah.TraySeparator" TargetType="Separator">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Height="1" Margin="0,4" Background="{StaticResource Celah.Brush.WinStroke}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Celah.TrayItem" TargetType="MenuItem">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Foreground" Value="{StaticResource Celah.Brush.TextPrimary}" />
+        <Setter Property="FontFamily" Value="{StaticResource Celah.Font}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Grid>
+                        <Border x:Name="Bg" Height="32" Padding="12,0" CornerRadius="4" Background="Transparent">
+                            <Grid>
+                                <ContentPresenter ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                                <Path x:Name="Arrow" Data="M9.5,6 L15.5,12 L9.5,18" Stroke="{StaticResource Celah.Brush.TextSecondary}"
+                                      StrokeThickness="2" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                      Visibility="Collapsed">
+                                    <Path.LayoutTransform>
+                                        <ScaleTransform ScaleX="0.5" ScaleY="0.5" />
+                                    </Path.LayoutTransform>
+                                </Path>
+                                <Path x:Name="Check" Data="M6,12.5 L10,16.5 L18,8" Stroke="{StaticResource Celah.Brush.Accent}"
+                                      StrokeThickness="2.4" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                      Visibility="Collapsed">
+                                    <Path.LayoutTransform>
+                                        <ScaleTransform ScaleX="0.5" ScaleY="0.5" />
+                                    </Path.LayoutTransform>
+                                </Path>
+                            </Grid>
+                        </Border>
+                        <Popup x:Name="PART_Popup" Placement="Left" HorizontalOffset="-4" AllowsTransparency="True"
+                               IsOpen="{TemplateBinding IsSubmenuOpen}" Focusable="False" PopupAnimation="Fade">
+                            <Border MinWidth="180" Padding="4" CornerRadius="8" Background="{StaticResource Celah.Brush.WinCard}"
+                                    BorderBrush="{StaticResource Celah.Brush.WinStroke}" BorderThickness="1">
+                                <StackPanel IsItemsHost="True" />
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Celah.Brush.WinCardHover}" />
+                        </Trigger>
+                        <Trigger Property="Role" Value="SubmenuHeader">
+                            <Setter TargetName="Arrow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource Celah.Brush.TextSecondary}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Ikon isi untuk tombol pil -->
     <Geometry x:Key="Celah.Fill.Play">M8,5.5 V18.5 L19,12 Z</Geometry>
     <Geometry x:Key="Celah.Fill.Pause">M6.5,5 H10.5 V19 H6.5 Z M13.5,5 H17.5 V19 H13.5 Z</Geometry>

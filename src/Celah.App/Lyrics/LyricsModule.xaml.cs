@@ -189,6 +189,7 @@ public partial class LyricsModule : UserControl
             LyricsViewState.NotFound => ("Lirik tidak ditemukan", "Belum ada lirik untuk lagu ini di lrclib.net."),
             LyricsViewState.Failed => ("Lirik belum bisa dimuat", "Periksa koneksi internet, lalu coba lagi."),
             LyricsViewState.Instrumental => ("Instrumental", "Lagu ini tidak punya lirik."),
+            LyricsViewState.Disabled => ("Lirik dimatikan", "Ambil lirik dari internet sedang mati."),
             _ => ("Belum ada yang diputar", "Putar lagu dan liriknya akan muncul di sini."),
         };
     }

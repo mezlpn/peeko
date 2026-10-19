@@ -123,7 +123,7 @@
 
         <!-- ── Tidak ditemukan / gagal / instrumental / tidak ada lagu ── -->
         <Grid Grid.Row="2" Margin="4,0"
-              Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed,Instrumental,None'}">
+              Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed,Instrumental,None,Disabled'}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="88" />
                 <ColumnDefinition Width="20" />
@@ -133,7 +133,7 @@
                 <Grid>
                     <!-- Kedip "bingung": satu mata menyipit -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed,None'}">
+                                Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed,None,Disabled'}">
                         <Rectangle Width="6" Height="10" RadiusX="3" RadiusY="3" Fill="{StaticResource Celah.Brush.TextSecondary}" />
                         <Rectangle Width="6" Height="5" RadiusX="2.5" RadiusY="2.5" Margin="10,4,0,0" Fill="{StaticResource Celah.Brush.TextSecondary}" />
                     </StackPanel>
@@ -157,6 +157,9 @@
                     <Button Style="{StaticResource TextButton}" Content="Lihat di peramban" Margin="8,0,0,0"
                             Command="{Binding OpenInBrowserCommand}" />
                 </StackPanel>
+                <Button Style="{StaticResource PillButton}" Content="Buka pengaturan" Margin="0,12,0,0" HorizontalAlignment="Left"
+                        Command="{Binding OpenSettingsCommand}"
+                        Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter=Disabled}" />
             </StackPanel>
         </Grid>
     </Grid>

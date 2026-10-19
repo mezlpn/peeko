@@ -238,4 +238,14 @@ Kesimpulan: WPF dengan `AllowsTransparency` cukup untuk proyek ini. Alternatif D
 
 Belum ada: bayangan 9-slice di panel expanded, serta animasi indikator tab yang meluncur.
 
+## 13. Tahap 6: pengaturan & rilis (19 Okt 2026)
+
+- **Pengaturan** (`settings.json`, `SettingsService`): semua perubahan langsung diterapkan tanpa tombol Simpan. Modul yang dimatikan hilang dari bar tab; peek sistem bisa dimatikan kecuali baterai kritis; lirik bisa dimatikan sepenuhnya (tidak ada request ke LRCLIB).
+- **Tambahan di luar desain:** baris "Garis tipis" (Otomatis / Selalu pil / Selalu garis) menggantikan baris "Posisi notch" (v1 hanya monitor utama). Slider "Geser horizontal" tanpa isi karena nilai 0 ada di tengah.
+- **Menu tray gelap:** status, Pengaturan, Sembunyikan selama 30 menit / 1 jam / sampai besok pagi (07.00) / sampai dinyalakan lagi, Keluar. Klik kiri ikon tray membuka Pengaturan. "Uji peek" hanya di build Debug.
+- **Pintasan Win + Alt + C** (`RegisterHotKey`) membuka/menutup panel.
+- **Mulai bersama Windows** lewat `HKCU\...\Run` (tanpa hak admin).
+- **Rilis** (`scripts/publish.ps1`): self-contained single file, tanpa kompresi. Dengan kompresi memori ±130 MB; tanpa kompresi ±55 MB (exe ±180 MB, zip tetap ±70 MB). Setelah tenang, CPU 0,1–0,3% di T470.
+- **Belum dibuat:** installer, auto-update, tanda tangan kode (SmartScreen akan memperingatkan), notch di monitor selain monitor utama.
+
 Karena itu, prompt desain meminta token dan ukuran dalam piksel pada skala 100%, tanpa efek yang tidak bisa dibuat di WPF/Windows 10.

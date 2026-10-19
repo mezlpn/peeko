@@ -10,6 +10,9 @@ using Celah.Core.Lyrics;
 using Celah.App.Notch;
 using Celah.App.Peeks;
 using Celah.App.Productivity;
+using Celah.App.Settings;
+using System.Windows.Media;
+using Ellipse = System.Windows.Shapes.Ellipse;
 using Celah.Core.Media;
 using Celah.Core.Notch;
 using Celah.Platform.Media;
@@ -102,13 +105,18 @@ public partial class App : Application
         builder.Services.AddSingleton<FocusController>();
         builder.Services.AddSingleton<WaterController>();
         builder.Services.AddSingleton<ListsController>();
+        builder.Services.AddSingleton<SettingsService>();
+        builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddSingleton<NotchWindow>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
 
         var controller = _host.Services.GetRequiredService<NotchController>();
+        controller.OpenSettingsRequested += OpenSettings;
         controller.Start();
         CreateTray();
+
+        if (e.Args.Contains("--settings")) OpenSettings();
 
         // Alat pengembang: putar semua contoh peek bergantian (dipakai untuk mengecek tampilan).
         if (e.Args.Contains("--demo-peeks"))
@@ -119,28 +127,117 @@ public partial class App : Application
         }
     }
 
+    private SettingsWindow? _settingsWindow;
+    private readonly DispatcherTimer _resumeTimer = new();
+
+    /// <summary>Satu jendela Pengaturan saja; jika sudah terbuka, bawa ke depan.</summary>
+    private void OpenSettings()
+    {
+        if (_settingsWindow is { IsLoaded: true })
+        {
+            if (_settingsWindow.WindowState == WindowState.Minimized) _settingsWindow.WindowState = WindowState.Normal;
+            _settingsWindow.Activate();
+            return;
+        }
+        _settingsWindow = new SettingsWindow(_host!.Services.GetRequiredService<SettingsViewModel>());
+        _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+        _settingsWindow.Show();
+        _settingsWindow.Activate();
+    }
+
+    /// <summary>Menu tray (Settings.dc.html): status, Pengaturan, Sembunyikan selama…, Keluar.</summary>
     private void CreateTray()
     {
         var controller = _host!.Services.GetRequiredService<NotchController>();
+        var settingsService = _host.Services.GetRequiredService<SettingsService>();
+        var itemStyle = (Style)Resources["Celah.TrayItem"];
 
-        var hide = new MenuItem { Header = "Sembunyikan sementara", IsCheckable = true };
-        hide.Click += (_, _) => controller.SetSuspended(hide.IsChecked);
+        MenuItem Item(string header, Action? onClick = null)
+        {
+            var item = new MenuItem { Header = header, Style = itemStyle };
+            if (onClick is not null) item.Click += (_, _) => onClick();
+            return item;
+        }
 
-        var testPeek = new MenuItem { Header = "Uji peek" };
-        testPeek.Click += (_, _) => controller.ShowTestPeek();
+        // Baris status: "Celah aktif · n modul berjalan" atau "disembunyikan sampai …".
+        var statusText = new TextBlock { FontSize = 11, Foreground = (Brush)Resources["Celah.Brush.TextSecondary"], VerticalAlignment = VerticalAlignment.Center };
+        var statusDot = new Ellipse { Width = 6, Height = 6, Margin = new Thickness(0, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center };
+        var status = new MenuItem
+        {
+            Style = itemStyle,
+            IsEnabled = false,
+            Header = new StackPanel { Orientation = Orientation.Horizontal, Children = { statusDot, statusText } },
+        };
 
-        var settings = new MenuItem { Header = "Pengaturan", IsEnabled = false };
+        string? hiddenUntil = null;
+        void RefreshStatus()
+        {
+            var s = settingsService.Current;
+            int modules = new[] { s.MusicEnabled, s.LyricsEnabled, s.FocusEnabled, s.WaterEnabled, s.TodoEnabled, s.ShelfEnabled }.Count(x => x);
+            statusDot.Fill = (Brush)Resources[hiddenUntil is null ? "Celah.Brush.Accent" : "Celah.Brush.TextTertiary"];
+            statusText.Text = hiddenUntil is null ? $"Celah aktif · {modules} modul berjalan" : $"Disembunyikan {hiddenUntil}";
+        }
 
-        var exit = new MenuItem { Header = "Keluar" };
-        exit.Click += (_, _) => Shutdown();
+        var hide = Item("Sembunyikan selama");
+        var show = Item("Tampilkan lagi");
+
+        void Suspend(TimeSpan? duration, string label)
+        {
+            controller.SetSuspended(true);
+            hiddenUntil = label;
+            _resumeTimer.Stop();
+            if (duration is { } d)
+            {
+                _resumeTimer.Interval = d;
+                _resumeTimer.Start();
+            }
+            show.Visibility = Visibility.Visible;
+            RefreshStatus();
+        }
+        void Resume()
+        {
+            _resumeTimer.Stop();
+            controller.SetSuspended(false);
+            hiddenUntil = null;
+            show.Visibility = Visibility.Collapsed;
+            RefreshStatus();
+        }
+        _resumeTimer.Tick += (_, _) => Resume();
+        show.Click += (_, _) => Resume();
+        show.Visibility = Visibility.Collapsed;
+
+        hide.Items.Add(Item("30 menit", () => Suspend(TimeSpan.FromMinutes(30), $"sampai {DateTime.Now.AddMinutes(30):HH:mm}")));
+        hide.Items.Add(Item("1 jam", () => Suspend(TimeSpan.FromHours(1), $"sampai {DateTime.Now.AddHours(1):HH:mm}")));
+        hide.Items.Add(Item("Sampai besok pagi", () =>
+        {
+            var morning = DateTime.Today.AddDays(1).AddHours(7);
+            Suspend(morning - DateTime.Now, "sampai besok pagi");
+        }));
+        hide.Items.Add(Item("Sampai dinyalakan lagi", () => Suspend(null, "sampai dinyalakan lagi")));
+        foreach (MenuItem sub in hide.Items) sub.Style = itemStyle;
+
+        var menu = new ContextMenu { Style = (Style)Resources["Celah.TrayMenu"] };
+        menu.Items.Add(status);
+        menu.Items.Add(new Separator { Style = (Style)Resources["Celah.TraySeparator"] });
+        menu.Items.Add(Item("Pengaturan", OpenSettings));
+        menu.Items.Add(hide);
+        menu.Items.Add(show);
+#if DEBUG
+        menu.Items.Add(Item("Uji peek", controller.ShowTestPeek));
+#endif
+        menu.Items.Add(new Separator { Style = (Style)Resources["Celah.TraySeparator"] });
+        menu.Items.Add(Item("Keluar", Shutdown));
+        menu.Opened += (_, _) => RefreshStatus();
 
         _tray = new TaskbarIcon
         {
             ToolTipText = "Celah",
             IconSource = new BitmapImage(new Uri("pack://application:,,,/Assets/celah.ico")),
-            ContextMenu = new ContextMenu { Items = { settings, hide, testPeek, new Separator(), exit } },
+            ContextMenu = menu,
             NoLeftClickDelay = true,
         };
+        // Klik kiri ikon tray: buka Pengaturan.
+        _tray.TrayLeftMouseUp += (_, _) => OpenSettings();
         // EfficiencyMode (EcoQoS) bisa membuat animasi tersendat, jadi dimatikan.
         _tray.ForceCreate(enablesEfficiencyMode: false);
     }

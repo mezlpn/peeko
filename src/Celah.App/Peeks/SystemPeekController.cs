@@ -82,6 +82,8 @@ public sealed class SystemPeekController : IDisposable
         }
     }
 
+    public void SetBatteryThreshold(int percent) => _battery.LowThreshold = percent;
+
     /// <summary>Jendela aktif berganti: catat bahasanya tanpa peek (bahasa bisa per-aplikasi).</summary>
     public void OnForegroundChanged() => _keyboard.SyncLanguageSilently();
 

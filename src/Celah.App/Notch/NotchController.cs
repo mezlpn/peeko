@@ -6,6 +6,8 @@ using Celah.App.Lyrics;
 using Celah.App.Music;
 using Celah.App.Peeks;
 using Celah.App.Productivity;
+using Celah.App.Settings;
+using Celah.Core.Settings;
 using Celah.Core.Notch;
 using Celah.Core.Peeks;
 using Celah.Platform.Display;
@@ -27,6 +29,9 @@ public sealed class NotchController : IDisposable
     private readonly FocusController _focus;
     private readonly WaterController _water;
     private readonly ListsController _lists;
+    private readonly SettingsService _settings;
+    private bool _rawFullscreen;
+    private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
     private readonly DispatcherTimer _dragExpand = new() { Interval = TimeSpan.FromMilliseconds(600) };
     private readonly DispatcherTimer _dragLeave = new() { Interval = TimeSpan.FromMilliseconds(120) };
@@ -36,7 +41,7 @@ public sealed class NotchController : IDisposable
 
     public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music,
         LyricsController lyrics, SystemPeekController peeks, FocusController focus, WaterController water,
-        ListsController lists, ILogger<NotchController> log)
+        ListsController lists, SettingsService settings, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -46,6 +51,7 @@ public sealed class NotchController : IDisposable
         _focus = focus;
         _water = water;
         _lists = lists;
+        _settings = settings;
         _log = log;
     }
 
@@ -76,7 +82,12 @@ public sealed class NotchController : IDisposable
         lyricsView.LineClicked += _lyrics.SeekToLine;
         _window.VisibleModuleChanged += module => _lyrics.SetVisible(module == NotchWindow.LyricsTab);
 
-        _peeks.PeekRequested += ShowPeek;
+        // Peek sistem bisa dimatikan di Pengaturan; baterai kritis selalu muncul.
+        _peeks.PeekRequested += request =>
+        {
+            if (_settings.Current.SystemPeeksEnabled || request.Kind == PeekKind.BatteryCritical)
+                ShowPeek(request);
+        };
 
         // ── Fokus, minum, tugas, rak (tahap 5) ──
         _window.FocusModule.Attach(_focus.Timer);
@@ -127,7 +138,13 @@ public sealed class NotchController : IDisposable
         _dragLeave.Tick += (_, _) => EndDrag(dropped: false);
         UpdateActivity();
 
+        _window.HotkeyPressed += ToggleFromHotkey;
+        _lyrics.OpenSettingsRequested += () => OpenSettingsRequested?.Invoke();
+        _settings.Changed += ApplySettings;
+
         _window.Show();
+        ApplySettings(_settings.Current);
+        if (!_window.HotkeyRegistered) _log.LogWarning("Pintasan Win+Alt+C sudah dipakai aplikasi lain");
         _ = _music.StartAsync();
         _ = _peeks.StartAsync();
 
@@ -185,7 +202,11 @@ public sealed class NotchController : IDisposable
     /// <summary>Isi pil: pengingat minum → timer fokus → musik → idle (ActivityArbiter).</summary>
     private void UpdateActivity()
     {
-        _window.SetCollapsedActivity(ActivityArbiter.Pick(_musicLive, _focus.Timer.Status, _water.ReminderActive));
+        var s = _settings.Current;
+        _window.SetCollapsedActivity(ActivityArbiter.Pick(
+            _musicLive && s.MusicEnabled,
+            s.FocusEnabled ? _focus.Timer.Status : Core.Productivity.FocusStatus.Ready,
+            _water.ReminderActive && s.WaterEnabled));
         UpdateFocusDisplay();
     }
 
@@ -206,7 +227,7 @@ public sealed class NotchController : IDisposable
     {
         _dragLeave.Stop();
         e.Handled = true;
-        if (DraggedFiles(e) is not { Length: > 0 } files)
+        if (!_settings.Current.ShelfEnabled || DraggedFiles(e) is not { Length: > 0 } files)
         {
             e.Effects = DragDropEffects.None;
             return;
@@ -227,14 +248,14 @@ public sealed class NotchController : IDisposable
     private void OnDragOver(object sender, DragEventArgs e)
     {
         _dragLeave.Stop();
-        e.Effects = DraggedFiles(e) is { Length: > 0 } ? DragDropEffects.Copy : DragDropEffects.None;
+        e.Effects = _settings.Current.ShelfEnabled && DraggedFiles(e) is { Length: > 0 } ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
     }
 
     private void OnDrop(object sender, DragEventArgs e)
     {
         e.Handled = true;
-        var files = DraggedFiles(e);
+        var files = _settings.Current.ShelfEnabled ? DraggedFiles(e) : null;
         int added = files is null ? 0 : _lists.Shelf.Add(files);
         bool expanded = _stateMachine.State == NotchState.Expanded;
         EndDrag(dropped: true);
@@ -273,13 +294,65 @@ public sealed class NotchController : IDisposable
     private void OnFullscreenChanged(bool fullscreen)
     {
         _log.LogDebug("Fullscreen: {Fullscreen}", fullscreen);
-        _stateMachine.SetFullscreen(fullscreen);
+        _rawFullscreen = fullscreen;
+        _stateMachine.SetFullscreen(fullscreen && _settings.Current.HideOnFullscreen);
     }
 
     private void OnCoversTopChanged(bool coversTop)
     {
         _log.LogDebug("Jendela menutupi tepi atas: {CoversTop}", coversTop);
-        _stateMachine.SetSlim(coversTop);
+        _rawCoversTop = coversTop;
+        ApplySlim();
+    }
+
+    private void ApplySlim() => _stateMachine.SetSlim(_settings.Current.SlimMode switch
+    {
+        SlimMode.AlwaysLine => true,
+        SlimMode.AlwaysPill => false,
+        _ => _rawCoversTop,
+    });
+
+    /// <summary>Tombol "Buka pengaturan" di dalam notch (mis. di modul Lirik).</summary>
+    public event Action? OpenSettingsRequested;
+
+    /// <summary>Semua pengaturan langsung diterapkan, tanpa tombol Simpan (Settings.dc.html).</summary>
+    private void ApplySettings(AppSettings s)
+    {
+        _stateMachine.SetFullscreen(_rawFullscreen && s.HideOnFullscreen);
+        ApplySlim();
+        _window.SetHorizontalOffset(s.HorizontalOffset);
+
+        _window.SetModuleEnabled(NotchWindow.MusicTab, s.MusicEnabled);
+        _window.SetModuleEnabled(NotchWindow.LyricsTab, s.LyricsEnabled);
+        _window.SetModuleEnabled(NotchWindow.FocusTab, s.FocusEnabled);
+        _window.SetModuleEnabled(NotchWindow.WaterTab, s.WaterEnabled);
+        _window.SetModuleEnabled(NotchWindow.TodoTab, s.TodoEnabled);
+        _window.SetModuleEnabled(NotchWindow.ShelfTab, s.ShelfEnabled);
+
+        _lyrics.SetFetchEnabled(s.LyricsEnabled && s.FetchLyrics);
+        _peeks.SetBatteryThreshold(s.BatteryThreshold);
+        _water.Apply(s.WaterEnabled, s.WaterGoal, s.WaterIntervalMinutes);
+        _focus.Apply(s.FocusMinutes, s.ShortBreakMinutes, s.LongBreakMinutes);
+        if (!s.FocusEnabled && _focus.Timer.Status != Core.Productivity.FocusStatus.Ready) _focus.Timer.Reset();
+
+        try
+        {
+            if (Environment.ProcessPath is { } exe && StartupRegistration.IsEnabled(exe) != s.StartWithWindows)
+                StartupRegistration.Set(s.StartWithWindows, exe);
+        }
+        catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+        {
+            _log.LogWarning(ex, "Gagal mengubah startup Windows");
+        }
+
+        UpdateActivity();
+    }
+
+    /// <summary>Win + Alt + C: buka panel, atau tutup jika sedang terbuka.</summary>
+    private void ToggleFromHotkey()
+    {
+        if (_stateMachine.State == NotchState.Expanded) _stateMachine.PointerExited();
+        else _stateMachine.ExpandNow();
     }
 
     private void OnDisplaySettingsChanged(object? sender, EventArgs e)

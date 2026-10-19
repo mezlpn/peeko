@@ -37,7 +37,8 @@ public sealed class LyricsController : IDisposable
         _music = music;
         _service = service;
         _log = log;
-        ViewModel = new LyricsViewModel(music.ViewModel, () => FetchAsync(retry: true), OpenInBrowser);
+        ViewModel = new LyricsViewModel(music.ViewModel, () => FetchAsync(retry: true), OpenInBrowser,
+            () => OpenSettingsRequested?.Invoke());
 
         _trackDebounce.Tick += (_, _) =>
         {
@@ -60,6 +61,21 @@ public sealed class LyricsController : IDisposable
     }
 
     public LyricsViewModel ViewModel { get; }
+
+    /// <summary>Tombol "Buka pengaturan" di state lirik dimatikan.</summary>
+    public event Action? OpenSettingsRequested;
+
+    private bool _fetchEnabled = true;
+
+    /// <summary>"Ambil lirik dari internet". Mati: tidak ada request sama sekali ke LRCLIB.</summary>
+    public void SetFetchEnabled(bool enabled)
+    {
+        if (_fetchEnabled == enabled) return;
+        _fetchEnabled = enabled;
+        _trackKey = null; // paksa lagu sekarang diproses ulang
+        if (_music.State is { } state) OnStateApplied(state);
+        else OnStateApplied(null);
+    }
 
     /// <summary>Lirik tersinkron baru (atau null) — modul membangun ulang daftar baris.</summary>
     public event Action<SyncedLyrics?>? LinesChanged;
@@ -99,6 +115,12 @@ public sealed class LyricsController : IDisposable
             _trackKey = state.Track.Key;
             CancelFetch();
             SetLyrics(null);
+            if (!_fetchEnabled)
+            {
+                _trackDebounce.Stop();
+                ViewModel.State = LyricsViewState.Disabled;
+                return;
+            }
             ViewModel.State = LyricsViewState.Loading;
             // Tunggu sebentar: durasi lagu kadang menyusul, dan skip lagu beruntun tidak perlu dicari semua.
             _trackDebounce.Stop();

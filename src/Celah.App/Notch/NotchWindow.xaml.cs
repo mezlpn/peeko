@@ -151,7 +151,65 @@ public partial class NotchWindow : Window
         NotchWindowInterop.ApplyOverlayStyles(Handle);
         Reposition();
         Kedip.StartIdle();
+
+        // Win + Alt + C membuka/menutup notch (Settings.dc.html).
+        HwndSource.FromHwnd(Handle)?.AddHook(WndProc);
+        HotkeyRegistered = NotchWindowInterop.RegisterWinAltHotkey(Handle, HotkeyId, 'C');
     }
+
+    private const int HotkeyId = 0xC31A;
+
+    public bool HotkeyRegistered { get; private set; }
+
+    /// <summary>Pintasan Win + Alt + C ditekan.</summary>
+    public event Action? HotkeyPressed;
+
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == NotchWindowInterop.WM_HOTKEY && (int)wParam == HotkeyId)
+        {
+            HotkeyPressed?.Invoke();
+            handled = true;
+        }
+        return IntPtr.Zero;
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        if (Handle != IntPtr.Zero) NotchWindowInterop.UnregisterHotkey(Handle, HotkeyId);
+        base.OnClosed(e);
+    }
+
+    private double _horizontalOffset;
+
+    /// <summary>Geser dari tengah layar (DIP), mis. untuk menghindari webcam.</summary>
+    public void SetHorizontalOffset(double dips)
+    {
+        _horizontalOffset = dips;
+        Reposition();
+    }
+
+    /// <summary>Modul yang dimatikan di Pengaturan dihapus dari bar tab, tidak sekadar dinonaktifkan.</summary>
+    public void SetModuleEnabled(int index, bool enabled)
+    {
+        if (Tabs.Children[index] is not System.Windows.Controls.RadioButton tab) return;
+        tab.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        if (!enabled && _moduleIndex == index)
+        {
+            // Pindah ke tab pertama yang masih aktif.
+            foreach (var child in Tabs.Children.OfType<System.Windows.Controls.RadioButton>())
+            {
+                if (child.Visibility == Visibility.Visible)
+                {
+                    child.IsChecked = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    public bool IsModuleEnabled(int index) =>
+        Tabs.Children[index] is UIElement tab && tab.Visibility == Visibility.Visible;
 
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
     {
@@ -163,7 +221,8 @@ public partial class NotchWindow : Window
     public void Reposition()
     {
         if (Handle == IntPtr.Zero) return;
-        NotchWindowInterop.PlaceTopCenter(Handle, NotchWindowInterop.GetPrimaryMonitor());
+        double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+        NotchWindowInterop.PlaceTopCenter(Handle, NotchWindowInterop.GetPrimaryMonitor(), (int)Math.Round(_horizontalOffset * scale));
     }
 
     public void EnsureTopmost()

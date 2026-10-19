@@ -14,17 +14,22 @@ public enum LyricsViewState
     Instrumental,
     NotFound,
     Failed,
+    /// <summary>"Ambil lirik dari internet" dimatikan di Pengaturan.</summary>
+    Disabled,
 }
 
 /// <summary>Data tampilan modul Lirik. Header ("sedang diputar") memakai <see cref="Music"/>.</summary>
 public sealed partial class LyricsViewModel : ObservableObject
 {
-    public LyricsViewModel(MusicViewModel music, Func<Task> retry, Action openInBrowser)
+    public LyricsViewModel(MusicViewModel music, Func<Task> retry, Action openInBrowser, Action openSettings)
     {
         Music = music;
         RetryCommand = new AsyncRelayCommand(retry);
         OpenInBrowserCommand = new RelayCommand(openInBrowser);
+        OpenSettingsCommand = new RelayCommand(openSettings);
     }
+
+    public IRelayCommand OpenSettingsCommand { get; }
 
     public MusicViewModel Music { get; }
 

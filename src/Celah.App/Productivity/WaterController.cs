@@ -58,10 +58,24 @@ public sealed class WaterController : IDisposable
 
     public void Undo() => Tracker.Undo();
 
+    /// <summary>Terapkan pengaturan. Modul mati: tidak ada pengingat sama sekali.</summary>
+    public void Apply(bool enabled, int goal, int intervalMinutes)
+    {
+        _enabled = enabled;
+        Tracker.Data.Goal = goal;
+        Tracker.Data.IntervalMinutes = intervalMinutes;
+        if (!enabled) EndReminder();
+        _saver.MarkDirty();
+        Schedule();
+        Updated?.Invoke();
+    }
+
+    private bool _enabled = true;
+
     private void Schedule()
     {
         _due.Stop();
-        if (Tracker.NextReminder is not { } next) return;
+        if (!_enabled || Tracker.NextReminder is not { } next) return;
         var wait = next - DateTimeOffset.UtcNow;
         // Jaga-jaga lewat tengah malam: hitung ulang paling lambat tiap jam.
         if (wait > TimeSpan.FromHours(1)) wait = TimeSpan.FromHours(1);

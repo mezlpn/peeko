@@ -8,6 +8,13 @@ namespace Celah.Core.Peeks;
 /// </summary>
 public sealed class BatteryPeekLogic(int lowThreshold = 20, int criticalThreshold = 10)
 {
+    /// <summary>Ambang "baterai lemah" dari Pengaturan (10–50%). Kritis tetap 10%.</summary>
+    public int LowThreshold
+    {
+        get => lowThreshold;
+        set => lowThreshold = Math.Max(value, criticalThreshold);
+    }
+
     private bool? _onAc;
     private bool _lowShown;
     private bool _criticalShown;
