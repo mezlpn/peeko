@@ -4,8 +4,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <Version>0.1.0</Version>
-    <Company>Celah</Company>
-    <Product>Celah</Product>
+    <Version>0.1.1</Version>
+    <Company>Peeko</Company>
+    <Product>Peeko</Product>
   </PropertyGroup>
 </Project>

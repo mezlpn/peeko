@@ -1,37 +1,99 @@
-# Celah
+# Peeko
 
-Notch interaktif di tepi atas layar Windows 10/11 (WPF, .NET 8): musik dan lirik sinkron,
-timer fokus, pengingat minum, to-do, rak file, serta info sistem singkat (volume, baterai,
-Wi-Fi, headphone…).
+Notch kecil yang suka mengintip dari tepi atas layar Windows. Arahkan kursor ke tengah atas
+layar, dan Peeko terbuka menampilkan:
 
-**Unduh:** [Releases](https://github.com/mezlpn/celah/releases/latest) → `Celah-<versi>-win-x64.zip`.
+- 🎵 **Musik** yang sedang diputar (Spotify, YouTube, dll.) + **lirik yang ikut berjalan**
+- ⏱️ **Timer fokus** (Pomodoro) dan 💧 **pengingat minum air**
+- ✅ **To-do** singkat dan 📁 **rak file** (tempat menaruh file sementara)
+- 🔔 Info singkat saat volume, kecerahan, Caps Lock, baterai, Wi-Fi, atau headphone berubah
+
+Gratis, ringan (± 55 MB RAM, hampir 0% CPU saat diam), dan semua data tersimpan di laptopmu sendiri.
+
+---
+
+## 📥 Cara install (untuk pemula)
+
+Butuh **Windows 10 atau 11**. Tidak perlu memasang apa-apa lagi.
+
+### 1. Unduh
+
+1. Buka halaman **[Releases](https://github.com/mezlpn/peeko/releases/latest)**.
+2. Di bagian **Assets** (paling bawah), klik **`Peeko-…-win-x64.zip`**. File ±70 MB akan terunduh.
+
+### 2. Ekstrak
+
+1. Buka folder **Downloads**.
+2. **Klik kanan** file `Peeko-…-win-x64.zip` → **Extract All… / Ekstrak Semua…** → **Extract / Ekstrak**.
+3. Pindahkan folder hasil ekstrak ke tempat yang tidak akan terhapus,
+   misalnya **Documents** (Dokumen). Jangan jalankan langsung dari dalam file zip.
+
+### 3. Jalankan
+
+1. Buka foldernya, lalu **klik dua kali `Peeko.exe`**.
+2. Windows mungkin menampilkan layar biru **"Windows protected your PC" / "Windows telah melindungi PC Anda"**.
+   Ini muncul karena Peeko aplikasi baru yang belum "dikenal" Windows, bukan karena berbahaya.
+   - Klik **More info / Info selengkapnya**
+   - lalu klik **Run anyway / Tetap jalankan**.
+
+   Peringatan ini hanya muncul sekali.
+3. Selesai! Notch hitam kecil dengan dua mata muncul di **tengah atas layar**. 👀
+
+### 4. Cara pakai
+
+- **Arahkan kursor** ke notch di tengah atas layar untuk membukanya. Jauhkan kursor untuk menutup.
+- Klik **ikon-ikon di bagian atas** panel untuk pindah antara Musik, Lirik, Fokus, Minum, Tugas, dan Rak.
+- **Seret file** dari Explorer ke notch untuk menyimpannya sementara di Rak.
+- Pintasan keyboard: **Win + Alt + C** membuka/menutup notch.
+- Ikon Peeko ada di **pojok kanan bawah**, dekat jam. Kalau tidak terlihat, klik panah **˄** di sana.
+  - **Klik** ikonnya untuk membuka **Pengaturan**.
+  - **Klik kanan** untuk menyembunyikan Peeko sementara, atau **Keluar**.
+
+### 5. Supaya otomatis jalan saat laptop dinyalakan
+
+Klik ikon Peeko di tray → **Pengaturan** → nyalakan **Mulai bersama Windows**.
+Kalau nanti folder Peeko dipindah, matikan lalu nyalakan lagi pilihan ini.
+
+### Update ke versi baru
+
+Keluar dari Peeko (klik kanan ikon tray → **Keluar**), unduh zip versi terbaru, lalu ganti
+`Peeko.exe` yang lama dengan yang baru. Pengaturan, to-do, dan data lainnya tidak hilang.
+
+### Uninstall
+
+1. Klik kanan ikon Peeko di tray → **Keluar**.
+2. Jika "Mulai bersama Windows" sempat dinyalakan, matikan dulu di Pengaturan sebelum keluar.
+3. Hapus folder Peeko.
+4. (Opsional) Hapus datanya: tekan **Win + R**, ketik `%AppData%\Peeko`, Enter, lalu hapus folder itu.
+
+### ❓ Masalah umum
+
+| Masalah | Solusi |
+|---|---|
+| Notch tidak terlihat | Saat ada aplikasi layar penuh (game, video), Peeko sengaja bersembunyi. Saat jendela seperti Chrome dibuat penuh, notch berubah jadi **garis tipis**; arahkan kursor ke garis itu. |
+| Notch menutupi webcam/tombol | Pengaturan → **Geser horizontal**. |
+| Lagu tidak muncul | Peeko membaca pemutar yang mendukung kontrol media Windows (Spotify, Chrome, Edge, Brave, Media Player…). Coba putar ulang lagunya. |
+| Lirik tidak muncul | Lirik diambil dari [lrclib.net](https://lrclib.net) dan butuh internet. Tidak semua lagu tersedia. |
+| Antivirus memblokir | Peeko membaca tombol Caps Lock dan pergantian bahasa keyboard, jadi beberapa antivirus curiga. Kode sumbernya terbuka di repo ini; tambahkan Peeko ke pengecualian jika kamu percaya. |
+| Masih bermasalah | Buka **[Issues](https://github.com/mezlpn/peeko/issues/new/choose)** → *Laporan bug*. |
+
+---
+
+## Untuk developer
 
 - Rancangan sistem: [docs/ARSITEKTUR.md](docs/ARSITEKTUR.md)
 - Desain (handoff Claude Design): [design/README.md](design/README.md)
-- Ingin melapor bug atau mengusulkan fitur? Lihat [CONTRIBUTING.md](CONTRIBUTING.md).
+- Ingin berkontribusi? Lihat [CONTRIBUTING.md](CONTRIBUTING.md).
 - Lisensi: [MIT](LICENSE)
-
-## Memakai versi rilis
-
-1. Ekstrak `Celah-<versi>-win-x64.zip` ke folder mana saja (mis. `C:\Program Files\Celah` atau `Documents\Celah`).
-2. Jalankan `Celah.exe`. Tidak perlu memasang .NET; semuanya ada di dalam satu file.
-3. Windows SmartScreen mungkin memperingatkan karena aplikasinya belum ditandatangani:
-   pilih **Info selengkapnya → Tetap jalankan**.
-
-- **Pengaturan:** klik kiri ikon tray, atau klik kanan → Pengaturan.
-- **Buka notch dari keyboard:** Win + Alt + C.
-- **Mulai bersama Windows:** Pengaturan → Umum. Jika folder `Celah.exe` dipindah, matikan lalu nyalakan lagi.
-- **Data:** `%AppData%\Celah\` (pengaturan, to-do, rak, cache lirik, log). Hapus folder ini untuk mulai dari nol.
-
-Butuh Windows 10 versi 2004 (build 19041) atau lebih baru.
+- Data aplikasi: `%AppData%\Peeko\` (settings.json, to-do, rak, cache lirik, log).
 
 ## Menjalankan dari kode
 
 ```bash
-dotnet run --project src/Celah.App
+dotnet run --project src/Peeko.App
 ```
 
-Keluar lewat ikon tray → **Keluar**. Log tersimpan di `%AppData%\Celah\logs\`.
+Keluar lewat ikon tray → **Keluar**. Log tersimpan di `%AppData%\Peeko\logs\`.
 
 ## Membuat rilis
 
@@ -39,7 +101,7 @@ Keluar lewat ikon tray → **Keluar**. Log tersimpan di `%AppData%\Celah\logs\`.
 powershell -ExecutionPolicy Bypass -File scripts/publish.ps1
 ```
 
-Hasilnya `publish/Celah-<versi>-win-x64.zip`: satu `Celah.exe` mandiri (±180 MB, zip ±70 MB).
+Hasilnya `publish/Peeko-<versi>-win-x64.zip`: satu `Peeko.exe` mandiri (±180 MB, zip ±70 MB).
 Rilis dibatalkan jika ada test yang gagal.
 
 ## Catatan pengembangan
@@ -48,13 +110,13 @@ Aplikasi Claude desktop adalah paket MSIX. Proses yang dijalankan dari sesi Clau
 identitas paket itu, sehingga:
 
 - prosesnya ikut ditutup saat sesi Claude berakhir;
-- tulisannya ke `%AppData%\Celah` dialihkan ke
-  `%LocalAppData%\Packages\Claude_<id>\LocalCache\Roaming\Celah`.
+- tulisannya ke `%AppData%\Peeko` dialihkan ke
+  `%LocalAppData%\Packages\Claude_<id>\LocalCache\Roaming\Peeko`.
 
-Untuk menjalankan Celah "normal" dari sesi Claude Code, buat prosesnya lewat WMI:
+Untuk menjalankan Peeko "normal" dari sesi Claude Code, buat prosesnya lewat WMI:
 
 ```bash
-powershell -Command "Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = '\"<path>\\Celah.exe\"' }"
+powershell -Command "Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = '\"<path>\\Peeko.exe\"' }"
 ```
 
 Argumen pengembang: `--demo-peeks` memutar semua contoh peek; `--settings` langsung membuka Pengaturan.

@@ -1,7 +1,7 @@
-# Celah — paket desain (handoff)
+# Peeko — paket desain (handoff)
 
-Design system dan mockup untuk **Celah**, aplikasi notch WPF (.NET 8, Windows 10+).
-Dibuat dengan Claude Design.
+Design system dan mockup untuk **Peeko**, aplikasi notch WPF (.NET 8, Windows 10+).
+Dibuat dengan Claude Design. Papan di `project/` masih memakai nama kerja lama, "Celah".
 
 ## Isi
 
@@ -24,7 +24,7 @@ File ini merujuk `./support.js` (runtime kanvas), sehingga tidak akan tampil sem
 
 - Semua ukuran px pada skala 100%. Font Segoe UI, ikon Segoe MDL2 Assets.
 - **Tanpa** blur, acrylic, atau Mica. Satu-satunya bayangan ada di panel Expanded; buat sebagai PNG 9-slice, bukan `DropShadowEffect`.
-- Penamaan kunci XAML: `Celah.Brush.<Peran>`, `Celah.Radius.*`, `Celah.Space.*`, `Celah.Dur.*`, `Celah.Ease.*`.
+- Penamaan kunci XAML: `Peeko.Brush.<Peran>`, `Peeko.Radius.*`, `Peeko.Space.*`, `Peeko.Dur.*`, `Peeko.Ease.*`.
 - `KeySpline` WPF hanya menerima 0–1. Untuk `ease-spring` (0.34, 1.32, 0.64, 1) pakai `BackEase EaseOut Amplitude=0.32`, dan untuk `ease-spring-soft` pakai Amplitude=0.14.
 - Jendela notch berukuran tetap dan transparan. Animasikan Width/Height sebuah Border di dalam Canvas; konten hanya menerima Opacity dan RenderTransform.
 - Pakai `HandoffBehavior.SnapshotAndReplace` agar animasi bisa dibatalkan di tengah jalan. `DesiredFrameRate` 60 untuk transisi, 30 untuk loop idle.

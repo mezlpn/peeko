@@ -1,0 +1,36 @@
+<!-- Pengingat minum di pil (Collapsed.dc.html): tetes berdenyut, teks, chip "+1 gelas" yang bisa diklik. -->
+<UserControl x:Class="Peeko.App.Productivity.WaterPill"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="32">
+    <Grid Margin="10,0,4,0">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" IsHitTestVisible="False">
+            <Path x:Name="Drop" Data="{StaticResource Peeko.Icon.Water}" Fill="{StaticResource Peeko.Brush.Water}"
+                  Width="24" Height="24" RenderTransformOrigin="0.5,0.5">
+                <Path.LayoutTransform>
+                    <ScaleTransform ScaleX="0.6667" ScaleY="0.6667" />
+                </Path.LayoutTransform>
+                <Path.RenderTransform>
+                    <ScaleTransform x:Name="DropScale" />
+                </Path.RenderTransform>
+            </Path>
+            <TextBlock Style="{StaticResource Peeko.Text.Pill}" Margin="8,0,0,0" VerticalAlignment="Center" Text="Waktunya minum" />
+        </StackPanel>
+        <Button x:Name="DrinkButton" HorizontalAlignment="Right" VerticalAlignment="Center" Height="24" Cursor="Hand"
+                Click="OnDrinkClick" FocusVisualStyle="{x:Null}">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="12" Padding="10,0" Background="{StaticResource Peeko.Brush.WaterMuted}">
+                        <TextBlock Style="{StaticResource Peeko.Text.Caption}" FontWeight="SemiBold" VerticalAlignment="Center"
+                                   Foreground="{StaticResource Peeko.Brush.Water}" Text="+1 gelas" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#1A2E38" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+</UserControl>

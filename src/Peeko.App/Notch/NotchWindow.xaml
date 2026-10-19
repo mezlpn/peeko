@@ -1,0 +1,168 @@
+<Window x:Class="Peeko.App.Notch.NotchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Peeko.App.Controls"
+        xmlns:music="clr-namespace:Peeko.App.Music"
+        xmlns:lyrics="clr-namespace:Peeko.App.Lyrics"
+        xmlns:peeks="clr-namespace:Peeko.App.Peeks"
+        xmlns:prod="clr-namespace:Peeko.App.Productivity"
+        Title="Peeko"
+        Width="640" Height="320"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True" ShowActivated="False"
+        UseLayoutRounding="True" SnapsToDevicePixels="True"
+        FontFamily="{StaticResource Peeko.Font}">
+
+    <Window.Resources>
+        <!-- Tab ikon 32 × 28, radius 10; aktif: surface-raised + titik accent 4 × 2 (Components.dc.html) -->
+        <Style x:Key="TabButton" TargetType="RadioButton">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Margin" Value="0,0,2,0" />
+            <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextTertiary}" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bg" CornerRadius="{StaticResource Peeko.Radius.Md}" Background="Transparent">
+                            <Grid>
+                                <Path Style="{StaticResource Peeko.IconPath}" Data="{TemplateBinding Tag}"
+                                      Stroke="{TemplateBinding Foreground}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <Border x:Name="Dot" Width="4" Height="2" CornerRadius="1" Margin="0,0,0,2"
+                                        VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                        Background="{StaticResource Peeko.Brush.Accent}" Visibility="Hidden" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Peeko.Brush.SurfaceHover}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Peeko.Brush.SurfaceRaised}" />
+                                <Setter TargetName="Dot" Property="Visibility" Value="Visible" />
+                                <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextPrimary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <!-- Bentuk notch: bahu kiri + badan + bahu kanan. Hanya area berwarna yang menerima hover. -->
+        <StackPanel x:Name="ShapeHost" Orientation="Horizontal" AllowDrop="True"
+                    HorizontalAlignment="Center" VerticalAlignment="Top">
+            <StackPanel.RenderTransform>
+                <TranslateTransform x:Name="HideShift" />
+            </StackPanel.RenderTransform>
+
+            <!-- Bahu cekung 10 × 10 yang menyatukan pil dengan tepi layar -->
+            <Path x:Name="LeftShoulder" Width="10" Height="10" VerticalAlignment="Top"
+                  Fill="{StaticResource Peeko.Brush.NotchBg}" RenderTransformOrigin="1,0"
+                  Data="M0,0 L10,0 L10,10 A10,10 0 0 0 0,0 Z">
+                <Path.RenderTransform>
+                    <ScaleTransform x:Name="LeftShoulderScale" />
+                </Path.RenderTransform>
+            </Path>
+
+            <Border x:Name="Body" Width="200" Height="32" VerticalAlignment="Top"
+                    CornerRadius="{StaticResource Peeko.Radius.NotchPill}"
+                    Background="{StaticResource Peeko.Brush.NotchBg}" ClipToBounds="True">
+                <Grid>
+                    <!-- ── Collapsed ── -->
+                    <Grid x:Name="CollapsedLayer" Height="32" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform>
+                            <ScaleTransform x:Name="CollapsedScale" />
+                        </Grid.RenderTransform>
+                        <controls:Kedip x:Name="Kedip" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <music:MusicPill x:Name="MusicPillView" Opacity="0" Visibility="Collapsed" />
+                        <prod:FocusPill x:Name="FocusPillView" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Opacity="0" Visibility="Collapsed" />
+                        <prod:WaterPill x:Name="WaterPillView" Opacity="0" Visibility="Collapsed" />
+                    </Grid>
+
+                    <!-- ── Peek: tinggi 44, lebar 280–340 sesuai isi (Peek.dc.html) ── -->
+                    <Grid x:Name="PeekLayer" Width="320" Height="44" HorizontalAlignment="Center" VerticalAlignment="Top"
+                          Opacity="0" Visibility="Collapsed">
+                        <Grid.RenderTransform>
+                            <TranslateTransform x:Name="PeekShift" />
+                        </Grid.RenderTransform>
+                        <peeks:PeekView x:Name="PeekContent" />
+                    </Grid>
+
+                    <!-- ── Expanded 560 × 260 ── -->
+                    <Grid x:Name="ExpandedLayer" Width="560" Height="260" HorizontalAlignment="Center" VerticalAlignment="Top"
+                          Opacity="0" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="28" />
+                            <RowDefinition Height="10" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="18" />
+                        </Grid.RowDefinitions>
+
+                        <Grid x:Name="TabBar" Grid.Row="1" Margin="20,0">
+                            <Grid.RenderTransform>
+                                <TranslateTransform x:Name="TabBarShift" />
+                            </Grid.RenderTransform>
+                            <StackPanel x:Name="Tabs" Orientation="Horizontal">
+                                <RadioButton x:Name="TabMusic" Style="{StaticResource TabButton}" GroupName="Modul" IsChecked="True"
+                                             Tag="{StaticResource Peeko.Icon.Music}" ToolTip="Musik" Checked="OnTabChecked" />
+                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
+                                             Tag="{StaticResource Peeko.Icon.Lyrics}" ToolTip="Lirik" Checked="OnTabChecked" />
+                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
+                                             Tag="{StaticResource Peeko.Icon.Focus}" ToolTip="Fokus" Checked="OnTabChecked" />
+                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
+                                             Tag="{StaticResource Peeko.Icon.Water}" ToolTip="Minum" Checked="OnTabChecked" />
+                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
+                                             Tag="{StaticResource Peeko.Icon.Todo}" ToolTip="Tugas" Checked="OnTabChecked" />
+                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
+                                             Tag="{StaticResource Peeko.Icon.Shelf}" ToolTip="Rak" Checked="OnTabChecked" />
+                            </StackPanel>
+                            <TextBlock x:Name="Clock" Style="{StaticResource Peeko.Text.Caption}"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" Text="00:00" />
+                        </Grid>
+
+                        <Grid x:Name="ModuleHost" Grid.Row="3" Margin="20,0" ClipToBounds="True">
+                            <Grid.RenderTransform>
+                                <TranslateTransform x:Name="ModuleShift" />
+                            </Grid.RenderTransform>
+                            <music:MusicModule x:Name="MusicModuleView" />
+                            <lyrics:LyricsModule x:Name="LyricsModuleView" Visibility="Collapsed" />
+                            <prod:FocusModule x:Name="FocusModuleView" Visibility="Collapsed" />
+                            <prod:WaterModule x:Name="WaterModuleView" Visibility="Collapsed" />
+                            <prod:TodoModule x:Name="TodoModuleView" Visibility="Collapsed" />
+                            <prod:ShelfModule x:Name="ShelfModuleView" Visibility="Collapsed" />
+                            <Border x:Name="PlaceholderModule" Visibility="Collapsed"
+                                    CornerRadius="{StaticResource Peeko.Radius.Lg}" Background="{StaticResource Peeko.Brush.SurfaceRaised}">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock x:Name="PlaceholderTitle" Style="{StaticResource Peeko.Text.BodyStrong}" HorizontalAlignment="Center"
+                                               Text="Modul menyusul" />
+                                    <TextBlock Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,4,0,0"
+                                               Text="Modul ini dikerjakan di tahap berikutnya" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- Peek saat panel terbuka: baris 32 px di bawah bar tab (Peek.dc.html → aturan antrian) -->
+                        <Border x:Name="PeekBanner" Grid.Row="3" Height="32" Margin="20,0" VerticalAlignment="Top"
+                                CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
+                                Opacity="0" Visibility="Collapsed" IsHitTestVisible="False">
+                            <peeks:PeekView x:Name="PeekBannerContent" Compact="True" />
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Path x:Name="RightShoulder" Width="10" Height="10" VerticalAlignment="Top"
+                  Fill="{StaticResource Peeko.Brush.NotchBg}" RenderTransformOrigin="0,0"
+                  Data="M10,0 L0,0 L0,10 A10,10 0 0 1 10,0 Z">
+                <Path.RenderTransform>
+                    <ScaleTransform x:Name="RightShoulderScale" />
+                </Path.RenderTransform>
+            </Path>
+        </StackPanel>
+    </Grid>
+</Window>

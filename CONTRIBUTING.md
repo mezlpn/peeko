@@ -1,4 +1,4 @@
-# Berkontribusi ke Celah
+# Berkontribusi ke Peeko
 
 Terima kasih sudah mau membantu! Usulan, laporan bug, dan perbaikan kode semuanya diterima.
 
@@ -11,7 +11,7 @@ Buka tab **Issues** → **New issue**, lalu pilih templat:
 
 Sebelum membuat issue baru, cek dulu apakah sudah ada issue yang sama.
 
-Untuk bug, lampirkan log jika bisa: `%AppData%\Celah\logs\celah-<tanggal>.log`.
+Untuk bug, lampirkan log jika bisa: `%AppData%\Peeko\logs\peeko-<tanggal>.log`.
 Log berisi judul lagu yang sedang diputar; hapus bagian yang tidak ingin kamu bagikan.
 
 ## Mengirim perubahan kode (Pull Request)

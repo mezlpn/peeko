@@ -1,0 +1,48 @@
+<!-- Modul Tugas (WaterTodo.dc.html): header jumlah + tombol tambah, baris 32 px, input saat menambah. -->
+<UserControl x:Class="Peeko.App.Productivity.TodoModule"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <TextBlock Style="{StaticResource Peeko.Text.Overline}" Foreground="{StaticResource Peeko.Brush.TextTertiary}"
+                       VerticalAlignment="Center" Margin="8,0,0,0" Text="TUGAS" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock x:Name="CountText" Style="{StaticResource Peeko.Text.Caption}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <Button Style="{StaticResource Peeko.Button.Icon}" Tag="{StaticResource Peeko.Icon.Plus}" Height="28" Width="28"
+                        Foreground="{StaticResource Peeko.Brush.TextPrimary}" ToolTip="Tambah tugas" Click="OnAddClick" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Input tugas baru: Enter menambah dan mengosongkan untuk tugas berikutnya, Esc menutup. -->
+        <Grid x:Name="InputRow" Grid.Row="1" Height="32" Margin="0,4,0,2" Visibility="Collapsed">
+            <Border CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
+                    BorderBrush="{StaticResource Peeko.Brush.StrokeStrong}" BorderThickness="1" />
+            <TextBox x:Name="Input" Margin="10,0" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
+                     Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{StaticResource Peeko.Brush.Accent}"
+                     SelectionBrush="{StaticResource Peeko.Brush.Accent}" FontFamily="{StaticResource Peeko.Font}" FontSize="13"
+                     MaxLength="200" KeyDown="OnInputKeyDown" LostKeyboardFocus="OnInputLostFocus" TextChanged="OnInputTextChanged" />
+            <TextBlock x:Name="Placeholder" Style="{StaticResource Peeko.Text.Body}" Margin="12,0" VerticalAlignment="Center"
+                       Foreground="{StaticResource Peeko.Brush.TextTertiary}" IsHitTestVisible="False"
+                       Text="Tulis tugas, lalu Enter" />
+        </Grid>
+
+        <ScrollViewer x:Name="ListScroll" Grid.Row="2" VerticalScrollBarVisibility="Hidden">
+            <StackPanel x:Name="List" />
+        </ScrollViewer>
+
+        <!-- Kosong -->
+        <StackPanel x:Name="EmptyView" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Style="{StaticResource Peeko.Text.BodyStrong}" HorizontalAlignment="Center" Text="Belum ada tugas" />
+            <TextBlock Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,4,0,10"
+                       Text="Catat hal kecil yang perlu diingat hari ini" />
+            <Button Style="{StaticResource Peeko.Button.PillSecondary}" HorizontalAlignment="Center"
+                    Tag="{StaticResource Peeko.Fill.Plus}" Content="Tambah tugas" Click="OnAddClick" />
+        </StackPanel>
+    </Grid>
+</UserControl>

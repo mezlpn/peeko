@@ -1,4 +1,4 @@
-﻿# Membuat paket rilis Celah: satu Celah.exe mandiri (tidak perlu memasang .NET di PC tujuan),
+﻿# Membuat paket rilis Peeko: satu Peeko.exe mandiri (tidak perlu memasang .NET di PC tujuan),
 # lalu dibungkus zip di folder publish\.
 #
 #   powershell -ExecutionPolicy Bypass -File scripts\publish.ps1
@@ -8,15 +8,15 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$project = Join-Path $root 'src\Celah.App\Celah.App.csproj'
+$project = Join-Path $root 'src\Peeko.App\Peeko.App.csproj'
 $version = ([xml](Get-Content (Join-Path $root 'Directory.Build.props'))).Project.PropertyGroup.Version
-$outDir = Join-Path $root "publish\Celah-$version-$Runtime"
-$zip = Join-Path $root "publish\Celah-$version-$Runtime.zip"
+$outDir = Join-Path $root "publish\Peeko-$version-$Runtime"
+$zip = Join-Path $root "publish\Peeko-$version-$Runtime.zip"
 
-Write-Host "Celah $version ($Runtime) -> $outDir"
+Write-Host "Peeko $version ($Runtime) -> $outDir"
 if (Test-Path $outDir) { Remove-Item $outDir -Recurse -Force }
 
-dotnet test (Join-Path $root 'tests\Celah.Core.Tests') -c Release --nologo
+dotnet test (Join-Path $root 'tests\Peeko.Core.Tests') -c Release --nologo
 if ($LASTEXITCODE -ne 0) { throw 'Test gagal; rilis dibatalkan.' }
 
 # Tanpa EnableCompressionInSingleFile: exe lebih besar (±180 MB, zip tetap ±70 MB), tetapi memori

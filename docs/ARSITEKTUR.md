@@ -1,6 +1,6 @@
-# Celah — Rancangan Sistem
+# Peeko — Rancangan Sistem
 
-> "Celah" adalah nama kerja sementara. Silakan diganti.
+> Nama aplikasi: **Peeko** (dari *peek*: notch yang suka mengintip dari tepi atas layar). Sampai versi 0.1.0 namanya "Celah"; papan desain di `design/project/` masih memakai nama lama. Saat pertama dijalankan, Peeko memindahkan data dari `%AppData%\Celah` dan menghapus entri startup lama.
 > Ini aplikasi notch untuk Windows: jendela kecil di tepi atas layar yang membesar saat di-hover dan menampilkan musik, lirik, timer, dan info sistem.
 
 ## 1. Batasan dan target
@@ -12,21 +12,21 @@
 | Stack | C# + .NET 8 + WPF, `TargetFramework = net8.0-windows10.0.19041.0` (supaya bisa memanggil API WinRT) |
 | Tool | VS Code + .NET SDK (`dotnet build`/`run`), tanpa Visual Studio |
 | Target performa | Idle (notch tertutup, tidak ada musik): CPU ≈ 0%, RAM < 80 MB. Animasi 60 fps di HD 520 |
-| Penyimpanan data | File JSON di `%AppData%\Celah\` |
+| Penyimpanan data | File JSON di `%AppData%\Peeko\` |
 | Efek visual | Tidak bergantung pada Mica/Acrylic, karena keduanya tidak ada di Windows 10 |
 
 ## 2. Struktur solusi
 
 ```
-Celah.sln
+Peeko.sln
 ├─ src/
-│  ├─ Celah.App/          WPF: jendela, View (XAML), ViewModel, tray, startup
-│  ├─ Celah.Core/         Logika murni tanpa WPF/Win32: model, state machine, parser LRC,
+│  ├─ Peeko.App/          WPF: jendela, View (XAML), ViewModel, tray, startup
+│  ├─ Peeko.Core/         Logika murni tanpa WPF/Win32: model, state machine, parser LRC,
 │  │                      jam posisi lagu, pomodoro, to-do, pengaturan
-│  └─ Celah.Platform/     Interop Windows: WinRT media, Core Audio, Win32 hook,
+│  └─ Peeko.Platform/     Interop Windows: WinRT media, Core Audio, Win32 hook,
 │                         WMI, deteksi fullscreen, monitor/DPI
 └─ tests/
-   └─ Celah.Core.Tests/   Unit test (xUnit) untuk Celah.Core
+   └─ Peeko.Core.Tests/   Unit test (xUnit) untuk Peeko.Core
 ```
 
 Aturan dependensi: `App → Core`, `App → Platform`, `Platform → Core`. `Core` tidak bergantung pada apa pun yang khusus Windows, jadi bisa dites tanpa membuka jendela.
@@ -41,13 +41,13 @@ Paket NuGet:
 ## 3. Gambaran arsitektur
 
 ```
- ┌──────────────── Celah.Platform (sumber event) ────────────────┐
+ ┌──────────────── Peeko.Platform (sumber event) ────────────────┐
  │ MediaSource  AudioEndpoint  Brightness  Keyboard  Power  Net  │
  │ FullscreenWatcher  MonitorWatcher                             │
  └───────────────┬───────────────────────────────────────────────┘
                  │ event (thread latar)
                  ▼
- ┌──────────────── Celah.Core ───────────────────────────────────┐
+ ┌──────────────── Peeko.Core ───────────────────────────────────┐
  │ Service fitur: Media, Lyrics, Pomodoro, Water, Todo, Shelf    │
  │                         │                                     │
  │                         ▼                                     │
@@ -57,7 +57,7 @@ Paket NuGet:
  └─────────────────────────┬─────────────────────────────────────┘
                            │ (dikirim ke Dispatcher UI)
                            ▼
- ┌──────────────── Celah.App ────────────────────────────────────┐
+ ┌──────────────── Peeko.App ────────────────────────────────────┐
  │ NotchWindow + NotchViewModel                                  │
  │   ├─ CompactPresenter  (isi saat tertutup/peek)               │
  │   └─ ExpandedPresenter (tab: Musik, Timer, Shelf, To-do)      │
@@ -124,8 +124,8 @@ Hasilnya dijepit ke `[0, EndTime]`. Kalau `LastUpdatedTime` aneh (beberapa brows
 
 ### 5.2 Lirik
 - `LrcParser`: parsing format LRC (`[mm:ss.xx] teks`, beberapa timestamp per baris, offset `[offset:]`). Unit test wajib.
-- `LyricsService`: `GET https://lrclib.net/api/get?track_name=&artist_name=&album_name=&duration=`, kalau gagal fallback ke `/api/search`. Header `User-Agent: Celah/<versi> (<url repo>)`.
-- Cache disk `%AppData%\Celah\lyrics\<hash>.lrc`, termasuk cache "tidak ditemukan" (TTL 7 hari) supaya tidak terus-menerus request.
+- `LyricsService`: `GET https://lrclib.net/api/get?track_name=&artist_name=&album_name=&duration=`, kalau gagal fallback ke `/api/search`. Header `User-Agent: Peeko/<versi> (<url repo>)`.
+- Cache disk `%AppData%\Peeko\lyrics\<hash>.lrc`, termasuk cache "tidak ditemukan" (TTL 7 hari) supaya tidak terus-menerus request.
 - Pencocokan baris pakai binary search pada posisi dari `PlaybackClock`.
 - Timer lirik hanya aktif saat lirik sedang terlihat. Dihitung dari waktu ke baris berikutnya, bukan polling per frame.
 - Privasi: judul dan artis dikirim ke lrclib.net. Fitur ini bisa dimatikan di pengaturan.
@@ -134,7 +134,7 @@ Hasilnya dijepit ke `[0, EndTime]`. Kalau `LastUpdatedTime` aneh (beberapa brows
 - **Pomodoro**: state machine fokus/istirahat, simpan `endsAt` (bukan sisa detik) supaya akurat setelah sleep.
 - **Pengingat minum**: interval + target harian, counter direset tiap hari.
 - **To-do**: daftar sederhana (teks, selesai, urutan).
-- **Shelf**: drop file → simpan referensi path (default) atau salinan ke `%AppData%\Celah\shelf\`. Drag keluar pakai `DataObject` FileDrop.
+- **Shelf**: drop file → simpan referensi path (default) atau salinan ke `%AppData%\Peeko\shelf\`. Drag keluar pakai `DataObject` FileDrop.
 
 ## 6. Threading dan performa
 
@@ -149,7 +149,7 @@ Hasilnya dijepit ke `[0, EndTime]`. Kalau `LastUpdatedTime` aneh (beberapa brows
 ## 7. Data dan konfigurasi
 
 ```
-%AppData%\Celah\
+%AppData%\Peeko\
 ├─ settings.json     (posisi, perilaku, fitur aktif/nonaktif, ambang baterai, dll.)
 ├─ todo.json
 ├─ water.json

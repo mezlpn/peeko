@@ -26,7 +26,7 @@ body:
   - type: input
     id: versi
     attributes:
-      label: Versi Celah
+      label: Versi Peeko
       description: Lihat di Pengaturan, di bawah logo.
       placeholder: "0.1.0"
   - type: input
@@ -38,5 +38,5 @@ body:
     id: log
     attributes:
       label: Log (opsional)
-      description: Isi `%AppData%\Celah\logs\celah-<tanggal>.log` di sekitar waktu kejadian. Hapus judul lagu jika tidak ingin dibagikan.
+      description: Isi `%AppData%\Peeko\logs\peeko-<tanggal>.log` di sekitar waktu kejadian. Hapus judul lagu jika tidak ingin dibagikan.
       render: text

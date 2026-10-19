@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B001E922-8366-435A-B44A-A38F549E7B9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peeko.Core", "src\Peeko.Core\Peeko.Core.csproj", "{BEF4C728-E550-4A58-94A8-DCD5C0F18C0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peeko.Platform", "src\Peeko.Platform\Peeko.Platform.csproj", "{94A397C8-5959-4C29-98C0-73185701C103}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7F99E614-F980-4431-99A6-4AB266C46D82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peeko.Core.Tests", "tests\Peeko.Core.Tests\Peeko.Core.Tests.csproj", "{E4E43661-2479-48B0-BD5A-4B398CF5FF94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peeko.App", "src\Peeko.App\Peeko.App.csproj", "{27106835-BB02-4C7D-86A8-889D47240719}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BEF4C728-E550-4A58-94A8-DCD5C0F18C0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEF4C728-E550-4A58-94A8-DCD5C0F18C0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEF4C728-E550-4A58-94A8-DCD5C0F18C0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEF4C728-E550-4A58-94A8-DCD5C0F18C0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94A397C8-5959-4C29-98C0-73185701C103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94A397C8-5959-4C29-98C0-73185701C103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94A397C8-5959-4C29-98C0-73185701C103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94A397C8-5959-4C29-98C0-73185701C103}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4E43661-2479-48B0-BD5A-4B398CF5FF94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4E43661-2479-48B0-BD5A-4B398CF5FF94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4E43661-2479-48B0-BD5A-4B398CF5FF94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4E43661-2479-48B0-BD5A-4B398CF5FF94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27106835-BB02-4C7D-86A8-889D47240719}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27106835-BB02-4C7D-86A8-889D47240719}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27106835-BB02-4C7D-86A8-889D47240719}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27106835-BB02-4C7D-86A8-889D47240719}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BEF4C728-E550-4A58-94A8-DCD5C0F18C0B} = {B001E922-8366-435A-B44A-A38F549E7B9C}
+		{94A397C8-5959-4C29-98C0-73185701C103} = {B001E922-8366-435A-B44A-A38F549E7B9C}
+		{E4E43661-2479-48B0-BD5A-4B398CF5FF94} = {7F99E614-F980-4431-99A6-4AB266C46D82}
+		{27106835-BB02-4C7D-86A8-889D47240719} = {B001E922-8366-435A-B44A-A38F549E7B9C}
+	EndGlobalSection
+EndGlobal

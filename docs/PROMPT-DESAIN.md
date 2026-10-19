@@ -4,7 +4,7 @@ Salin semua teks di bawah garis ke Claude Design.
 
 ---
 
-Saya sedang membuat **Celah** (nama sementara), aplikasi desktop untuk Windows yang menaruh "notch" interaktif di tengah tepi atas layar, mirip Dynamic Island di iPhone. Notch berupa pil kecil gelap yang membesar dengan halus saat di-hover, dan menampilkan aktivitas yang sedang berjalan: musik, lirik sinkron, timer fokus, dan info sistem singkat.
+Saya sedang membuat **Peeko** (nama sementara), aplikasi desktop untuk Windows yang menaruh "notch" interaktif di tengah tepi atas layar, mirip Dynamic Island di iPhone. Notch berupa pil kecil gelap yang membesar dengan halus saat di-hover, dan menampilkan aktivitas yang sedang berjalan: musik, lirik sinkron, timer fokus, dan info sistem singkat.
 
 Tolong rancang **design system dan semua layar utamanya**. Desainnya harus orisinal: punya identitas sendiri, jangan meniru NotchNook, Dynamic Island, atau aplikasi notch Windows lain secara persis.
 
