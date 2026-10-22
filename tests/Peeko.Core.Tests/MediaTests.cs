@@ -140,3 +140,50 @@ public class CoverPaletteTests
         Assert.True(c.R > c.G + 50, $"Diharapkan merah, dapat {c.ToHex()}");
     }
 }
+
+public class SpectrumAnalyzerTests
+{
+    private static float[] Sine(double bin, int samples, double amplitude = 0.5) =>
+        Enumerable.Range(0, samples)
+            .Select(i => (float)(amplitude * Math.Sin(2 * Math.PI * bin * i / SpectrumAnalyzer.FftSize)))
+            .ToArray();
+
+    [Fact]
+    public void Silence_stays_at_floor()
+    {
+        var analyzer = new SpectrumAnalyzer();
+        Assert.True(analyzer.Push(new float[SpectrumAnalyzer.FftSize]));
+        Assert.All(analyzer.Levels, l => Assert.Equal(SpectrumAnalyzer.Floor, l));
+    }
+
+    [Fact]
+    public void Needs_a_full_window_before_updating()
+    {
+        var analyzer = new SpectrumAnalyzer();
+        Assert.False(analyzer.Push(new float[SpectrumAnalyzer.FftSize - 1]));
+        Assert.True(analyzer.Push(new float[1]));
+    }
+
+    [Theory]
+    [InlineData(4, 1)]    // ≈ 375 Hz → pita 2
+    [InlineData(10, 2)]   // ≈ 940 Hz → pita 3
+    [InlineData(100, 4)]  // ≈ 9.4 kHz → pita 5
+    public void Tone_lights_up_its_own_band(double bin, int band)
+    {
+        var analyzer = new SpectrumAnalyzer();
+        for (int i = 0; i < 8; i++) analyzer.Push(Sine(bin, SpectrumAnalyzer.FftSize));
+        var levels = analyzer.Levels;
+        Assert.Equal(band, Array.IndexOf(levels, levels.Max()));
+        Assert.True(levels[band] > 0.8f);
+    }
+
+    [Fact]
+    public void Levels_fall_back_after_the_music_stops()
+    {
+        var analyzer = new SpectrumAnalyzer();
+        for (int i = 0; i < 8; i++) analyzer.Push(Sine(10, SpectrumAnalyzer.FftSize));
+        float loud = analyzer.Levels[2];
+        for (int i = 0; i < 8; i++) analyzer.Push(new float[SpectrumAnalyzer.FftSize]);
+        Assert.True(analyzer.Levels[2] < loud / 2);
+    }
+}

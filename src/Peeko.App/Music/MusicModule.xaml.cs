@@ -22,6 +22,9 @@ public partial class MusicModule : UserControl
     public SeekBar SeekBar => Seek;
 
     /// <summary>Marquee hanya berjalan saat modul terlihat (hemat CPU).</summary>
+    /// <summary>Level visualizer di samping chip sumber.</summary>
+    public void SetLevels(double[] levels, bool playing) => Bars.SetLevels(levels, playing);
+
     public void SetActive(bool active)
     {
         if (_marqueeActive == active) return;

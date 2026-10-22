@@ -18,24 +18,23 @@ public sealed class MusicController : IDisposable
     // Desain: 30 dtk. Revisi #10: Kedip harus cepat kembali setelah musik dijeda. Tidak 0 karena
     // saat ganti lagu beberapa pemutar sempat melaporkan "dijeda" sesaat.
     private static readonly TimeSpan PausedLinger = TimeSpan.FromSeconds(1.5);
-    private const int BarCount = 4;
+    private const int BarCount = SpectrumAnalyzer.BandCount;
 
     private readonly IMediaSource _source;
     private readonly Dispatcher _dispatcher;
     private readonly ILogger<MusicController> _log;
     private readonly PlaybackClock _clock = new();
-    private readonly AudioPeakMeter _meter = new();
+    private readonly AudioSpectrum _spectrum = new();
 
     private readonly DispatcherTimer _progressTimer;
     private readonly DispatcherTimer _visualizerTimer;
     private readonly DispatcherTimer _pausedTimer;
 
-    private readonly double[] _barLevels = new double[BarCount];
-    private readonly double[] _barNoise = new double[BarCount];
 
     private MediaState? _state;
     private string? _coverKey;
     private NotchState _notchState = NotchState.Collapsed;
+    private bool _musicTabVisible;
     private bool _pausedLongEnough;
     private CollapsedActivity _activity = CollapsedActivity.Idle;
 
@@ -50,8 +49,8 @@ public sealed class MusicController : IDisposable
         _progressTimer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(250) };
         _progressTimer.Tick += (_, _) => UpdateProgress();
 
-        // 12× per detik sesuai Motion.dc.html; tiap bar di-tween 80 ms oleh MusicPill.
-        _visualizerTimer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(83) };
+        // 30× per detik; tiap bar mengejar levelnya dengan pegas, jadi gerakannya tetap halus.
+        _visualizerTimer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(33) };
         _visualizerTimer.Tick += (_, _) => UpdateVisualizer();
 
         _pausedTimer = new DispatcherTimer { Interval = PausedLinger };
@@ -68,8 +67,8 @@ public sealed class MusicController : IDisposable
     /// <summary>Isi pil yang diinginkan modul musik (Music saat diputar atau baru saja dijeda).</summary>
     public event Action<CollapsedActivity>? ActivityChanged;
 
-    /// <summary>Level 4 bar visualizer (0–1) untuk pil musik.</summary>
-    public event Action<double[]>? LevelsUpdated;
+    /// <summary>Level 5 pita frekuensi (0–1) dan apakah lagu sedang diputar, untuk visualizer.</summary>
+    public event Action<double[], bool>? LevelsUpdated;
 
     public CollapsedActivity Activity => _activity;
 
@@ -114,6 +113,13 @@ public sealed class MusicController : IDisposable
         if (target < TimeSpan.Zero) target = TimeSpan.Zero;
         if (target > _clock.Duration) target = _clock.Duration;
         return _source.SeekAsync(target);
+    }
+
+    /// <summary>Tab Musik sedang terlihat di panel yang terbuka.</summary>
+    public void SetMusicTabVisible(bool visible)
+    {
+        _musicTabVisible = visible;
+        UpdateTimers();
     }
 
     public void SetNotchState(NotchState state)
@@ -262,9 +268,14 @@ public sealed class MusicController : IDisposable
         bool playing = _state?.Playback.IsPlaying == true;
 
         SetRunning(_progressTimer, playing && _notchState == NotchState.Expanded && _state?.Timeline is not null);
-        SetRunning(_visualizerTimer, playing && _notchState == NotchState.Collapsed && _activity == CollapsedActivity.Music);
+        bool pillShowsBars = _notchState == NotchState.Collapsed
+            && _activity is CollapsedActivity.Music or CollapsedActivity.MusicAndFocus;
+        bool visualize = playing && (pillShowsBars || (_notchState == NotchState.Expanded && _musicTabVisible));
+        SetRunning(_visualizerTimer, visualize);
+        // Tangkapan audio hanya hidup selama bar terlihat dan lagu berjalan.
+        if (visualize) _spectrum.Start(); else _spectrum.Stop();
 
-        if (!playing) LevelsUpdated?.Invoke(new double[BarCount]); // bar turun jadi titik
+        if (!playing) LevelsUpdated?.Invoke(new double[BarCount], false); // bar turun jadi titik
     }
 
     private static void SetRunning(DispatcherTimer timer, bool run)
@@ -273,19 +284,8 @@ public sealed class MusicController : IDisposable
         else if (!run && timer.IsEnabled) timer.Stop();
     }
 
-    private void UpdateVisualizer()
-    {
-        // Satu angka puncak dibuat terasa "hidup": tiap bar punya derau yang dihaluskan
-        // sendiri, lalu dikalikan dengan level puncak (dikompresi supaya lagu pelan tetap bergerak).
-        double peak = Math.Pow(_meter.GetPeak(), 0.6);
-        for (int i = 0; i < BarCount; i++)
-        {
-            _barNoise[i] = _barNoise[i] * 0.4 + Random.Shared.NextDouble() * 0.6;
-            double target = peak * (0.45 + 0.55 * _barNoise[i]);
-            _barLevels[i] = target > _barLevels[i] ? target : _barLevels[i] * 0.55 + target * 0.45;
-        }
-        LevelsUpdated?.Invoke((double[])_barLevels.Clone());
-    }
+    private void UpdateVisualizer() =>
+        LevelsUpdated?.Invoke(Array.ConvertAll(_spectrum.Levels, l => (double)l), true);
 
     private static T Freeze<T>(T freezable) where T : System.Windows.Freezable
     {
@@ -299,6 +299,6 @@ public sealed class MusicController : IDisposable
         _visualizerTimer.Stop();
         _pausedTimer.Stop();
         _source.Dispose();
-        _meter.Dispose();
+        _spectrum.Dispose();
     }
 }

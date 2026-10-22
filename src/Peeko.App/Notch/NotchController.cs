@@ -76,7 +76,11 @@ public sealed class NotchController : IDisposable
             _musicLive = activity == CollapsedActivity.Music;
             UpdateActivity();
         };
-        _music.LevelsUpdated += _window.MusicPill.SetLevels;
+        _music.LevelsUpdated += (levels, playing) =>
+        {
+            _window.MusicPill.SetLevels(levels, playing);
+            _window.MusicModule.SetLevels(levels, playing);
+        };
         var seekBar = _window.MusicModule.SeekBar;
         seekBar.SeekRequested += fraction => _ = _music.SeekAsync(fraction);
         seekBar.Nudged += direction => _ = _music.SeekByAsync(NudgeStep * direction);
@@ -88,6 +92,7 @@ public sealed class NotchController : IDisposable
         _lyrics.ActiveLineChanged += lyricsView.SetActive;
         lyricsView.LineClicked += _lyrics.SeekToLine;
         _window.VisibleModuleChanged += module => _lyrics.SetVisible(module == NotchWindow.LyricsTab);
+        _window.VisibleModuleChanged += module => _music.SetMusicTabVisible(module == NotchWindow.MusicTab);
 
         // Peek sistem bisa dimatikan di Pengaturan; baterai kritis selalu muncul.
         _peeks.PeekRequested += request =>

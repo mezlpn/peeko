@@ -18,7 +18,7 @@ public readonly record struct SpringConfig(double Stiffness, double Damping, dou
     public static readonly SpringConfig Radius = new(1000, 40);
     public static readonly SpringConfig Default = new(500, 30, 1, 0.002);
     public static readonly SpringConfig Content = new(400, 30);
-    public static readonly SpringConfig Bar = new(600, 30, 0.5, 0.002);
+    public static readonly SpringConfig Bar = new(600, 30, 0.5);
 }
 
 /// <summary>
