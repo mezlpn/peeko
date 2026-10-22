@@ -235,7 +235,7 @@ public partial class App : Application
         void RefreshStatus()
         {
             var s = settingsService.Current;
-            int modules = new[] { s.MusicEnabled, s.LyricsEnabled, s.FocusEnabled, s.WaterEnabled, s.TodoEnabled, s.ShelfEnabled }.Count(x => x);
+            int modules = new[] { s.MusicEnabled, s.LyricsEnabled, s.FocusEnabled, s.WaterEnabled, s.TodoEnabled, s.ShelfEnabled, s.ControlEnabled }.Count(x => x);
             statusDot.Fill = (Brush)Resources[hiddenUntil is null ? "Peeko.Brush.Accent" : "Peeko.Brush.TextTertiary"];
             statusText.Text = hiddenUntil is null ? $"Peeko aktif · {modules} modul berjalan" : $"Disembunyikan {hiddenUntil}";
         }

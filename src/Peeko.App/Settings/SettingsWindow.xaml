@@ -265,6 +265,11 @@
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ShelfEnabled}" />
                                     </Grid>
                                     <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Kontrol (Wi-Fi, Bluetooth, volume…)" />
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ControlEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
                                     <Grid Style="{StaticResource Row}">
                                         <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
                                             <TextBlock Style="{StaticResource Label}" Text="Peek sistem" />

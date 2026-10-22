@@ -136,6 +136,19 @@
     <Geometry x:Key="Peeko.Icon.Convert">M4,9 H18 M14.5,5.5 L18,9 L14.5,12.5 M20,15 H6 M9.5,11.5 L6,15 L9.5,18.5</Geometry>
     <Geometry x:Key="Peeko.Icon.Volume">M4,9.5 H7.5 L12,5.5 V18.5 L7.5,14.5 H4 Z M15.5,9 A4,4 0 0 1 15.5,15 M18,6.5 A7.5,7.5 0 0 1 18,17.5</Geometry>
 
+    <!-- Command Center dan tab Hari ini (0.3.0) -->
+    <Geometry x:Key="Peeko.Icon.Control">M4,7 H13 M17,7 H20 M15,5 V9 M4,17 H7 M11,17 H20 M9,15 V19</Geometry>
+    <Geometry x:Key="Peeko.Icon.Today">M5,6.5 H19 V19 H5 Z M5,10.5 H19 M9,4 V8 M15,4 V8 M9,14.5 H9.01 M12,14.5 H12.01 M15,14.5 H15.01</Geometry>
+    <Geometry x:Key="Peeko.Icon.Wifi">M3.5,9.2 Q12,1.8 20.5,9.2 M6.6,12.4 Q12,7.6 17.4,12.4 M9.6,15.6 Q12,13.6 14.4,15.6 M12,18.8 V19.2</Geometry>
+    <Geometry x:Key="Peeko.Icon.Bluetooth">M7,7.5 L17,16.5 L12,20.5 V3.5 L17,7.5 L7,16.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.Moon">M19,14.5 A7.5,7.5 0 1 1 9.5,5 A6,6 0 0 0 19,14.5 Z</Geometry>
+    <Geometry x:Key="Peeko.Icon.Leaf">M5,19 C5,10 10,5 19,5 C19,14 14,19 5,19 Z M5,19 L12.5,11.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.Bell">M6.5,16 V11 A5.5,5.5 0 0 1 17.5,11 V16 L19,17.5 H5 Z M10,20 H14</Geometry>
+    <Geometry x:Key="Peeko.Icon.Gear">M12,9 A3,3 0 1 1 12,15 A3,3 0 1 1 12,9 Z M12,3 V5.5 M12,18.5 V21 M3,12 H5.5 M18.5,12 H21 M5.6,5.6 L7.4,7.4 M16.6,16.6 L18.4,18.4 M5.6,18.4 L7.4,16.6 M16.6,7.4 L18.4,5.6</Geometry>
+    <Geometry x:Key="Peeko.Icon.Lock">M6.5,11 H17.5 V19.5 H6.5 Z M9,11 V8.5 A3,3 0 0 1 15,8.5 V11</Geometry>
+    <Geometry x:Key="Peeko.Icon.Crop">M7,3.5 V17 H20.5 M3.5,7 H17 V20.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.Sun">M12,8.5 A3.5,3.5 0 1 1 12,15.5 A3.5,3.5 0 1 1 12,8.5 Z M12,3.5 V5 M12,19 V20.5 M3.5,12 H5 M19,12 H20.5 M6,6 L7,7 M17,17 L18,18 M6,18 L7,17 M17,7 L18,6</Geometry>
+
     <!-- Digambar di kanvas 24 × 24 seperti viewBox SVG-nya, lalu diskalakan ke 16 px. -->
     <Style x:Key="Peeko.IconPath" TargetType="Path">
         <Setter Property="Width" Value="24" />

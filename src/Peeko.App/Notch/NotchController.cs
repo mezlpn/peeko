@@ -210,6 +210,10 @@ public sealed class NotchController : IDisposable
     private void ShowPeek(PeekRequest request)
     {
         _log.LogDebug("Peek {Kind}", request.Kind);
+        // Jangan Ganggu (Command Center): hanya baterai kritis yang tetap muncul.
+        if (_window.ControlModule.Quiet && request.Kind != PeekKind.BatteryCritical) return;
+        // Volume/kecerahan sedang digeser di Command Center; angkanya sudah terlihat di sana.
+        if (request.Kind is PeekKind.Volume or PeekKind.Brightness && _window.VisibleModule == NotchWindow.ControlTab) return;
         if (_stateMachine.State == NotchState.Expanded)
         {
             _window.ShowBanner(request);
@@ -230,7 +234,7 @@ public sealed class NotchController : IDisposable
         // Dibuka karena file diseret: tetap di tab Rak walau musik sedang diputar.
         // Sedang mengubah format: tetap di tab Rak.
         if (to == NotchState.Expanded && _musicLive && !_expandingForShelf && !_window.ShelfModule.ConvertPanel.IsActive
-            && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.LyricsTab))
+            && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.LyricsTab or NotchWindow.ControlTab))
             _window.SelectModule(NotchWindow.MusicTab);
 
         _window.TransitionTo(from, to);
@@ -394,6 +398,7 @@ public sealed class NotchController : IDisposable
         _window.SetModuleEnabled(NotchWindow.WaterTab, s.WaterEnabled);
         _window.SetModuleEnabled(NotchWindow.TodoTab, s.TodoEnabled);
         _window.SetModuleEnabled(NotchWindow.ShelfTab, s.ShelfEnabled);
+        _window.SetModuleEnabled(NotchWindow.ControlTab, s.ControlEnabled);
         if (_window.ShelfModule.ConvertAvailable != s.ConvertEnabled)
         {
             _window.ShelfModule.ConvertAvailable = s.ConvertEnabled;

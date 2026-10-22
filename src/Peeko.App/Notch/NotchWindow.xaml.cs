@@ -132,6 +132,8 @@ public partial class NotchWindow : Window
 
     public ShelfModule ShelfModule => ShelfModuleView;
 
+    public Control.ControlModule ControlModule => ControlModuleView;
+
     public FrameworkElement DropTarget => ShapeHost;
 
     /// <summary>Tab yang dipilih (walau panel sedang tertutup).</summary>
@@ -147,6 +149,7 @@ public partial class NotchWindow : Window
     public const int WaterTab = 3;
     public const int TodoTab = 4;
     public const int ShelfTab = 5;
+    public const int ControlTab = 6;
 
     private UIElement ModuleView(int index) => index switch
     {
@@ -156,6 +159,7 @@ public partial class NotchWindow : Window
         WaterTab => WaterModuleView,
         TodoTab => TodoModuleView,
         ShelfTab => ShelfModuleView,
+        ControlTab => ControlModuleView,
         _ => PlaceholderModule,
     };
 
@@ -163,6 +167,7 @@ public partial class NotchWindow : Window
     {
         MusicModuleView.SetActive(VisibleModule == MusicTab);
         LyricsModuleView.SetVisible(VisibleModule == LyricsTab);
+        ControlModuleView.SetVisible(VisibleModule == ControlTab);
         if (VisibleModule != TodoTab) TodoModuleView.EndInput();
         VisibleModuleChanged?.Invoke(VisibleModule);
     }

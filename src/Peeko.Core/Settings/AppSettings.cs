@@ -28,6 +28,8 @@ public sealed class AppSettings
     public bool WaterEnabled { get; set; } = true;
     public bool TodoEnabled { get; set; } = true;
     public bool ShelfEnabled { get; set; } = true;
+    /// <summary>Command Center: Wi-Fi, Bluetooth, jangan ganggu, volume, kecerahan.</summary>
+    public bool ControlEnabled { get; set; } = true;
     /// <summary>Zona "Ubah format" saat file diseret ke notch (memakai Filee).</summary>
     public bool ConvertEnabled { get; set; } = true;
     public bool SystemPeeksEnabled { get; set; } = true;

@@ -65,6 +65,7 @@ public sealed class SettingsViewModel : ObservableObject
     public bool WaterEnabled { get => S.WaterEnabled; set => Set(value, s => s.WaterEnabled, (s, v) => s.WaterEnabled = v); }
     public bool TodoEnabled { get => S.TodoEnabled; set => Set(value, s => s.TodoEnabled, (s, v) => s.TodoEnabled = v); }
     public bool ShelfEnabled { get => S.ShelfEnabled; set => Set(value, s => s.ShelfEnabled, (s, v) => s.ShelfEnabled = v); }
+    public bool ControlEnabled { get => S.ControlEnabled; set => Set(value, s => s.ControlEnabled, (s, v) => s.ControlEnabled = v); }
     public bool SystemPeeksEnabled { get => S.SystemPeeksEnabled; set => Set(value, s => s.SystemPeeksEnabled, (s, v) => s.SystemPeeksEnabled = v); }
 
     // ── Baterai ──

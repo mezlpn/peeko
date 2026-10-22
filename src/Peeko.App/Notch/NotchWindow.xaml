@@ -7,6 +7,7 @@
         xmlns:peeks="clr-namespace:Peeko.App.Peeks"
         xmlns:prod="clr-namespace:Peeko.App.Productivity"
         xmlns:upd="clr-namespace:Peeko.App.Updates"
+        xmlns:ctl="clr-namespace:Peeko.App.Control"
         Title="Peeko"
         Width="640" Height="320"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
@@ -122,6 +123,8 @@
                                              Tag="{StaticResource Peeko.Icon.Todo}" ToolTip="Tugas" Checked="OnTabChecked" />
                                 <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
                                              Tag="{StaticResource Peeko.Icon.Shelf}" ToolTip="Rak" Checked="OnTabChecked" />
+                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
+                                             Tag="{StaticResource Peeko.Icon.Control}" ToolTip="Kontrol" Checked="OnTabChecked" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <!-- Ada update: tombol kecil di sebelah jam, bisa dipasang dari tab mana pun -->
@@ -141,6 +144,7 @@
                             <prod:WaterModule x:Name="WaterModuleView" Visibility="Collapsed" />
                             <prod:TodoModule x:Name="TodoModuleView" Visibility="Collapsed" />
                             <prod:ShelfModule x:Name="ShelfModuleView" Visibility="Collapsed" />
+                            <ctl:ControlModule x:Name="ControlModuleView" Visibility="Collapsed" />
                             <Border x:Name="PlaceholderModule" Visibility="Collapsed"
                                     CornerRadius="{StaticResource Peeko.Radius.Lg}" Background="{StaticResource Peeko.Brush.SurfaceRaised}">
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

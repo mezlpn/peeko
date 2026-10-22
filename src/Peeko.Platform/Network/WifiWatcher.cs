@@ -27,7 +27,7 @@ public sealed class WifiWatcher : IDisposable
 
     private void OnStatusChanged(object sender) => _settle.Change(Settle, Timeout.InfiniteTimeSpan);
 
-    private static string? ReadSsid()
+    public static string? ReadSsid()
     {
         try
         {
