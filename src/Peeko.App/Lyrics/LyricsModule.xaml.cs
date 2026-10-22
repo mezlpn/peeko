@@ -15,9 +15,9 @@ namespace Peeko.App.Lyrics;
 /// </summary>
 public partial class LyricsModule : UserControl
 {
-    private const double SlotHeight = 26;
-    private const int ActiveSlot = 2; // slot ketiga (0-based)
-    private const double DimScale = 0.86;
+    private const double SlotHeight = 22;
+    private const int ActiveSlot = 1; // slot tengah dari tiga (0-based)
+    private const double DimScale = 0.88;
 
     private static readonly Color Primary = (Color)ColorConverter.ConvertFromString("#F4F4F1");
     private static readonly Color Tertiary = (Color)ColorConverter.ConvertFromString("#7A7A83");
@@ -66,7 +66,7 @@ public partial class LyricsModule : UserControl
             {
                 Text = lyrics.Lines[i].Text,
                 Height = SlotHeight,
-                FontSize = 18,
+                FontSize = 15,
                 FontWeight = FontWeights.SemiBold,
                 FontFamily = (FontFamily)FindResource("Peeko.Font"),
                 Foreground = new SolidColorBrush(Tertiary),
@@ -186,11 +186,11 @@ public partial class LyricsModule : UserControl
     {
         (EmptyTitle.Text, EmptyBody.Text) = ViewModel?.State switch
         {
-            LyricsViewState.NotFound => ("Lirik tidak ditemukan", "Belum ada lirik untuk lagu ini di lrclib.net."),
-            LyricsViewState.Failed => ("Lirik belum bisa dimuat", "Periksa koneksi internet, lalu coba lagi."),
-            LyricsViewState.Instrumental => ("Instrumental", "Lagu ini tidak punya lirik."),
-            LyricsViewState.Disabled => ("Lirik dimatikan", "Ambil lirik dari internet sedang mati."),
-            _ => ("Belum ada yang diputar", "Putar lagu dan liriknya akan muncul di sini."),
+            LyricsViewState.NotFound => ("Lirik tidak ditemukan", " · belum ada di lrclib.net"),
+            LyricsViewState.Failed => ("Lirik belum bisa dimuat", " · periksa internet"),
+            LyricsViewState.Instrumental => ("Instrumental", " · tanpa lirik"),
+            LyricsViewState.Disabled => ("Lirik dimatikan", ""),
+            _ => ("", ""),
         };
     }
 

@@ -53,8 +53,10 @@ Butuh **Windows 10 atau 11**. Tidak perlu memasang apa-apa lagi.
 ### 4. Cara pakai
 
 - **Arahkan kursor** ke notch di tengah atas layar untuk membukanya. Jauhkan kursor untuk menutup.
-- Klik **ikon-ikon di bagian atas** panel untuk pindah antara Musik, Lirik, Fokus, Minum, Tugas, Rak,
-  Kontrol, dan Hari ini. Bisa juga dengan **menggulir mouse** di baris ikon itu.
+- Bagian atas panel menampilkan cuaca, jam (dengan mata Peeko), dan baterai.
+- **Gulir mouse** di panel untuk pindah tampilan, atau klik **titik kecil** di bagian bawah. Ada lima tampilan,
+  dan ukuran notch menyesuaikan isinya:
+  **Musik + lirik** · **Kontrol** · **Hari ini** (kalender + timer fokus) · **Tugas + minum** · **Rak**.
 - Cuaca memakai perkiraan lokasi dari internet. Kalau kotanya meleset, isi kotamu di
   Pengaturan → **Cuaca**.
 - **Seret file** dari Explorer ke notch. Tahan sebentar sampai panel terbuka, lalu lepaskan di:

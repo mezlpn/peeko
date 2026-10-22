@@ -9,7 +9,7 @@ namespace Peeko.App.Productivity;
 
 public partial class FocusModule : UserControl
 {
-    private const double W = 236, H = 120, Stroke = 4;
+    private const double W = 224, H = 100, Stroke = 4;
     private static readonly Geometry Stadium = BuildStadium();
     private static readonly double Perimeter = 2 * (W - H) + Math.PI * (H - Stroke);
 
@@ -80,11 +80,13 @@ public partial class FocusModule : UserControl
             _ => $"Fokus {t.Settings.FocusMinutes} · istirahat {t.Settings.ShortBreakMinutes} · panjang {t.Settings.LongBreakMinutes} menit",
         };
 
+        TimeText.ToolTip = InfoText.Text;
+
         // Tombol: Siap → Mulai fokus (satu-satunya accent); berjalan → Jeda; dijeda → Lanjutkan.
         switch (t.Status)
         {
             case FocusStatus.Ready:
-                SetPrimary("Mulai fokus", "Peeko.Fill.Play", accent: true);
+                SetPrimary("Mulai", "Peeko.Fill.Play", accent: true);
                 ResetButton.Visibility = Visibility.Collapsed;
                 SkipButton.Visibility = Visibility.Collapsed;
                 break;

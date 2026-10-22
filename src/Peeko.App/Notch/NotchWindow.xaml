@@ -17,39 +17,20 @@
         FontFamily="{StaticResource Peeko.Font}">
 
     <Window.Resources>
-        <!-- Tab ikon 32 × 28, radius 10; aktif: surface-raised + titik accent 4 × 2 (Components.dc.html) -->
-        <Style x:Key="TabButton" TargetType="RadioButton">
-            <Setter Property="Width" Value="32" />
-            <Setter Property="Height" Value="28" />
-            <Setter Property="Margin" Value="0,0,2,0" />
-            <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextTertiary}" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-            <Setter Property="Template">
+        <!-- Ikon kecil 14 px di baris status -->
+        <Style x:Key="StatusIcon" TargetType="Path" BasedOn="{StaticResource Peeko.IconPath}">
+            <Setter Property="Stroke" Value="{StaticResource Peeko.Brush.TextSecondary}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="LayoutTransform">
                 <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="Bg" CornerRadius="{StaticResource Peeko.Radius.Md}" Background="Transparent">
-                            <Grid>
-                                <Path Style="{StaticResource Peeko.IconPath}" Data="{TemplateBinding Tag}"
-                                      Stroke="{TemplateBinding Foreground}"
-                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <Border x:Name="Dot" Width="4" Height="2" CornerRadius="1" Margin="0,0,0,2"
-                                        VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                                        Background="{StaticResource Peeko.Brush.Accent}" Visibility="Hidden" />
-                            </Grid>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Peeko.Brush.SurfaceHover}" />
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Peeko.Brush.SurfaceRaised}" />
-                                <Setter TargetName="Dot" Property="Visibility" Value="Visible" />
-                                <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextPrimary}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
+                    <ScaleTransform ScaleX="0.58" ScaleY="0.58" />
                 </Setter.Value>
             </Setter>
+        </Style>
+        <Style x:Key="StatusText" TargetType="TextBlock" BasedOn="{StaticResource Peeko.Text.Caption}">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextSecondary}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </Window.Resources>
 
@@ -96,76 +77,85 @@
                         <peeks:PeekView x:Name="PeekContent" />
                     </Grid>
 
-                    <!-- ── Expanded 560 × 260 ── -->
-                    <Grid x:Name="ExpandedLayer" Width="560" Height="260" HorizontalAlignment="Center" VerticalAlignment="Top"
-                          Opacity="0" Visibility="Collapsed">
+                    <!-- ── Expanded (0.3.0, gaya Bloom): baris status, isi tampilan, titik halaman.
+                         Ukuran notch mengikuti isi tampilan; ganti tampilan dengan gulir mouse atau klik titik. ── -->
+                    <Grid x:Name="ExpandedLayer" VerticalAlignment="Top" Opacity="0" Visibility="Collapsed" Background="Transparent"
+                          PreviewMouseWheel="OnExpandedWheel">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="8" />
-                            <RowDefinition Height="28" />
+                            <RowDefinition Height="24" />
                             <RowDefinition Height="10" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="18" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="6" />
+                            <RowDefinition Height="10" />
                         </Grid.RowDefinitions>
 
-                        <Grid x:Name="TabBar" Grid.Row="1" Margin="20,0" Background="Transparent" MouseWheel="OnTabBarWheel">
+                        <!-- Baris status: cuaca · mata + jam · baterai -->
+                        <Grid x:Name="StatusBar" Grid.Row="1" Margin="18,0">
                             <Grid.RenderTransform>
-                                <TranslateTransform x:Name="TabBarShift" />
+                                <TranslateTransform x:Name="StatusShift" />
                             </Grid.RenderTransform>
-                            <StackPanel x:Name="Tabs" Orientation="Horizontal">
-                                <RadioButton x:Name="TabMusic" Style="{StaticResource TabButton}" GroupName="Modul" IsChecked="True"
-                                             Tag="{StaticResource Peeko.Icon.Music}" ToolTip="Musik" Checked="OnTabChecked" />
-                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
-                                             Tag="{StaticResource Peeko.Icon.Lyrics}" ToolTip="Lirik" Checked="OnTabChecked" />
-                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
-                                             Tag="{StaticResource Peeko.Icon.Focus}" ToolTip="Fokus" Checked="OnTabChecked" />
-                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
-                                             Tag="{StaticResource Peeko.Icon.Water}" ToolTip="Minum" Checked="OnTabChecked" />
-                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
-                                             Tag="{StaticResource Peeko.Icon.Todo}" ToolTip="Tugas" Checked="OnTabChecked" />
-                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
-                                             Tag="{StaticResource Peeko.Icon.Shelf}" ToolTip="Rak" Checked="OnTabChecked" />
-                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
-                                             Tag="{StaticResource Peeko.Icon.Control}" ToolTip="Kontrol" Checked="OnTabChecked" />
-                                <RadioButton Style="{StaticResource TabButton}" GroupName="Modul"
-                                             Tag="{StaticResource Peeko.Icon.Today}" ToolTip="Hari ini" Checked="OnTabChecked" />
+                            <StackPanel x:Name="WeatherBox" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <Path x:Name="WeatherGlyph" Style="{StaticResource StatusIcon}" Data="{StaticResource Peeko.Icon.Thermo}" />
+                                <TextBlock x:Name="WeatherText" Style="{StaticResource StatusText}" Margin="4,0,0,0" Text="–" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <controls:Kedip x:Name="HeaderEyes" VerticalAlignment="Center" Margin="0,0,8,0">
+                                    <controls:Kedip.LayoutTransform>
+                                        <ScaleTransform ScaleX="0.6" ScaleY="0.6" />
+                                    </controls:Kedip.LayoutTransform>
+                                </controls:Kedip>
+                                <TextBlock x:Name="Clock" Style="{StaticResource Peeko.Text.BodyStrong}" VerticalAlignment="Center" Text="00:00" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <!-- Ada update: tombol kecil di sebelah jam, bisa dipasang dari tab mana pun -->
-                                <Button x:Name="UpdateChip" Style="{StaticResource Peeko.Button.Pill}" Height="24" Padding="10,0"
+                                <!-- Ada update: tombol kecil, bisa dipasang dari tampilan mana pun -->
+                                <Button x:Name="UpdateChip" Style="{StaticResource Peeko.Button.Pill}" Height="22" Padding="8,0"
                                         Margin="0,0,10,0" Visibility="Collapsed" Tag="{StaticResource Peeko.Icon.UpdateArrow}" />
-                                <TextBlock x:Name="Clock" Style="{StaticResource Peeko.Text.Caption}" VerticalAlignment="Center" Text="00:00" />
+                                <Path x:Name="BatteryBolt" Style="{StaticResource StatusIcon}" Data="{StaticResource Peeko.Icon.Bolt}"
+                                      Stroke="{StaticResource Peeko.Brush.Accent}" Visibility="Collapsed" Margin="0,0,1,0" />
+                                <Border Width="20" Height="11" CornerRadius="3" BorderThickness="1.2" Padding="1.5" VerticalAlignment="Center"
+                                        BorderBrush="{StaticResource Peeko.Brush.TextSecondary}">
+                                    <Border x:Name="BatteryFill" HorizontalAlignment="Left" CornerRadius="1" Width="8"
+                                            Background="{StaticResource Peeko.Brush.TextSecondary}" />
+                                </Border>
+                                <Border Width="1.5" Height="4" Margin="1,0,0,0" CornerRadius="0,1,1,0" VerticalAlignment="Center"
+                                        Background="{StaticResource Peeko.Brush.TextSecondary}" />
+                                <TextBlock x:Name="BatteryText" Style="{StaticResource StatusText}" Margin="5,0,0,0" Text="–" />
                             </StackPanel>
                         </Grid>
 
-                        <Grid x:Name="ModuleHost" Grid.Row="3" Margin="20,0" ClipToBounds="True">
-                            <Grid.RenderTransform>
-                                <TranslateTransform x:Name="ModuleShift" />
-                            </Grid.RenderTransform>
-                            <music:MusicModule x:Name="MusicModuleView" />
-                            <lyrics:LyricsModule x:Name="LyricsModuleView" Visibility="Collapsed" />
-                            <prod:FocusModule x:Name="FocusModuleView" Visibility="Collapsed" />
-                            <prod:WaterModule x:Name="WaterModuleView" Visibility="Collapsed" />
-                            <prod:TodoModule x:Name="TodoModuleView" Visibility="Collapsed" />
-                            <prod:ShelfModule x:Name="ShelfModuleView" Visibility="Collapsed" />
-                            <ctl:ControlModule x:Name="ControlModuleView" Visibility="Collapsed" />
-                            <today:TodayModule x:Name="TodayModuleView" Visibility="Collapsed" />
-                            <Border x:Name="PlaceholderModule" Visibility="Collapsed"
-                                    CornerRadius="{StaticResource Peeko.Radius.Lg}" Background="{StaticResource Peeko.Brush.SurfaceRaised}">
-                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <TextBlock x:Name="PlaceholderTitle" Style="{StaticResource Peeko.Text.BodyStrong}" HorizontalAlignment="Center"
-                                               Text="Modul menyusul" />
-                                    <TextBlock Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,4,0,0"
-                                               Text="Modul ini dikerjakan di tahap berikutnya" />
-                                </StackPanel>
-                            </Border>
+                        <!-- Isi tampilan. Tinggi diatur kode sesuai tampilan aktif. -->
+                        <Grid x:Name="ModuleHost" Grid.Row="3" Margin="18,0" ClipToBounds="True">
+                            <StackPanel x:Name="MusicMode" Width="400" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                <music:MusicModule x:Name="MusicModuleView" />
+                                <lyrics:LyricsModule x:Name="LyricsModuleView" Margin="0,10,0,0" />
+                            </StackPanel>
+                            <ctl:ControlModule x:Name="ControlModuleView" Width="400" HorizontalAlignment="Center" VerticalAlignment="Top"
+                                               Visibility="Collapsed" />
+                            <StackPanel x:Name="TodayMode" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top"
+                                        Visibility="Collapsed">
+                                <today:TodayModule x:Name="TodayModuleView" />
+                                <prod:FocusModule x:Name="FocusModuleView" Margin="20,0,0,0" />
+                            </StackPanel>
+                            <StackPanel x:Name="TasksMode" Orientation="Horizontal" Height="150" HorizontalAlignment="Center"
+                                        VerticalAlignment="Top" Visibility="Collapsed">
+                                <prod:TodoModule x:Name="TodoModuleView" Width="250" />
+                                <prod:WaterModule x:Name="WaterModuleView" Width="150" Margin="14,0,0,0" />
+                            </StackPanel>
+                            <prod:ShelfModule x:Name="ShelfModuleView" Width="440" Height="96" HorizontalAlignment="Center"
+                                              VerticalAlignment="Top" Visibility="Collapsed" />
                         </Grid>
 
-                        <!-- Peek saat panel terbuka: baris 32 px di bawah bar tab (Peek.dc.html → aturan antrian) -->
-                        <Border x:Name="PeekBanner" Grid.Row="3" Height="32" Margin="20,0" VerticalAlignment="Top"
+                        <!-- Peek saat panel terbuka: baris 32 px di atas isi -->
+                        <Border x:Name="PeekBanner" Grid.Row="3" Height="32" Margin="18,0" VerticalAlignment="Top"
                                 CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
                                 Opacity="0" Visibility="Collapsed" IsHitTestVisible="False">
                             <peeks:PeekView x:Name="PeekBannerContent" Compact="True" />
                         </Border>
+
+                        <!-- Titik halaman: aktif memanjang, bisa diklik -->
+                        <StackPanel x:Name="Dots" Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center" />
                     </Grid>
                 </Grid>
             </Border>

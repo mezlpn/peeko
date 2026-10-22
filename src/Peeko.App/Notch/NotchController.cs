@@ -60,7 +60,7 @@ public sealed class NotchController : IDisposable
         _updates = updates;
         _convert = convert;
         _log = log;
-        _window.TodayModule.Attach(weather);
+        _window.AttachWeather(weather);
     }
 
     public NotchState State => _stateMachine.State;
@@ -92,7 +92,7 @@ public sealed class NotchController : IDisposable
         _lyrics.LinesChanged += lyricsView.SetLines;
         _lyrics.ActiveLineChanged += lyricsView.SetActive;
         lyricsView.LineClicked += _lyrics.SeekToLine;
-        _window.VisibleModuleChanged += module => _lyrics.SetVisible(module == NotchWindow.LyricsTab);
+        _window.VisibleModuleChanged += module => _lyrics.SetVisible(module == NotchWindow.MusicTab);
         _window.VisibleModuleChanged += module => _music.SetMusicTabVisible(module == NotchWindow.MusicTab);
 
         // Peek sistem bisa dimatikan di Pengaturan; baterai kritis selalu muncul.
@@ -235,7 +235,7 @@ public sealed class NotchController : IDisposable
         // Dibuka karena file diseret: tetap di tab Rak walau musik sedang diputar.
         // Sedang mengubah format: tetap di tab Rak.
         if (to == NotchState.Expanded && _musicLive && !_expandingForShelf && !_window.ShelfModule.ConvertPanel.IsActive
-            && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.LyricsTab or NotchWindow.ControlTab or NotchWindow.TodayTab))
+            && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.ControlTab or NotchWindow.TodayTab))
             _window.SelectModule(NotchWindow.MusicTab);
 
         _window.TransitionTo(from, to);
@@ -263,7 +263,7 @@ public sealed class NotchController : IDisposable
     {
         bool pill = _stateMachine.State == NotchState.Collapsed
             && _window.CollapsedActivity is CollapsedActivity.Focus or CollapsedActivity.MusicAndFocus;
-        _focus.SetDisplayVisible(pill || _window.VisibleModule == NotchWindow.FocusTab);
+        _focus.SetDisplayVisible(pill || _window.VisibleModule == NotchWindow.TodayTab);
     }
 
     // ── Seret file ke notch → rak ───────────────────────────────────────────
@@ -393,14 +393,8 @@ public sealed class NotchController : IDisposable
         ApplySlim();
         _window.SetHorizontalOffset(s.HorizontalOffset);
 
-        _window.SetModuleEnabled(NotchWindow.MusicTab, s.MusicEnabled);
-        _window.SetModuleEnabled(NotchWindow.LyricsTab, s.LyricsEnabled);
-        _window.SetModuleEnabled(NotchWindow.FocusTab, s.FocusEnabled);
-        _window.SetModuleEnabled(NotchWindow.WaterTab, s.WaterEnabled);
-        _window.SetModuleEnabled(NotchWindow.TodoTab, s.TodoEnabled);
-        _window.SetModuleEnabled(NotchWindow.ShelfTab, s.ShelfEnabled);
-        _window.SetModuleEnabled(NotchWindow.ControlTab, s.ControlEnabled);
-        _window.SetModuleEnabled(NotchWindow.TodayTab, s.TodayEnabled);
+        _window.SetModulesEnabled(s.MusicEnabled, s.LyricsEnabled, s.ControlEnabled, s.TodayEnabled, s.FocusEnabled,
+            s.TodoEnabled, s.WaterEnabled, s.ShelfEnabled);
         if (_window.ShelfModule.ConvertAvailable != s.ConvertEnabled)
         {
             _window.ShelfModule.ConvertAvailable = s.ConvertEnabled;

@@ -26,7 +26,6 @@ public partial class NotchWindow : Window
     private static readonly Size MusicSize = IdleSize;
     private static readonly Size WaterSize = new(260, 32);
     private static readonly Size PeekSize = new(320, 44);
-    private static readonly Size ExpandedSize = new(560, 260);
 
     // Respons hover instan: pil sedikit menggembung sebelum panel terbuka.
     private static readonly Size SlimHoverSize = new(184, 6);
@@ -44,9 +43,6 @@ public partial class NotchWindow : Window
     private CollapsedActivity _activity = CollapsedActivity.Idle;
     private int _moduleIndex;
 
-    public const int MusicTab = 0;
-    public const int LyricsTab = 1;
-
     // Bentuk notch digerakkan pegas, satu per sifat (cara Bloom): lebar, tinggi, radius, bahu, dan
     // posisi sembunyi masing-masing punya kekakuan sendiri dan bisa dibalik di tengah gerak.
     private readonly SpringValue _width;
@@ -54,7 +50,6 @@ public partial class NotchWindow : Window
     private readonly SpringValue _radius;
     private readonly SpringValue _shoulders;
     private readonly SpringValue _hideY;
-    private readonly Dictionary<FrameworkElement, SpringValue> _moduleX = [];
 
     public NotchWindow(MusicViewModel music, LyricsViewModel lyrics)
     {
@@ -78,6 +73,8 @@ public partial class NotchWindow : Window
         MusicPillView.DataContext = music;
         MusicModuleView.DataContext = music;
         LyricsModuleView.DataContext = lyrics;
+        WatchContentSize();
+        BuildDots();
     }
 
     /// <summary>
@@ -137,45 +134,6 @@ public partial class NotchWindow : Window
     public Today.TodayModule TodayModule => TodayModuleView;
 
     public FrameworkElement DropTarget => ShapeHost;
-
-    /// <summary>Tab yang dipilih (walau panel sedang tertutup).</summary>
-    public int SelectedModule => _moduleIndex;
-
-    /// <summary>Modul yang benar-benar terlihat sekarang, atau −1 jika panel tertutup.</summary>
-    public int VisibleModule => _visualState == NotchState.Expanded ? _moduleIndex : -1;
-
-    /// <summary>Panel dibuka/ditutup atau tab berganti.</summary>
-    public event Action<int>? VisibleModuleChanged;
-
-    public const int FocusTab = 2;
-    public const int WaterTab = 3;
-    public const int TodoTab = 4;
-    public const int ShelfTab = 5;
-    public const int ControlTab = 6;
-    public const int TodayTab = 7;
-
-    private UIElement ModuleView(int index) => index switch
-    {
-        MusicTab => MusicModuleView,
-        LyricsTab => LyricsModuleView,
-        FocusTab => FocusModuleView,
-        WaterTab => WaterModuleView,
-        TodoTab => TodoModuleView,
-        ShelfTab => ShelfModuleView,
-        ControlTab => ControlModuleView,
-        TodayTab => TodayModuleView,
-        _ => PlaceholderModule,
-    };
-
-    private void NotifyVisibleModule()
-    {
-        MusicModuleView.SetActive(VisibleModule == MusicTab);
-        LyricsModuleView.SetVisible(VisibleModule == LyricsTab);
-        ControlModuleView.SetVisible(VisibleModule == ControlTab);
-        TodayModuleView.SetVisible(VisibleModule == TodayTab);
-        if (VisibleModule != TodoTab) TodoModuleView.EndInput();
-        VisibleModuleChanged?.Invoke(VisibleModule);
-    }
 
     /// <summary>
     /// Input teks (to-do) dibuka: jendela notch sementara boleh aktif supaya bisa menerima ketikan.
@@ -245,28 +203,6 @@ public partial class NotchWindow : Window
         Reposition();
     }
 
-    /// <summary>Modul yang dimatikan di Pengaturan dihapus dari bar tab, tidak sekadar dinonaktifkan.</summary>
-    public void SetModuleEnabled(int index, bool enabled)
-    {
-        if (Tabs.Children[index] is not System.Windows.Controls.RadioButton tab) return;
-        tab.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
-        if (!enabled && _moduleIndex == index)
-        {
-            // Pindah ke tab pertama yang masih aktif.
-            foreach (var child in Tabs.Children.OfType<System.Windows.Controls.RadioButton>())
-            {
-                if (child.Visibility == Visibility.Visible)
-                {
-                    child.IsChecked = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    public bool IsModuleEnabled(int index) =>
-        Tabs.Children[index] is UIElement tab && tab.Visibility == Visibility.Visible;
-
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
     {
         base.OnDpiChanged(oldDpi, newDpi);
@@ -333,24 +269,32 @@ public partial class NotchWindow : Window
     private void ToExpanded()
     {
         Kedip.StopIdle();
+        HeaderEyes.StartIdle();
+        RefreshStatusBar();
         FadeOut(CollapsedLayer, Motion.Ms(80));
         ScaleCollapsed(0.96, Motion.Ms(80), Motion.In);
         FadeOut(PeekLayer, Motion.Ms(80));
         AnimateShoulders(1);
 
-        AnimateShape(ExpandedSize, ExpandedRadius);
+        AnimateShape(ExpandedShape(), ExpandedRadius);
 
         UpdateClock();
         ExpandedLayer.Visibility = Visibility.Visible;
         FadeIn(ExpandedLayer, Motion.Ms(180), delayMs: 120);
-        Slide(TabBarShift, TranslateTransform.YProperty, from: -6, Motion.Ms(180), delayMs: 120);
-        Slide(ModuleShift, TranslateTransform.YProperty, from: 8, Motion.Ms(240), delayMs: 150);
+        Slide(StatusShift, TranslateTransform.YProperty, from: -6, Motion.Ms(180), delayMs: 120);
+        var mode = ModeView(_moduleIndex);
+        mode.Visibility = Visibility.Visible;
+        mode.BeginAnimation(OpacityProperty, null);
+        mode.Opacity = 1;
+        ModeY(mode).Set(10);
+        ModeY(mode).AnimateTo(0, delayMs: 120);
     }
 
     /// <summary>Kembali ke state istirahat: pil (Collapsed) atau garis tipis (Slim).</summary>
     private void ToRest(NotchState from, bool slim)
     {
         _clockTimer.Stop();
+        HeaderEyes.StopIdle();
         ShowWindowIfHidden();
 
         var size = slim ? SlimSize : CollapsedSize;
@@ -372,7 +316,7 @@ public partial class NotchWindow : Window
             {
                 case NotchState.Expanded:
                     FadeOut(ExpandedLayer, Motion.Fast);
-                    Slide(TabBarShift, TranslateTransform.YProperty, from: null, Motion.Fast, to: -4, ease: Motion.In);
+                    Slide(StatusShift, TranslateTransform.YProperty, from: null, Motion.Fast, to: -4, ease: Motion.In);
                     AnimateShape(size, radius);
                     contentDelay = 200;
                     break;
@@ -470,94 +414,6 @@ public partial class NotchWindow : Window
 
     public CollapsedActivity CollapsedActivity => _activity;
 
-    /// <summary>Pilih tab sebelum panel terbuka (mis. buka tab Musik saat lagu diputar).</summary>
-    public void SelectModule(int index)
-    {
-        if (Tabs.Children[index] is System.Windows.Controls.RadioButton tab)
-            tab.IsChecked = true;
-    }
-
-    private void OnTabChecked(object sender, RoutedEventArgs e)
-    {
-        if (sender is not System.Windows.Controls.RadioButton tab || Tabs is null) return;
-        int index = Tabs.Children.IndexOf(tab);
-        if (index < 0 || index == _moduleIndex) return;
-
-        // Ganti tab (revisi #18): geser seperti umumnya. Isi lama bergeser keluar searah tab sambil
-        // memudar, isi baru masuk dari sisi lain sambil muncul; keduanya bergerak bersamaan.
-        int direction = index > _moduleIndex ? 1 : -1;
-        var hide = (FrameworkElement)ModuleView(_moduleIndex);
-        var show = (FrameworkElement)ModuleView(index);
-        _moduleIndex = index;
-
-        PlaceholderTitle.Text = tab.ToolTip is string name ? $"Modul {name} menyusul" : "Modul menyusul";
-
-        bool animate = !Motion.Reduced && _visualState == NotchState.Expanded && hide != show;
-        const double distance = 48;
-
-        if (hide != show)
-        {
-            if (animate)
-            {
-                ModuleX(hide).AnimateTo(-distance * direction);
-                var fadeOut = Motion.To(0, Motion.Base, Motion.Standard);
-                fadeOut.Completed += (_, _) =>
-                {
-                    // Bisa saja pengguna sudah kembali ke tab ini sebelum animasi selesai.
-                    if (ModuleView(_moduleIndex) != hide) hide.Visibility = Visibility.Collapsed;
-                };
-                hide.Animate(OpacityProperty, fadeOut);
-            }
-            else
-            {
-                hide.BeginAnimation(OpacityProperty, null);
-                hide.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        show.Visibility = Visibility.Visible;
-        var shiftIn = ModuleX(show);
-        if (animate)
-        {
-            // Pegas: kalau tab diganti cepat berturut-turut, isi melanjutkan geraknya, tidak meloncat.
-            if (!shiftIn.IsMoving) shiftIn.Set(distance * direction);
-            shiftIn.AnimateTo(0);
-            var fadeIn = Motion.To(1, Motion.Ms(280), Motion.Out);
-            fadeIn.From = 0;
-            show.Animate(OpacityProperty, fadeIn);
-        }
-        else
-        {
-            shiftIn.Set(0);
-            show.BeginAnimation(OpacityProperty, null);
-            show.Opacity = 1;
-        }
-
-        NotifyVisibleModule();
-    }
-
-    /// <summary>Gulir di bar tab untuk pindah modul (seperti island Bloom yang berganti mode saat digulir).</summary>
-    private void OnTabBarWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
-    {
-        var tabs = Tabs.Children.OfType<System.Windows.Controls.RadioButton>()
-            .Where(t => t.Visibility == Visibility.Visible).ToList();
-        int current = tabs.FindIndex(t => t.IsChecked == true);
-        int next = Math.Clamp(current + (e.Delta < 0 ? 1 : -1), 0, tabs.Count - 1);
-        if (next != current) tabs[next].IsChecked = true;
-        e.Handled = true;
-    }
-
-    /// <summary>Tiap modul punya pegas geser sendiri supaya yang keluar dan yang masuk bisa bergerak bersamaan.</summary>
-    private SpringValue ModuleX(FrameworkElement module)
-    {
-        if (_moduleX.TryGetValue(module, out var spring)) return spring;
-        var t = new TranslateTransform();
-        module.RenderTransform = t;
-        spring = new SpringValue(0, SpringConfig.Content, v => t.X = v);
-        _moduleX[module] = spring;
-        return spring;
-    }
-
     private void ToPeek(NotchState from)
     {
         ShowWindowIfHidden();
@@ -628,6 +484,7 @@ public partial class NotchWindow : Window
     {
         _clockTimer.Stop();
         Kedip.StopIdle();
+        HeaderEyes.StopIdle();
 
         double distance = Body.ActualHeight + 12;
         _hideY.Settled += () =>
@@ -726,6 +583,7 @@ public partial class NotchWindow : Window
     {
         var now = DateTime.Now;
         Clock.Text = now.ToString("HH:mm");
+        if (_visualState == NotchState.Expanded) RefreshStatusBar();
         _clockTimer.Interval = TimeSpan.FromSeconds(60 - now.Second) + TimeSpan.FromMilliseconds(50);
         if (_visualState == NotchState.Expanded) _clockTimer.Start();
     }

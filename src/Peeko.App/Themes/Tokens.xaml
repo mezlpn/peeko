@@ -149,6 +149,16 @@
     <Geometry x:Key="Peeko.Icon.Crop">M7,3.5 V17 H20.5 M3.5,7 H17 V20.5</Geometry>
     <Geometry x:Key="Peeko.Icon.Sun">M12,8.5 A3.5,3.5 0 1 1 12,15.5 A3.5,3.5 0 1 1 12,8.5 Z M12,3.5 V5 M12,19 V20.5 M3.5,12 H5 M19,12 H20.5 M6,6 L7,7 M17,17 L18,18 M6,18 L7,17 M17,7 L18,6</Geometry>
 
+    <!-- Cuaca (baris status) -->
+    <Geometry x:Key="Peeko.Icon.Cloud">M7,17 H17 A4,4 0 0 0 16.5,9.1 A5.5,5.5 0 0 0 6.2,10.6 A3.2,3.2 0 0 0 7,17 Z</Geometry>
+    <Geometry x:Key="Peeko.Icon.CloudRain">M7,14 H17 A3.6,3.6 0 0 0 16.5,7 A5,5 0 0 0 6.4,8.3 A2.9,2.9 0 0 0 7,14 Z M9,17 L8,20 M13,17 L12,20 M17,17 L16,20</Geometry>
+    <Geometry x:Key="Peeko.Icon.CloudDrizzle">M7,14 H17 A3.6,3.6 0 0 0 16.5,7 A5,5 0 0 0 6.4,8.3 A2.9,2.9 0 0 0 7,14 Z M9,17.5 V18.5 M13,17.5 V18.5 M17,17.5 V18.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.CloudSnow">M7,14 H17 A3.6,3.6 0 0 0 16.5,7 A5,5 0 0 0 6.4,8.3 A2.9,2.9 0 0 0 7,14 Z M9,17.5 V17.6 M12,19.5 V19.6 M15,17.5 V17.6</Geometry>
+    <Geometry x:Key="Peeko.Icon.CloudStorm">M7,14 H17 A3.6,3.6 0 0 0 16.5,7 A5,5 0 0 0 6.4,8.3 A2.9,2.9 0 0 0 7,14 Z M12.5,15 L10.5,18.2 H13.5 L11.5,21.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.Fog">M5,9 H19 M3.5,13 H20.5 M6,17 H18</Geometry>
+    <Geometry x:Key="Peeko.Icon.Thermo">M10,14.5 V5.5 A2,2 0 0 1 14,5.5 V14.5 A3.5,3.5 0 1 1 10,14.5 Z</Geometry>
+    <Geometry x:Key="Peeko.Icon.Bolt">M13,3 L6,13.5 H11.5 L10.5,21 L17.5,10.5 H12 Z</Geometry>
+
     <!-- Digambar di kanvas 24 × 24 seperti viewBox SVG-nya, lalu diskalakan ke 16 px. -->
     <Style x:Key="Peeko.IconPath" TargetType="Path">
         <Setter Property="Width" Value="24" />

@@ -1,5 +1,4 @@
-<!-- Modul Lirik 520 × 196 (Lyrics.dc.html): baris "sedang diputar" 32 px, lalu jendela lirik
-     5 slot × 26 px dengan baris aktif di slot ketiga. -->
+<!-- Lirik (Lyrics.dc.html), versi pita ringkas 0.3.0 yang menempel di bawah pemutar musik. -->
 <UserControl x:Class="Peeko.App.Lyrics.LyricsModule"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,15 +9,15 @@
 
         <!-- Tombol pil 32 px untuk "Cari lagi" (utama) dan "Lihat di peramban" (teks). -->
         <Style x:Key="PillButton" TargetType="Button">
-            <Setter Property="Height" Value="32" />
-            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="Padding" Value="10,0" />
             <Setter Property="Background" Value="{StaticResource Peeko.Brush.SurfaceRaised}" />
             <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextPrimary}" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bg" CornerRadius="16" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Bg" CornerRadius="13" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
                             <TextBlock Style="{StaticResource Peeko.Text.Pill}" Foreground="{TemplateBinding Foreground}"
                                        Text="{TemplateBinding Content}" VerticalAlignment="Center" />
                         </Border>
@@ -41,52 +40,21 @@
         </Style>
 
         <Style x:Key="Skeleton" TargetType="Border">
-            <Setter Property="Height" Value="12" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Margin" Value="13,7,0,7" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Margin" Value="13,6,0,6" />
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="Background" Value="{StaticResource Peeko.Brush.SurfaceHover}" />
         </Style>
     </UserControl.Resources>
 
+    <!-- Pita lirik ringkas (0.3.0) di bawah pemutar musik: tiga slot 22 px, baris aktif di tengah.
+         Tinggi diatur NotchWindow: 66 untuk lirik/memuat, 28 untuk pesan satu baris. -->
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="32" />
-            <RowDefinition Height="10" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <!-- ── Sedang diputar ── -->
-        <Grid DataContext="{Binding Music}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Border Width="28" Height="28" CornerRadius="7" Background="{StaticResource Peeko.Brush.SurfaceRaised}">
-                <Border CornerRadius="7">
-                    <Border.Background>
-                        <ImageBrush ImageSource="{Binding Cover}" Stretch="UniformToFill" />
-                    </Border.Background>
-                </Border>
-            </Border>
-            <TextBlock Grid.Column="1" Margin="10,0,12,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                       Style="{StaticResource Peeko.Text.Base}">
-                <Run Text="{Binding Title, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" />
-                <Run Text="{Binding Artist, Mode=OneWay, StringFormat='· {0}'}" FontSize="12"
-                     Foreground="{StaticResource Peeko.Brush.TextTertiary}" />
-            </TextBlock>
-            <TextBlock Grid.Column="2" Style="{StaticResource Peeko.Text.Caption}" VerticalAlignment="Center"
-                       Visibility="{Binding HasTimeline, Converter={StaticResource Vis}}">
-                <Run Text="{Binding PositionText, Mode=OneWay}" /> / <Run Text="{Binding DurationText, Mode=OneWay}" />
-            </TextBlock>
-        </Grid>
-
         <!-- ── Tersinkron ── -->
-        <Grid x:Name="SyncedView" Grid.Row="2" Height="130" VerticalAlignment="Top" ClipToBounds="True"
+        <Grid x:Name="SyncedView" Height="66" VerticalAlignment="Top" ClipToBounds="True"
               Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter=Synced}">
-            <!-- Penanda accent 3 × 18 di slot ketiga -->
-            <Rectangle x:Name="ActiveMarker" Width="3" Height="18" RadiusX="1.5" RadiusY="1.5" Margin="0,56,0,0"
+            <Rectangle x:Name="ActiveMarker" Width="3" Height="16" RadiusX="1.5" RadiusY="1.5" Margin="0,25,0,0"
                        HorizontalAlignment="Left" VerticalAlignment="Top" Fill="{StaticResource Peeko.Brush.Accent}" />
             <Canvas x:Name="LinesCanvas" Margin="13,0,0,0">
                 <StackPanel x:Name="LinesPanel">
@@ -98,67 +66,51 @@
         </Grid>
 
         <!-- ── Teks biasa: bisa di-scroll, tepi bawah memudar ── -->
-        <ScrollViewer x:Name="PlainView" Grid.Row="2" VerticalScrollBarVisibility="Hidden" Padding="2,0,0,0"
+        <ScrollViewer x:Name="PlainView" Height="66" VerticalAlignment="Top" VerticalScrollBarVisibility="Hidden" Padding="2,0,0,0"
                       Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter=Plain}">
             <ScrollViewer.OpacityMask>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                     <GradientStop Color="Black" Offset="0" />
-                    <GradientStop Color="Black" Offset="0.7" />
+                    <GradientStop Color="Black" Offset="0.6" />
                     <GradientStop Color="Transparent" Offset="1" />
                 </LinearGradientBrush>
             </ScrollViewer.OpacityMask>
-            <TextBlock Style="{StaticResource Peeko.Text.LyricDim}" Foreground="{StaticResource Peeko.Brush.TextSecondary}"
-                       TextWrapping="Wrap" Text="{Binding PlainText}" Margin="0,0,0,40" />
+            <TextBlock Style="{StaticResource Peeko.Text.Body}" Foreground="{StaticResource Peeko.Brush.TextSecondary}"
+                       TextWrapping="Wrap" Text="{Binding PlainText}" Margin="11,0,0,24" />
         </ScrollViewer>
 
         <!-- ── Memuat ── -->
-        <StackPanel x:Name="LoadingView" Grid.Row="2"
+        <StackPanel x:Name="LoadingView" VerticalAlignment="Top"
                     Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter=Loading}">
-            <Border Style="{StaticResource Skeleton}" Width="220" />
-            <Border Style="{StaticResource Skeleton}" Width="300" />
-            <Border Style="{StaticResource Skeleton}" Width="260" />
-            <Border Style="{StaticResource Skeleton}" Width="180" />
-            <TextBlock Style="{StaticResource Peeko.Text.Caption}" Margin="13,8,0,0" Text="Mencari lirik di lrclib.net…" />
+            <Border Style="{StaticResource Skeleton}" Width="200" />
+            <Border Style="{StaticResource Skeleton}" Width="280" />
+            <Border Style="{StaticResource Skeleton}" Width="160" />
         </StackPanel>
 
-        <!-- ── Tidak ditemukan / gagal / instrumental / tidak ada lagu ── -->
-        <Grid Grid.Row="2" Margin="4,0"
-              Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed,Instrumental,None,Disabled'}">
+        <!-- ── Tidak ditemukan / gagal / instrumental / dimatikan: satu baris ── -->
+        <Grid Height="28" VerticalAlignment="Top"
+              Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed,Instrumental,Disabled'}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="88" />
-                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Border Height="88" CornerRadius="{StaticResource Peeko.Radius.Lg}" Background="{StaticResource Peeko.Brush.SurfaceRaised}">
-                <Grid>
-                    <!-- Kedip "bingung": satu mata menyipit -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed,None,Disabled'}">
-                        <Rectangle Width="6" Height="10" RadiusX="3" RadiusY="3" Fill="{StaticResource Peeko.Brush.TextSecondary}" />
-                        <Rectangle Width="6" Height="5" RadiusX="2.5" RadiusY="2.5" Margin="10,4,0,0" Fill="{StaticResource Peeko.Brush.TextSecondary}" />
-                    </StackPanel>
-                    <Path Style="{StaticResource Peeko.IconPath}" Data="{StaticResource Peeko.Icon.Music}"
-                          Stroke="{StaticResource Peeko.Brush.TextSecondary}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                          Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter=Instrumental}">
-                        <Path.LayoutTransform>
-                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
-                        </Path.LayoutTransform>
-                    </Path>
-                </Grid>
-            </Border>
-
-            <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                <TextBlock x:Name="EmptyTitle" Style="{StaticResource Peeko.Text.Title}" />
-                <TextBlock x:Name="EmptyBody" Style="{StaticResource Peeko.Text.Body}" Margin="0,4,0,0"
-                           Foreground="{StaticResource Peeko.Brush.TextSecondary}" TextWrapping="Wrap" />
-                <StackPanel Orientation="Horizontal" Margin="0,12,0,0"
-                            Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed'}">
-                    <Button Style="{StaticResource PillButton}" Content="Cari lagi" Command="{Binding RetryCommand}" />
-                    <Button Style="{StaticResource TextButton}" Content="Lihat di peramban" Margin="8,0,0,0"
-                            Command="{Binding OpenInBrowserCommand}" />
-                </StackPanel>
-                <Button Style="{StaticResource PillButton}" Content="Buka pengaturan" Margin="0,12,0,0" HorizontalAlignment="Left"
-                        Command="{Binding OpenSettingsCommand}"
+            <!-- Kedip "bingung": satu mata menyipit -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,0,0">
+                <Rectangle Width="4" Height="8" RadiusX="2" RadiusY="2" Fill="{StaticResource Peeko.Brush.TextTertiary}" />
+                <Rectangle Width="4" Height="4" RadiusX="2" RadiusY="2" Margin="5,4,0,0" Fill="{StaticResource Peeko.Brush.TextTertiary}" />
+            </StackPanel>
+            <TextBlock Grid.Column="1" Margin="10,0,8,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                       Style="{StaticResource Peeko.Text.Base}">
+                <Run x:Name="EmptyTitle" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource Peeko.Brush.TextSecondary}" />
+                <Run x:Name="EmptyBody" FontSize="12" Foreground="{StaticResource Peeko.Brush.TextTertiary}" />
+            </TextBlock>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Style="{StaticResource TextButton}" Content="Cari lagi" Command="{Binding RetryCommand}"
+                        Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed'}" />
+                <Button Style="{StaticResource TextButton}" Content="Peramban" Command="{Binding OpenInBrowserCommand}"
+                        Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter='NotFound,Failed'}" />
+                <Button Style="{StaticResource TextButton}" Content="Pengaturan" Command="{Binding OpenSettingsCommand}"
                         Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter=Disabled}" />
             </StackPanel>
         </Grid>

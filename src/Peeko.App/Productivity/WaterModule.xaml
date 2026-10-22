@@ -1,50 +1,49 @@
-<!-- Modul Minum (WaterTodo.dc.html): angka besar + delapan gelas 22 × 36, pemisah, pengingat dan tombol. -->
+<!-- Modul Minum (WaterTodo.dc.html), versi kolom ringkas 0.3.0 di samping Tugas: angka, gelas mini,
+     pengingat, tombol. Lebar 150. -->
 <UserControl x:Class="Peeko.App.Productivity.WaterModule"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Margin="4,4,4,0">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="1" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Border CornerRadius="{StaticResource Peeko.Radius.Lg}" Background="{StaticResource Peeko.Brush.SurfaceRaised}" Padding="12,10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <!-- Atas: jumlah gelas atau "target tercapai" -->
-        <Grid VerticalAlignment="Center">
-            <StackPanel x:Name="CountView" Orientation="Horizontal" VerticalAlignment="Bottom">
-                <TextBlock x:Name="CountText" Style="{StaticResource Peeko.Text.TimerDisplay}" />
-                <TextBlock x:Name="GoalText" Style="{StaticResource Peeko.Text.Title}" Margin="6,0,0,6" VerticalAlignment="Bottom"
-                           Foreground="{StaticResource Peeko.Brush.TextSecondary}" />
-            </StackPanel>
-            <StackPanel x:Name="DoneView" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Path Data="M2,10 Q8,0 14,10" Stroke="{StaticResource Peeko.Brush.Water}" StrokeThickness="3"
-                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="16" Height="12" />
-                    <Path Data="M2,10 Q8,0 14,10" Stroke="{StaticResource Peeko.Brush.Water}" StrokeThickness="3" Margin="6,0,0,0"
-                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="16" Height="12" />
+            <!-- Jumlah gelas atau "target tercapai" -->
+            <Grid>
+                <StackPanel x:Name="CountView" Orientation="Horizontal">
+                    <TextBlock x:Name="CountText" Style="{StaticResource Peeko.Text.TimerDisplay}" FontSize="30" />
+                    <TextBlock x:Name="GoalText" Style="{StaticResource Peeko.Text.Caption}" Margin="5,0,0,6" VerticalAlignment="Bottom" />
                 </StackPanel>
-                <StackPanel Margin="14,0,0,0">
-                    <TextBlock Style="{StaticResource Peeko.Text.Title}" Text="Target hari ini tercapai" />
-                    <TextBlock x:Name="DoneDetail" Style="{StaticResource Peeko.Text.Body}" Foreground="{StaticResource Peeko.Brush.TextSecondary}" />
+                <StackPanel x:Name="DoneView" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="M2,10 Q8,0 14,10" Stroke="{StaticResource Peeko.Brush.Water}" StrokeThickness="3"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="16" Height="12" />
+                        <Path Data="M2,10 Q8,0 14,10" Stroke="{StaticResource Peeko.Brush.Water}" StrokeThickness="3" Margin="5,0,0,0"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="16" Height="12" />
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource Peeko.Text.BodyStrong}" Margin="0,6,0,0" Text="Target tercapai" />
+                    <TextBlock x:Name="DoneDetail" Style="{StaticResource Peeko.Text.Caption}" />
                 </StackPanel>
-            </StackPanel>
-            <StackPanel x:Name="Glasses" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,6" />
-        </Grid>
+            </Grid>
 
-        <Border Grid.Row="1" Background="{StaticResource Peeko.Brush.SurfaceHover}" />
+            <WrapPanel x:Name="Glasses" Grid.Row="1" Margin="0,6,0,0" />
 
-        <!-- Bawah: pengingat dan tombol -->
-        <Grid Grid.Row="2" VerticalAlignment="Center">
-            <StackPanel VerticalAlignment="Center">
-                <TextBlock x:Name="ReminderText" Style="{StaticResource Peeko.Text.BodyStrong}" />
-                <TextBlock x:Name="ReminderDetail" Style="{StaticResource Peeko.Text.Caption}" Margin="0,2,0,0" />
+            <StackPanel Grid.Row="2" VerticalAlignment="Center" Margin="0,6,0,6">
+                <TextBlock x:Name="ReminderText" Style="{StaticResource Peeko.Text.Caption}" Foreground="{StaticResource Peeko.Brush.TextSecondary}"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock x:Name="ReminderDetail" Visibility="Collapsed" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+
+            <Grid Grid.Row="3">
                 <Button x:Name="UndoButton" Style="{StaticResource Peeko.Button.Icon}" Tag="{StaticResource Peeko.Icon.Minus}"
-                        ToolTip="Kurangi satu gelas" Click="OnUndo" />
-                <Button x:Name="DrinkButton" Style="{StaticResource Peeko.Button.Pill}" Margin="6,0,0,0"
+                        HorizontalAlignment="Left" ToolTip="Kurangi satu gelas" Click="OnUndo" />
+                <Button x:Name="DrinkButton" Style="{StaticResource Peeko.Button.Pill}" HorizontalAlignment="Right"
                         Tag="{StaticResource Peeko.Fill.Plus}" Content="1 gelas" Click="OnDrink" />
-            </StackPanel>
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </UserControl>

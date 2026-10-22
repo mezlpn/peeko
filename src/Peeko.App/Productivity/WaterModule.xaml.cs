@@ -32,7 +32,7 @@ public partial class WaterModule : UserControl
         var d = t.Data;
 
         CountText.Text = glasses.ToString();
-        GoalText.Text = $"/ {t.Goal} gelas";
+        GoalText.Text = $"/ {t.Goal}";
         CountView.Visibility = reached ? Visibility.Collapsed : Visibility.Visible;
         DoneView.Visibility = reached ? Visibility.Visible : Visibility.Collapsed;
         DoneDetail.Text = $"{glasses} gelas · {WaterTracker.Liters(glasses * d.GlassMl)}";
@@ -46,10 +46,10 @@ public partial class WaterModule : UserControl
             Glasses.Children.Add(new TextBlock
             {
                 Text = $"+{glasses - t.Goal}",
-                Style = (Style)FindResource("Peeko.Text.BodyStrong"),
+                Style = (Style)FindResource("Peeko.Text.Caption"),
                 Foreground = B("Water"),
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(8, 0, 0, 0),
+                Margin = new Thickness(2, 0, 0, 4),
             });
         }
         if (reached && !_wasReached && _shownGlasses >= 0) Wave();
@@ -58,12 +58,12 @@ public partial class WaterModule : UserControl
 
         if (reached)
         {
-            ReminderText.Text = "Pengingat dijeda sampai besok";
+            ReminderText.Text = "Pengingat dijeda";
             ReminderDetail.Text = "Gelas tambahan tetap dicatat";
         }
         else
         {
-            ReminderText.Text = t.NextReminder is { } next ? $"Pengingat berikutnya {next.ToLocalTime():HH:mm}" : "Pengingat aktif";
+            ReminderText.Text = t.NextReminder is { } next ? $"Minum lagi {next.ToLocalTime():HH:mm}" : "Pengingat aktif";
             ReminderDetail.Text = $"Setiap {d.IntervalMinutes} menit · {WaterTracker.Liters(glasses * d.GlassMl)} dari {WaterTracker.Liters(t.Goal * d.GlassMl)}";
         }
 
@@ -71,9 +71,10 @@ public partial class WaterModule : UserControl
         DrinkButton.Background = B(reached ? "WaterMuted" : "Water");
         DrinkButton.Foreground = reached ? B("Water") : new SolidColorBrush(Color.FromRgb(0x04, 0x14, 0x1C));
         UndoButton.IsEnabled = glasses > 0;
+        ReminderText.ToolTip = ReminderDetail.Text;
     }
 
-    /// <summary>Delapan gelas 22 × 36; gelas yang baru terisi naik dari bawah (320 ms ease-spring).</summary>
+    /// <summary>Gelas mini 11 × 18 (bisa dua baris); gelas yang baru terisi naik dari bawah (320 ms ease-spring).</summary>
     private void BuildGlasses(int filled, int goal, bool animateNew)
     {
         Glasses.Children.Clear();
@@ -82,10 +83,10 @@ public partial class WaterModule : UserControl
             bool full = i < filled;
             var glass = new Border
             {
-                Width = 22,
-                Height = 36,
-                Margin = new Thickness(i == 0 ? 0 : 6, 0, 0, 0),
-                CornerRadius = new CornerRadius(4, 4, 8, 8),
+                Width = 11,
+                Height = 18,
+                Margin = new Thickness(0, 0, 4, 4),
+                CornerRadius = new CornerRadius(2, 2, 4, 4),
                 BorderThickness = new Thickness(full ? 0 : 1.5),
                 BorderBrush = B("StrokeStrong"),
                 ClipToBounds = true,
@@ -97,7 +98,7 @@ public partial class WaterModule : UserControl
                 var water = new Border
                 {
                     Background = B("Water"),
-                    CornerRadius = new CornerRadius(4, 4, 8, 8),
+                    CornerRadius = new CornerRadius(2, 2, 4, 4),
                     RenderTransformOrigin = new Point(0.5, 1),
                     RenderTransform = new ScaleTransform(1, 1),
                 };

@@ -279,7 +279,13 @@ Karena itu, prompt desain meminta token dan ukuran dalam piksel pada skala 100%,
   dan geser tab masing-masing punya pegas sendiri dengan nilai dari island Bloom (mis. lebar 400/31,
   tinggi 450/29, radius 1000/40). Target bisa diganti kapan saja tanpa kehilangan kecepatan. Satu
   `CompositionTarget.Rendering` untuk semua pegas, dan hanya terpasang selama ada yang bergerak.
-  Fade isi tetap memakai kurva bezier lama. Gulir mouse di bar tab berpindah modul.
+  Fade isi tetap memakai kurva bezier lama.
+- **Island ringkas** (`Notch/NotchWindow.Modes.cs`): bar tab dihapus. Panel = baris status (cuaca ·
+  mata Kedip kecil + jam · baterai) + satu tampilan + titik halaman. Lima tampilan: Musik + pita lirik
+  (3 baris), Kontrol, Hari ini (kalender + Fokus versi tegak), Tugas + kolom Minum, Rak. Ukuran notch dihitung
+  dari isi tampilan (`ModeContentSize`) dan berubah dengan pegas saat tampilan berganti atau isinya berubah
+  (lirik muncul, rak terisi, Ubah format aktif). Gulir mouse di mana saja berpindah tampilan (jeda 320 ms per
+  pindah); daftar yang masih bisa digulir menggulir isinya dulu.
 - **Visualizer** (`Core/Media/SpectrumAnalyzer.cs`, `Platform/Audio/AudioSpectrum.cs`, `Controls/Visualizer.cs`):
   loopback WASAPI (NAudio) → mono → jendela Hann → FFT 512 → 5 pita (bin 1–2, 2–6, 6–18, 18–60, 60–200) dengan
   bobot dan penguatan otomatis Bloom → bar pegas 600/30/0.5. Tangkapan hanya hidup selama bar terlihat

@@ -1,102 +1,14 @@
-<!-- Tab Hari ini, diadaptasi dari Bloom (GPLv3): kalender bulan di kiri, di kanan tanggal, cuaca, dan
-     baterai. Area 520 × 196. -->
+<!-- Kalender bulan ini, diadaptasi dari Bloom (GPLv3). Tampil di kiri tampilan "Hari ini", di sebelah
+     timer fokus. Cuaca dan baterai pindah ke baris status di atas notch. Lebar 196. -->
 <UserControl x:Class="Peeko.App.Today.TodayModule"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <UserControl.Resources>
-        <Geometry x:Key="Cloud">M7,17 H17 A4,4 0 0 0 16.5,9.1 A5.5,5.5 0 0 0 6.2,10.6 A3.2,3.2 0 0 0 7,17 Z</Geometry>
-        <Geometry x:Key="CloudRain">M7,14 H17 A3.6,3.6 0 0 0 16.5,7 A5,5 0 0 0 6.4,8.3 A2.9,2.9 0 0 0 7,14 Z M9,17 L8,20 M13,17 L12,20 M17,17 L16,20</Geometry>
-        <Geometry x:Key="CloudDrizzle">M7,14 H17 A3.6,3.6 0 0 0 16.5,7 A5,5 0 0 0 6.4,8.3 A2.9,2.9 0 0 0 7,14 Z M9,17.5 V18.5 M13,17.5 V18.5 M17,17.5 V18.5</Geometry>
-        <Geometry x:Key="CloudSnow">M7,14 H17 A3.6,3.6 0 0 0 16.5,7 A5,5 0 0 0 6.4,8.3 A2.9,2.9 0 0 0 7,14 Z M9,17.5 V17.6 M12,19.5 V19.6 M15,17.5 V17.6</Geometry>
-        <Geometry x:Key="CloudStorm">M7,14 H17 A3.6,3.6 0 0 0 16.5,7 A5,5 0 0 0 6.4,8.3 A2.9,2.9 0 0 0 7,14 Z M12.5,15 L10.5,18.2 H13.5 L11.5,21.5</Geometry>
-        <Geometry x:Key="Fog">M5,9 H19 M3.5,13 H20.5 M6,17 H18</Geometry>
-        <Geometry x:Key="Thermo">M10,14.5 V5.5 A2,2 0 0 1 14,5.5 V14.5 A3.5,3.5 0 1 1 10,14.5 Z</Geometry>
-
-        <Style x:Key="Card" TargetType="Border">
-            <Setter Property="CornerRadius" Value="{StaticResource Peeko.Radius.Lg}" />
-            <Setter Property="Background" Value="{StaticResource Peeko.Brush.SurfaceRaised}" />
-            <Setter Property="Padding" Value="14,0" />
-        </Style>
-    </UserControl.Resources>
-
-    <Grid Margin="0,2,0,0">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="224" />
-            <ColumnDefinition Width="20" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <!-- Kalender -->
-        <StackPanel VerticalAlignment="Top">
-            <TextBlock x:Name="MonthTitle" Style="{StaticResource Peeko.Text.BodyStrong}" Margin="4,0,0,6" Text="Oktober 2026" />
-            <UniformGrid x:Name="WeekdayRow" Columns="7" Height="18" />
-            <UniformGrid x:Name="DaysGrid" Columns="7" />
-        </StackPanel>
-
-        <!-- Status -->
-        <Grid Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="10" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="8" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <StackPanel>
-                <TextBlock x:Name="DayName" Style="{StaticResource Peeko.Text.Caption}" Text="KAMIS" />
-                <TextBlock x:Name="DateText" Style="{StaticResource Peeko.Text.Title}" Text="22 Oktober" />
-            </StackPanel>
-
-            <!-- Cuaca -->
-            <Border Grid.Row="2" Style="{StaticResource Card}">
-                <Grid VerticalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Path x:Name="WeatherIconPath" Style="{StaticResource Peeko.IconPath}" Data="{StaticResource Thermo}"
-                          Stroke="{StaticResource Peeko.Brush.TextPrimary}" VerticalAlignment="Center">
-                        <Path.LayoutTransform>
-                            <ScaleTransform ScaleX="1.1" ScaleY="1.1" />
-                        </Path.LayoutTransform>
-                    </Path>
-                    <StackPanel Grid.Column="1" Margin="12,0,8,0" VerticalAlignment="Center">
-                        <TextBlock x:Name="WeatherCondition" Style="{StaticResource Peeko.Text.BodyStrong}" Text="Cuaca" TextTrimming="CharacterEllipsis" />
-                        <TextBlock x:Name="WeatherPlace" Style="{StaticResource Peeko.Text.Caption}" Text="Memuat…" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                    <TextBlock x:Name="WeatherTemp" Grid.Column="2" Style="{StaticResource Peeko.Text.Title}" FontSize="24"
-                               VerticalAlignment="Center" Text="–" />
-                </Grid>
-            </Border>
-
-            <!-- Baterai -->
-            <Border Grid.Row="4" Style="{StaticResource Card}">
-                <Grid VerticalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <!-- Badan baterai 26 × 14 dengan isi sesuai persen -->
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Border Width="26" Height="14" CornerRadius="4" BorderThickness="1.5"
-                                BorderBrush="{StaticResource Peeko.Brush.TextSecondary}" Padding="2">
-                            <Border x:Name="BatteryFill" HorizontalAlignment="Left" CornerRadius="1.5" Width="10"
-                                    Background="{StaticResource Peeko.Brush.Accent}" />
-                        </Border>
-                        <Border Width="2" Height="6" CornerRadius="0,1,1,0" Margin="1,0,0,0"
-                                Background="{StaticResource Peeko.Brush.TextSecondary}" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Margin="12,0,8,0" VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource Peeko.Text.BodyStrong}" Text="Baterai" />
-                        <TextBlock x:Name="BatteryStatus" Style="{StaticResource Peeko.Text.Caption}" Text="…" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                    <TextBlock x:Name="BatteryPercent" Grid.Column="2" Style="{StaticResource Peeko.Text.Title}" FontSize="24"
-                               VerticalAlignment="Center" Text="–" />
-                </Grid>
-            </Border>
+    <StackPanel VerticalAlignment="Top" Width="196">
+        <Grid Margin="2,0,0,4">
+            <TextBlock x:Name="MonthTitle" Style="{StaticResource Peeko.Text.BodyStrong}" Text="Oktober 2026" />
+            <TextBlock x:Name="DayName" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Right" VerticalAlignment="Center" />
         </Grid>
-    </Grid>
+        <UniformGrid x:Name="WeekdayRow" Columns="7" Height="16" />
+        <UniformGrid x:Name="DaysGrid" Columns="7" />
+    </StackPanel>
 </UserControl>
