@@ -121,6 +121,7 @@ public partial class App : Application
         builder.Services.AddSingleton<ListsController>();
         builder.Services.AddSingleton<Conversion.FileeService>();
         builder.Services.AddSingleton<Conversion.ConvertController>();
+        builder.Services.AddSingleton<Today.WeatherService>();
         // Alat pengembang: --update-feed=<url> mengganti sumber rilis (untuk menguji update tanpa GitHub).
         var feed = e.Args.FirstOrDefault(a => a.StartsWith("--update-feed="))?["--update-feed=".Length..];
         builder.Services.AddSingleton(sp => new UpdateController(sp.GetRequiredService<ILogger<UpdateController>>(), feed));
@@ -235,7 +236,7 @@ public partial class App : Application
         void RefreshStatus()
         {
             var s = settingsService.Current;
-            int modules = new[] { s.MusicEnabled, s.LyricsEnabled, s.FocusEnabled, s.WaterEnabled, s.TodoEnabled, s.ShelfEnabled, s.ControlEnabled }.Count(x => x);
+            int modules = new[] { s.MusicEnabled, s.LyricsEnabled, s.FocusEnabled, s.WaterEnabled, s.TodoEnabled, s.ShelfEnabled, s.ControlEnabled, s.TodayEnabled }.Count(x => x);
             statusDot.Fill = (Brush)Resources[hiddenUntil is null ? "Peeko.Brush.Accent" : "Peeko.Brush.TextTertiary"];
             statusText.Text = hiddenUntil is null ? $"Peeko aktif · {modules} modul berjalan" : $"Disembunyikan {hiddenUntil}";
         }

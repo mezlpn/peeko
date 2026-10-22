@@ -123,6 +123,17 @@ public static class SystemControls
     public static bool IsEnergySaverOn() =>
         GetSystemPowerStatus(out var status) && status.SystemStatusFlag == 1;
 
+    /// <summary>
+    /// Baterai: persen, charger tercolok, benar-benar sedang mengisi, sisa waktu (bila Windows tahu).
+    /// Null jika tanpa baterai. Tercolok belum tentu mengisi (mis. batas pengisian 80% aktif).
+    /// </summary>
+    public static (int Percent, bool PluggedIn, bool Charging, TimeSpan? Remaining)? GetBattery()
+    {
+        if (!GetSystemPowerStatus(out var s) || s.BatteryFlag == 128 || s.BatteryLifePercent > 100) return null;
+        TimeSpan? remaining = s.BatteryLifeTime == uint.MaxValue ? null : TimeSpan.FromSeconds(s.BatteryLifeTime);
+        return (s.BatteryLifePercent, s.ACLineStatus == 1, (s.BatteryFlag & 8) != 0, remaining);
+    }
+
     // ── Pintasan ───────────────────────────────────────────────────────────
 
     /// <summary>Buka halaman Pengaturan Windows, mis. "ms-settings:batterysaver".</summary>

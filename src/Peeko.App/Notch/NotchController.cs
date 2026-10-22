@@ -46,7 +46,7 @@ public sealed class NotchController : IDisposable
     public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music,
         LyricsController lyrics, SystemPeekController peeks, FocusController focus, WaterController water,
         ListsController lists, SettingsService settings, UpdateController updates, ConvertController convert,
-        ILogger<NotchController> log)
+        Today.WeatherService weather, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -60,6 +60,7 @@ public sealed class NotchController : IDisposable
         _updates = updates;
         _convert = convert;
         _log = log;
+        _window.TodayModule.Attach(weather);
     }
 
     public NotchState State => _stateMachine.State;
@@ -234,7 +235,7 @@ public sealed class NotchController : IDisposable
         // Dibuka karena file diseret: tetap di tab Rak walau musik sedang diputar.
         // Sedang mengubah format: tetap di tab Rak.
         if (to == NotchState.Expanded && _musicLive && !_expandingForShelf && !_window.ShelfModule.ConvertPanel.IsActive
-            && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.LyricsTab or NotchWindow.ControlTab))
+            && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.LyricsTab or NotchWindow.ControlTab or NotchWindow.TodayTab))
             _window.SelectModule(NotchWindow.MusicTab);
 
         _window.TransitionTo(from, to);
@@ -399,6 +400,7 @@ public sealed class NotchController : IDisposable
         _window.SetModuleEnabled(NotchWindow.TodoTab, s.TodoEnabled);
         _window.SetModuleEnabled(NotchWindow.ShelfTab, s.ShelfEnabled);
         _window.SetModuleEnabled(NotchWindow.ControlTab, s.ControlEnabled);
+        _window.SetModuleEnabled(NotchWindow.TodayTab, s.TodayEnabled);
         if (_window.ShelfModule.ConvertAvailable != s.ConvertEnabled)
         {
             _window.ShelfModule.ConvertAvailable = s.ConvertEnabled;

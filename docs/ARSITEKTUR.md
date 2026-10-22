@@ -267,3 +267,29 @@ Karena itu, prompt desain meminta token dan ukuran dalam piksel pada skala 100%,
 - **Alur di notch:** saat file diseret, zona tab Rak terbelah: "Simpan di rak" | "Ubah format". Dilepas di kanan → panel `ConvertPanel` menimpa isi rak: memuat → chip 5 format favorit (`ConvertSuggestions`, per jenis file) + "Lainnya (n)" → bar berjalan → "Selesai! Hasilnya masuk rak" (2,5 dtk, lalu kembali ke rak). Kartu rak juga punya tombol ⇄. Saat panel tertutup, hasil diberi tahu lewat peek. Selama ada konversi, hover tidak melempar ke tab Musik.
 - **Belum dibuat:** memasang mesin tambahan (FFmpeg, LibreOffice, …) dari Peeko. Tombol "Buka Filee" membuka aplikasi Filee yang ikut terunduh, lalu pengguna memasangnya di menu *Engines*.
 - Argumen pengembang `--convert=<file>` membuka panel untuk file itu.
+
+## 16. Adaptasi Bloom (0.3.0)
+
+- **Sumber:** [Bloom](https://github.com/SehajveerSingh2005/bloom) karya Sehajveer Singh (GPLv3, Tauri: Rust + React).
+  Peeko mengadaptasi beberapa bagiannya, sehingga lisensi Peeko berganti dari MIT ke GPLv3 (lihat `NOTICE.md`).
+  File yang memuat adaptasi diberi komentar "Diadaptasi dari Bloom". Kode Bloom tidak bisa ditempel langsung;
+  semuanya diterjemahkan ke C#/WPF.
+- **Animasi pegas** (`Animation/Spring.cs`): `SpringValue` meniru transisi `type: "spring"` framer-motion
+  (kekakuan, redaman, massa; Euler semi-implisit langkah 1 ms). Lebar, tinggi, radius, bahu, posisi sembunyi,
+  dan geser tab masing-masing punya pegas sendiri dengan nilai dari island Bloom (mis. lebar 400/31,
+  tinggi 450/29, radius 1000/40). Target bisa diganti kapan saja tanpa kehilangan kecepatan. Satu
+  `CompositionTarget.Rendering` untuk semua pegas, dan hanya terpasang selama ada yang bergerak.
+  Fade isi tetap memakai kurva bezier lama. Gulir mouse di bar tab berpindah modul.
+- **Visualizer** (`Core/Media/SpectrumAnalyzer.cs`, `Platform/Audio/AudioSpectrum.cs`, `Controls/Visualizer.cs`):
+  loopback WASAPI (NAudio) → mono → jendela Hann → FFT 512 → 5 pita (bin 1–2, 2–6, 6–18, 18–60, 60–200) dengan
+  bobot dan penguatan otomatis Bloom → bar pegas 600/30/0.5. Tangkapan hanya hidup selama bar terlihat
+  (pil musik atau tab Musik) dan lagu diputar; perangkat default dicek tiap 2 detik.
+- **Kontrol** (`Control/ControlModule`, `Platform/Control/SystemControls.cs`): radio Wi-Fi/Bluetooth lewat
+  `Windows.Devices.Radios`, volume Core Audio, kecerahan WMI (nilai digabung saat slider digeser cepat),
+  status Hemat baterai dari `GetSystemPowerStatus`. *Jangan ganggu* hanya menahan peek Peeko (kecuali baterai
+  kritis), tidak menyentuh Focus Assist Windows (tidak ada API publiknya). Status dibaca saat tab terlihat.
+- **Hari ini** (`Today/`): kalender bulan (`Core/Status/MonthGrid.cs`, minggu dimulai Minggu), cuaca
+  Open-Meteo (`WeatherService`, diambil hanya saat tab dibuka dan data > 30 menit), baterai. Lokasi: kota dari
+  Pengaturan (geocoding Open-Meteo) atau sekali dari ipapi.co, lalu koordinatnya disimpan di settings.json.
+  Baterai membedakan *tercolok* dan *mengisi* (`BatteryFlag & 8`).
+- **Tidak diambil:** Dock pengganti taskbar Bloom (mengganti taskbar Windows terlalu berisiko untuk Peeko).

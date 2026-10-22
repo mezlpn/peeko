@@ -10,11 +10,14 @@ public sealed class SettingsViewModel : ObservableObject
 {
     private readonly SettingsService _service;
     private readonly ConvertController _convert;
+    private readonly Today.WeatherService _weather;
 
-    public SettingsViewModel(SettingsService service, ConvertController convert)
+    public SettingsViewModel(SettingsService service, ConvertController convert, Today.WeatherService weather)
     {
         _service = service;
         _convert = convert;
+        _weather = weather;
+        _cityInput = service.Current.WeatherCity ?? "";
         convert.Changed += () =>
         {
             OnPropertyChanged(nameof(FileeStatus));
@@ -66,6 +69,7 @@ public sealed class SettingsViewModel : ObservableObject
     public bool TodoEnabled { get => S.TodoEnabled; set => Set(value, s => s.TodoEnabled, (s, v) => s.TodoEnabled = v); }
     public bool ShelfEnabled { get => S.ShelfEnabled; set => Set(value, s => s.ShelfEnabled, (s, v) => s.ShelfEnabled = v); }
     public bool ControlEnabled { get => S.ControlEnabled; set => Set(value, s => s.ControlEnabled, (s, v) => s.ControlEnabled = v); }
+    public bool TodayEnabled { get => S.TodayEnabled; set => Set(value, s => s.TodayEnabled, (s, v) => s.TodayEnabled = v); }
     public bool SystemPeeksEnabled { get => S.SystemPeeksEnabled; set => Set(value, s => s.SystemPeeksEnabled, (s, v) => s.SystemPeeksEnabled = v); }
 
     // ── Baterai ──
@@ -82,6 +86,33 @@ public sealed class SettingsViewModel : ObservableObject
 
     // ── Lirik ──
     public bool FetchLyrics { get => S.FetchLyrics; set => Set(value, s => s.FetchLyrics, (s, v) => s.FetchLyrics = v); }
+
+    // ── Cuaca ──
+    public bool WeatherEnabled { get => S.WeatherEnabled; set => Set(value, s => s.WeatherEnabled, (s, v) => s.WeatherEnabled = v); }
+
+    private string _cityInput;
+    public string CityInput { get => _cityInput; set => SetProperty(ref _cityInput, value); }
+
+    private string _cityStatus = "";
+    public string CityStatus { get => _cityStatus; private set => SetProperty(ref _cityStatus, value); }
+
+    public string WeatherLocationText => S.WeatherPlace is { Length: > 0 } place
+        ? $"Sekarang: {place}" + (string.IsNullOrWhiteSpace(S.WeatherCity) ? " (perkiraan dari IP)" : "")
+        : "Kosongkan untuk memperkirakan lokasi dari alamat IP";
+
+    /// <summary>Simpan kota; kosong = kembali ke perkiraan IP.</summary>
+    public async Task SaveCityAsync()
+    {
+        CityStatus = "Mencari…";
+        var found = await _weather.SetCityAsync(CityInput);
+        CityStatus = found switch
+        {
+            null => "Kota tidak ditemukan atau tidak ada internet",
+            "" => "Lokasi akan diperkirakan dari alamat IP",
+            _ => $"Tersimpan: {found}",
+        };
+        OnPropertyChanged(nameof(WeatherLocationText));
+    }
 
     // ── Ubah format (Filee) ──
     public bool ConvertEnabled { get => S.ConvertEnabled; set => Set(value, s => s.ConvertEnabled, (s, v) => s.ConvertEnabled = v); }

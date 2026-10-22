@@ -165,6 +165,7 @@
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Minum" Content="Minum air" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Fokus" Content="Timer fokus" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Lirik" Content="Lirik" Checked="OnNav" />
+                        <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Cuaca" Content="Cuaca" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Ubah" Content="Ubah format" Checked="OnNav" />
                     </StackPanel>
                 </DockPanel>
@@ -270,6 +271,11 @@
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ControlEnabled}" />
                                     </Grid>
                                     <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Hari ini (kalender, cuaca, baterai)" />
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding TodayEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
                                     <Grid Style="{StaticResource Row}">
                                         <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
                                             <TextBlock Style="{StaticResource Label}" Text="Peek sistem" />
@@ -373,6 +379,48 @@
                                     <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding FetchLyrics}" />
                                 </Grid>
                             </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="Cuaca" Margin="0,0,0,22">
+                            <TextBlock Style="{StaticResource SectionHeader}" Text="CUACA" />
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Tampilkan cuaca di tab Hari ini" />
+                                            <TextBlock Style="{StaticResource Hint}">
+                                                Diambil dari
+                                                <Hyperlink NavigateUri="https://open-meteo.com" RequestNavigate="OnLink" Foreground="{StaticResource Peeko.Brush.Accent}">Open-Meteo</Hyperlink>
+                                                hanya saat tab dibuka, paling sering tiap 30 menit
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding WeatherEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,10,0,10">
+                                            <TextBlock Style="{StaticResource Label}" Text="Kota" />
+                                            <Grid Margin="0,6,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox x:Name="CityBox" Text="{Binding CityInput, UpdateSourceTrigger=PropertyChanged}" Height="30"
+                                                         VerticalContentAlignment="Center" Padding="8,0" FontSize="13"
+                                                         Background="{StaticResource Peeko.Brush.WinBg}" Foreground="{StaticResource Peeko.Brush.TextPrimary}"
+                                                         BorderBrush="{StaticResource Peeko.Brush.WinStroke}" CaretBrush="{StaticResource Peeko.Brush.TextPrimary}"
+                                                         KeyDown="OnCityKey" />
+                                                <Button Grid.Column="1" Style="{StaticResource CardButton}" Margin="8,0,0,0" Content="Simpan" Click="OnSaveCity" />
+                                            </Grid>
+                                            <TextBlock Style="{StaticResource Hint}" Margin="0,6,0,0" Text="{Binding WeatherLocationText}" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="{Binding CityStatus}" Foreground="{StaticResource Peeko.Brush.Accent}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            <TextBlock Style="{StaticResource Hint}" Margin="2,8,0,0" Foreground="{StaticResource Peeko.Brush.TextTertiary}"
+                                       TextWrapping="Wrap"
+                                       Text="Tanpa kota, lokasi diperkirakan sekali dari alamat IP lewat ipapi.co lalu disimpan di laptopmu." />
                         </StackPanel>
 
                         <StackPanel x:Name="Ubah" Margin="0,0,0,22">

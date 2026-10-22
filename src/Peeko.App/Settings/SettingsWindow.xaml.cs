@@ -57,6 +57,15 @@ public partial class SettingsWindow : Window
 
     private void OnEngines(object sender, RoutedEventArgs e) => _vm.OpenEngines();
 
+    private async void OnSaveCity(object sender, RoutedEventArgs e) => await _vm.SaveCityAsync();
+
+    private async void OnCityKey(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key != System.Windows.Input.Key.Enter) return;
+        e.Handled = true;
+        await _vm.SaveCityAsync();
+    }
+
     private void OnMinimize(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     private void OnClose(object sender, RoutedEventArgs e) => Close();

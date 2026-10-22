@@ -3,16 +3,23 @@
 Notch kecil yang suka mengintip dari tepi atas layar Windows. Arahkan kursor ke tengah atas
 layar, dan Peeko terbuka menampilkan:
 
-- 🎵 **Musik** yang sedang diputar (Spotify, YouTube, dll.) + **lirik yang ikut berjalan**
+- 🎵 **Musik** yang sedang diputar (Spotify, YouTube, dll.) + **lirik yang ikut berjalan**, dengan visualizer
+  yang bergoyang mengikuti bass, vokal, dan treble lagunya
 - ⏱️ **Timer fokus** (Pomodoro) dan 💧 **pengingat minum air**
 - ✅ **To-do** singkat dan 📁 **rak file** (tempat menaruh file sementara)
+- 🎛️ **Kontrol cepat**: Wi-Fi, Bluetooth, Jangan ganggu, volume, kecerahan, tangkap layar, kunci layar
+- 📅 **Hari ini**: kalender bulan ini, cuaca, dan kondisi baterai
 - 🔄 **Ubah format file**: seret foto, PDF, atau dokumen ke notch, lalu pilih PNG, JPG, PDF, Word… (ditenagai [Filee](https://github.com/KnifeLemon/Filee))
 - 🔔 Info singkat saat volume, kecerahan, Caps Lock, baterai, Wi-Fi, atau headphone berubah
 
+Semua gerakannya memakai fisika pegas, jadi notch membuka, menutup, dan berganti tab dengan mulus,
+bahkan kalau arahnya berubah di tengah jalan.
+
 Gratis, ringan (± 55 MB RAM, hampir 0% CPU saat diam), dan semua data tersimpan di laptopmu sendiri.
 Peeko hanya terhubung ke internet untuk mengambil lirik ([lrclib.net](https://lrclib.net), bisa
-dimatikan), mengecek versi baru di GitHub, dan mengunduh Filee sekali saat kamu memasang fitur
-Ubah format. File yang diubah tidak pernah diunggah ke mana pun.
+dimatikan), cuaca ([Open-Meteo](https://open-meteo.com), saat tab Hari ini dibuka, bisa dimatikan),
+mengecek versi baru di GitHub, dan mengunduh Filee sekali saat kamu memasang fitur Ubah format.
+File yang diubah tidak pernah diunggah ke mana pun.
 
 ---
 
@@ -46,7 +53,10 @@ Butuh **Windows 10 atau 11**. Tidak perlu memasang apa-apa lagi.
 ### 4. Cara pakai
 
 - **Arahkan kursor** ke notch di tengah atas layar untuk membukanya. Jauhkan kursor untuk menutup.
-- Klik **ikon-ikon di bagian atas** panel untuk pindah antara Musik, Lirik, Fokus, Minum, Tugas, dan Rak.
+- Klik **ikon-ikon di bagian atas** panel untuk pindah antara Musik, Lirik, Fokus, Minum, Tugas, Rak,
+  Kontrol, dan Hari ini. Bisa juga dengan **menggulir mouse** di baris ikon itu.
+- Cuaca memakai perkiraan lokasi dari internet. Kalau kotanya meleset, isi kotamu di
+  Pengaturan → **Cuaca**.
 - **Seret file** dari Explorer ke notch. Tahan sebentar sampai panel terbuka, lalu lepaskan di:
   - **Simpan di rak** (kiri) untuk menyimpannya sementara, atau
   - **Ubah format** (kanan) untuk mengubahnya, mis. foto HEIC → JPG, gambar → PDF, PDF → Word.
@@ -97,6 +107,8 @@ Pengaturan, to-do, dan data lainnya tidak hilang.
 | Lagu tidak muncul | Peeko membaca pemutar yang mendukung kontrol media Windows (Spotify, Chrome, Edge, Brave, Media Player…). Coba putar ulang lagunya. |
 | Lirik tidak muncul | Lirik diambil dari [lrclib.net](https://lrclib.net) dan butuh internet. Tidak semua lagu tersedia. |
 | Antivirus memblokir | Peeko membaca tombol Caps Lock dan pergantian bahasa keyboard, jadi beberapa antivirus curiga. Kode sumbernya terbuka di repo ini; tambahkan Peeko ke pengecualian jika kamu percaya. |
+| Visualizer diam | Bar hanya bergerak saat lagu benar-benar berbunyi dari speaker/headphone default. |
+| Tombol Wi-Fi/Bluetooth tidak bisa diklik | Laptopmu tidak punya radio itu, atau Windows menolak akses (Pengaturan → Privasi → Radio). |
 | Video atau audio tidak bisa diubah | Butuh mesin FFmpeg. Pengaturan → Ubah format → **Buka Filee**, lalu pasang FFmpeg di menu *Engines*. |
 | Masih bermasalah | Buka **[Issues](https://github.com/mezlpn/peeko/issues/new/choose)** → *Laporan bug*. |
 
@@ -115,7 +127,11 @@ Pengaturan, to-do, dan data lainnya tidak hilang.
 - **[Filee](https://github.com/KnifeLemon/Filee)** oleh KnifeLemon (lisensi MIT) mengerjakan semua konversi di
   fitur Ubah format. Peeko tidak membundelnya: paket portable resminya diunduh dari rilis Filee saat fitur itu
   dipasang, dicek dengan SHA-256 dari rilis yang sama, lalu dijalankan sebagai program terpisah.
+- **[Bloom](https://github.com/SehajveerSingh2005/bloom)** oleh Sehajveer Singh (GPLv3). Animasi pegas, visualizer,
+  Command Center, serta kalender dan cuaca di Peeko diadaptasi dari Bloom. Karena itu Peeko kini juga berlisensi
+  GPLv3 (lihat [NOTICE.md](NOTICE.md)).
 - **[LRCLIB](https://lrclib.net)** untuk lirik tersinkron.
+- **[Open-Meteo](https://open-meteo.com)** untuk cuaca, dan **ipapi.co** untuk perkiraan lokasi bila kota belum diisi.
 
 ## Menjalankan dari kode
 
