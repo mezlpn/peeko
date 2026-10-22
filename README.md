@@ -107,7 +107,7 @@ Pengaturan, to-do, dan data lainnya tidak hilang.
 - Rancangan sistem: [docs/ARSITEKTUR.md](docs/ARSITEKTUR.md)
 - Desain (handoff Claude Design): [design/README.md](design/README.md)
 - Ingin berkontribusi? Lihat [CONTRIBUTING.md](CONTRIBUTING.md).
-- Lisensi: [MIT](LICENSE)
+- Lisensi: [GPLv3](LICENSE), lihat juga [NOTICE.md](NOTICE.md)
 - Data aplikasi: `%AppData%\Peeko\` (settings.json, to-do, rak, cache lirik, log); Filee di `%LocalAppData%\Peeko\filee\`.
 
 ## Terima kasih

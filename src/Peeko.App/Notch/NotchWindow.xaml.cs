@@ -47,9 +47,32 @@ public partial class NotchWindow : Window
     public const int MusicTab = 0;
     public const int LyricsTab = 1;
 
+    // Bentuk notch digerakkan pegas, satu per sifat (cara Bloom): lebar, tinggi, radius, bahu, dan
+    // posisi sembunyi masing-masing punya kekakuan sendiri dan bisa dibalik di tengah gerak.
+    private readonly SpringValue _width;
+    private readonly SpringValue _height;
+    private readonly SpringValue _radius;
+    private readonly SpringValue _shoulders;
+    private readonly SpringValue _hideY;
+    private readonly Dictionary<FrameworkElement, SpringValue> _moduleX = [];
+
     public NotchWindow(MusicViewModel music, LyricsViewModel lyrics)
     {
         InitializeComponent();
+        _width = new SpringValue(IdleSize.Width, SpringConfig.Width, v => Body.Width = Math.Max(0, v));
+        _height = new SpringValue(IdleSize.Height, SpringConfig.Height, v => Body.Height = Math.Max(0, v));
+        _radius = new SpringValue(CollapsedRadius.BottomLeft, SpringConfig.Radius, v =>
+        {
+            double r = Math.Max(0, v);
+            Body.CornerRadius = new CornerRadius(0, 0, r, r);
+        });
+        _shoulders = new SpringValue(1, SpringConfig.Default, v =>
+        {
+            double s = Math.Max(0, v);
+            LeftShoulderScale.ScaleX = LeftShoulderScale.ScaleY = s;
+            RightShoulderScale.ScaleX = RightShoulderScale.ScaleY = s;
+        });
+        _hideY = new SpringValue(0, SpringConfig.Offset, v => HideShift.Y = v);
         _clockTimer.Tick += (_, _) => UpdateClock();
         _bannerTimer.Tick += (_, _) => HideBanner();
         MusicPillView.DataContext = music;
@@ -290,9 +313,9 @@ public partial class NotchWindow : Window
         if (normal.IsEmpty) return;
 
         if (hovering)
-            AnimateShape(hover, radius, Motion.Instant, Motion.Out, widthDelay: 0, heightDelay: 0);
+            AnimateShape(hover, radius);
         else
-            AnimateShape(normal, radius, Motion.Fast, Motion.Standard, widthDelay: 0, heightDelay: 0);
+            AnimateShape(normal, radius);
     }
 
     // ── Transisi ────────────────────────────────────────────────────────────
@@ -303,10 +326,9 @@ public partial class NotchWindow : Window
         FadeOut(CollapsedLayer, Motion.Ms(80));
         ScaleCollapsed(0.96, Motion.Ms(80), Motion.In);
         FadeOut(PeekLayer, Motion.Ms(80));
-        AnimateShoulders(1, Motion.Ms(200), Motion.Out);
+        AnimateShoulders(1);
 
-        // Revisi hover: bentuk 460 → 340 ms, isi muncul mulai 120 ms (sebelumnya 220 ms).
-        AnimateShape(ExpandedSize, ExpandedRadius, Motion.Ms(340), Motion.Spring, widthDelay: 0, heightDelay: 30);
+        AnimateShape(ExpandedSize, ExpandedRadius);
 
         UpdateClock();
         ExpandedLayer.Visibility = Visibility.Visible;
@@ -330,7 +352,7 @@ public partial class NotchWindow : Window
             SetShapeImmediately(size, radius);
             ShowLayerImmediately(slim ? null : CollapsedLayer);
             SetShouldersImmediately(slim ? 0 : 1);
-            HideShift.Animate(TranslateTransform.YProperty, Motion.To(0, Reduced(Motion.Ms(380)), Motion.SpringSoft));
+            _hideY.AnimateTo(0);
             ShapeHost.Animate(OpacityProperty, Motion.To(1, Motion.Ms(120), Motion.Out));
         }
         else
@@ -341,16 +363,16 @@ public partial class NotchWindow : Window
                 case NotchState.Expanded:
                     FadeOut(ExpandedLayer, Motion.Fast);
                     Slide(TabBarShift, TranslateTransform.YProperty, from: null, Motion.Fast, to: -4, ease: Motion.In);
-                    AnimateShape(size, radius, Motion.ShapeClose, Motion.Standard, widthDelay: 110, heightDelay: 80);
-                    contentDelay = 380;
+                    AnimateShape(size, radius);
+                    contentDelay = 200;
                     break;
                 case NotchState.Peek:
                     FadeOut(PeekLayer, Motion.Fast);
-                    AnimateShape(size, radius, Motion.Ms(280), Motion.Standard, widthDelay: 60, heightDelay: 60);
-                    contentDelay = 180;
+                    AnimateShape(size, radius);
+                    contentDelay = 140;
                     break;
                 default: // Collapsed ↔ Slim
-                    AnimateShape(size, radius, Motion.Base, Motion.Standard, widthDelay: 0, heightDelay: 0);
+                    AnimateShape(size, radius);
                     contentDelay = 120;
                     break;
             }
@@ -358,14 +380,14 @@ public partial class NotchWindow : Window
             if (slim)
             {
                 FadeOut(CollapsedLayer, Motion.Ms(100));
-                AnimateShoulders(0, Motion.Base, Motion.In);
+                AnimateShoulders(0);
             }
             else
             {
                 FadeIn(CollapsedLayer, Motion.Base, contentDelay);
                 ScaleCollapsed(1, Motion.Base, Motion.Out, contentDelay);
-                AnimateShoulders(1, Motion.Base, Motion.Out);
-                if (from == NotchState.Expanded && _activity == CollapsedActivity.Idle) Kedip.Blink(delayMs: 520);
+                AnimateShoulders(1);
+                if (from == NotchState.Expanded && _activity == CollapsedActivity.Idle) Kedip.Blink(delayMs: 360);
             }
         }
 
@@ -415,7 +437,7 @@ public partial class NotchWindow : Window
 
         bool visible = _visualState == NotchState.Collapsed;
         if (visible)
-            AnimateShape(CollapsedSize, CollapsedRadius, Motion.Ms(300), Motion.SpringSoft, widthDelay: 0, heightDelay: 0);
+            AnimateShape(CollapsedSize, CollapsedRadius);
 
         foreach (var element in new UIElement[] { Kedip, MusicPillView, FocusPillView, WaterPillView, UpdatePillView })
         {
@@ -467,8 +489,7 @@ public partial class NotchWindow : Window
         {
             if (animate)
             {
-                var shiftOut = ModuleTransform(hide);
-                shiftOut.Animate(TranslateTransform.XProperty, Motion.To(-distance * direction, Motion.Base, Motion.Standard));
+                ModuleX(hide).AnimateTo(-distance * direction);
                 var fadeOut = Motion.To(0, Motion.Base, Motion.Standard);
                 fadeOut.Completed += (_, _) =>
                 {
@@ -485,20 +506,19 @@ public partial class NotchWindow : Window
         }
 
         show.Visibility = Visibility.Visible;
-        var shiftIn = ModuleTransform(show);
+        var shiftIn = ModuleX(show);
         if (animate)
         {
-            var slide = Motion.To(0, Motion.Ms(280), Motion.Out);
-            slide.From = distance * direction;
-            shiftIn.Animate(TranslateTransform.XProperty, slide);
+            // Pegas: kalau tab diganti cepat berturut-turut, isi melanjutkan geraknya, tidak meloncat.
+            if (!shiftIn.IsMoving) shiftIn.Set(distance * direction);
+            shiftIn.AnimateTo(0);
             var fadeIn = Motion.To(1, Motion.Ms(280), Motion.Out);
             fadeIn.From = 0;
             show.Animate(OpacityProperty, fadeIn);
         }
         else
         {
-            shiftIn.BeginAnimation(TranslateTransform.XProperty, null);
-            shiftIn.X = 0;
+            shiftIn.Set(0);
             show.BeginAnimation(OpacityProperty, null);
             show.Opacity = 1;
         }
@@ -506,13 +526,26 @@ public partial class NotchWindow : Window
         NotifyVisibleModule();
     }
 
-    /// <summary>Tiap modul punya geseran sendiri supaya yang keluar dan yang masuk bisa bergerak bersamaan.</summary>
-    private static TranslateTransform ModuleTransform(FrameworkElement module)
+    /// <summary>Gulir di bar tab untuk pindah modul (seperti island Bloom yang berganti mode saat digulir).</summary>
+    private void OnTabBarWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
     {
-        if (module.RenderTransform is TranslateTransform t) return t;
-        t = new TranslateTransform();
+        var tabs = Tabs.Children.OfType<System.Windows.Controls.RadioButton>()
+            .Where(t => t.Visibility == Visibility.Visible).ToList();
+        int current = tabs.FindIndex(t => t.IsChecked == true);
+        int next = Math.Clamp(current + (e.Delta < 0 ? 1 : -1), 0, tabs.Count - 1);
+        if (next != current) tabs[next].IsChecked = true;
+        e.Handled = true;
+    }
+
+    /// <summary>Tiap modul punya pegas geser sendiri supaya yang keluar dan yang masuk bisa bergerak bersamaan.</summary>
+    private SpringValue ModuleX(FrameworkElement module)
+    {
+        if (_moduleX.TryGetValue(module, out var spring)) return spring;
+        var t = new TranslateTransform();
         module.RenderTransform = t;
-        return t;
+        spring = new SpringValue(0, SpringConfig.Content, v => t.X = v);
+        _moduleX[module] = spring;
+        return spring;
     }
 
     private void ToPeek(NotchState from)
@@ -521,13 +554,13 @@ public partial class NotchWindow : Window
         if (from == NotchState.Hidden)
         {
             // Peek penting saat fullscreen: turunkan notch langsung ke bentuk peek.
-            HideShift.Animate(TranslateTransform.YProperty, Motion.To(0, Reduced(Motion.Ms(380)), Motion.SpringSoft));
+            _hideY.AnimateTo(0);
             ShapeHost.Animate(OpacityProperty, Motion.To(1, Motion.Ms(120), Motion.Out));
         }
 
         FadeOut(CollapsedLayer, Motion.Ms(100));
-        AnimateShoulders(1, Motion.Base, Motion.Out);
-        AnimateShape(_peekSize, PeekRadius, Motion.PeekIn, Motion.SpringSoft, widthDelay: 40, heightDelay: 40);
+        AnimateShoulders(1);
+        AnimateShape(_peekSize, PeekRadius);
         PeekContent.BeginAnimation(OpacityProperty, null);
         PeekContent.Opacity = 1;
 
@@ -549,7 +582,7 @@ public partial class NotchWindow : Window
         if (!showing || PeekContent.Kind == request.Kind || Motion.Reduced)
         {
             PeekContent.Show(request);
-            if (showing) AnimateShape(_peekSize, PeekRadius, Motion.Base, Motion.SpringSoft, 0, 0);
+            if (showing) AnimateShape(_peekSize, PeekRadius);
             return;
         }
 
@@ -560,7 +593,7 @@ public partial class NotchWindow : Window
             PeekContent.Animate(OpacityProperty, Motion.To(1, Motion.ReducedCrossfade, Motion.Out));
         };
         PeekContent.Animate(OpacityProperty, fadeOut);
-        AnimateShape(_peekSize, PeekRadius, Motion.Base, Motion.SpringSoft, 60, 60);
+        AnimateShape(_peekSize, PeekRadius);
     }
 
     /// <summary>Peek saat panel terbuka: baris 32 px di bawah bar tab, hilang setelah masa tahan.</summary>
@@ -587,13 +620,12 @@ public partial class NotchWindow : Window
         Kedip.StopIdle();
 
         double distance = Body.ActualHeight + 12;
-        var up = Motion.To(-distance, Reduced(Motion.Ms(260)), Motion.In);
-        up.Completed += (_, _) =>
+        _hideY.Settled += () =>
         {
             // Sembunyikan jendela sungguhan supaya tidak menumpuk di atas game/video fullscreen.
             if (_visualState == NotchState.Hidden) Hide();
         };
-        HideShift.Animate(TranslateTransform.YProperty, up);
+        _hideY.AnimateTo(-distance);
         ShapeHost.Animate(OpacityProperty, new DoubleAnimation(0, Reduced(Motion.Ms(80))) { BeginTime = Motion.Ms(Motion.Reduced ? 0 : 180) });
     }
 
@@ -608,54 +640,24 @@ public partial class NotchWindow : Window
 
     private static TimeSpan Reduced(TimeSpan normal) => Motion.Reduced ? TimeSpan.Zero : normal;
 
-    private void AnimateShape(Size size, CornerRadius radius, TimeSpan duration, IEasingFunction ease, double widthDelay, double heightDelay)
+    private void AnimateShape(Size size, CornerRadius radius)
     {
-        if (Motion.Reduced)
-        {
-            SetShapeImmediately(size, radius);
-            return;
-        }
-        Body.Animate(WidthProperty, Motion.To(size.Width, duration, ease, widthDelay));
-        Body.Animate(HeightProperty, Motion.To(size.Height, duration, ease, heightDelay));
-        var r = new CornerRadiusAnimation { To = radius, Duration = duration, EasingFunction = ease, BeginTime = Motion.Ms(widthDelay) };
-        Timeline.SetDesiredFrameRate(r, 60);
-        Body.Animate(System.Windows.Controls.Border.CornerRadiusProperty, r);
+        _width.AnimateTo(size.Width);
+        _height.AnimateTo(size.Height);
+        _radius.AnimateTo(radius.BottomLeft);
     }
 
     private void SetShapeImmediately(Size size, CornerRadius radius)
     {
-        Body.BeginAnimation(WidthProperty, null);
-        Body.BeginAnimation(HeightProperty, null);
-        Body.BeginAnimation(System.Windows.Controls.Border.CornerRadiusProperty, null);
-        Body.Width = size.Width;
-        Body.Height = size.Height;
-        Body.CornerRadius = radius;
+        _width.Set(size.Width);
+        _height.Set(size.Height);
+        _radius.Set(radius.BottomLeft);
     }
 
     /// <summary>Bahu cekung ikut menyusut di mode tipis supaya garisnya bersih.</summary>
-    private void AnimateShoulders(double scale, TimeSpan duration, IEasingFunction ease)
-    {
-        if (Motion.Reduced)
-        {
-            SetShouldersImmediately(scale);
-            return;
-        }
-        foreach (var t in new[] { LeftShoulderScale, RightShoulderScale })
-        {
-            t.Animate(ScaleTransform.ScaleXProperty, Motion.To(scale, duration, ease));
-            t.Animate(ScaleTransform.ScaleYProperty, Motion.To(scale, duration, ease));
-        }
-    }
+    private void AnimateShoulders(double scale) => _shoulders.AnimateTo(scale);
 
-    private void SetShouldersImmediately(double scale)
-    {
-        foreach (var t in new[] { LeftShoulderScale, RightShoulderScale })
-        {
-            t.BeginAnimation(ScaleTransform.ScaleXProperty, null);
-            t.BeginAnimation(ScaleTransform.ScaleYProperty, null);
-            t.ScaleX = t.ScaleY = scale;
-        }
-    }
+    private void SetShouldersImmediately(double scale) => _shoulders.Set(scale);
 
     private void ShowLayerImmediately(UIElement? layer)
     {

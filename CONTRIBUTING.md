@@ -39,4 +39,4 @@ Perubahan besar (modul baru, mengganti arsitektur) sebaiknya didiskusikan dulu l
 - **Privasi:** data hanya disimpan lokal. Satu-satunya layanan internet adalah LRCLIB untuk
   lirik, dan itu bisa dimatikan.
 
-Dengan mengirim kontribusi, kamu setuju kontribusimu dirilis di bawah [lisensi MIT](LICENSE).
+Dengan mengirim kontribusi, kamu setuju kontribusimu dirilis di bawah [lisensi GPLv3](LICENSE).
