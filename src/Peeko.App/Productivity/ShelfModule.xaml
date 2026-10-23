@@ -27,7 +27,7 @@
                         </Path.RenderTransform>
                     </Path>
                     <TextBlock x:Name="ZoneTitle" Style="{StaticResource Peeko.Text.BodyStrong}" HorizontalAlignment="Center" Margin="0,8,0,0"
-                               Text="Seret file ke sini" />
+                               Text="Seret file, teks, atau tautan ke sini" />
                     <TextBlock x:Name="ZoneDetail" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,2,0,0"
                                TextAlignment="Center" TextWrapping="Wrap" Text="Simpan sementara, lalu seret keluar ke mana saja" />
                 </StackPanel>
