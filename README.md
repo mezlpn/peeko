@@ -54,7 +54,7 @@ Butuh **Windows 10 atau 11**. Tidak perlu memasang apa-apa lagi.
 
 - **Arahkan kursor** ke notch di tengah atas layar untuk membukanya. Jauhkan kursor untuk menutup.
 - Bagian atas panel menampilkan cuaca, jam (dengan mata Peeko), dan baterai.
-- **Gulir mouse** di panel untuk pindah tampilan, atau klik **titik kecil** di bagian bawah. Ada lima tampilan,
+- **Gulir mouse** di panel untuk pindah tampilan, atau klik **titik kecil** di bawah jam. Ada lima tampilan,
   dan ukuran notch menyesuaikan isinya:
   **Musik + lirik** · **Kontrol** · **Hari ini** (kalender + timer fokus) · **Tugas + minum** · **Rak**.
 - Cuaca memakai perkiraan lokasi dari internet. Kalau kotanya meleset, isi kotamu di

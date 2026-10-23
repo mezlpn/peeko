@@ -25,8 +25,8 @@ public partial class NotchWindow
     public const int ShelfTab = 4;
     private const int ModeCount = 5;
 
-    // Baris status 8 + 24 + 10 di atas isi, lalu 12 + titik 6 + 10 di bawahnya; isi diberi tepi 18.
-    private const double ChromeHeight = 8 + 24 + 10 + 12 + 6 + 10;
+    // Di atas isi: 6 + baris status 24 + 2 + titik 6 + 12; di bawahnya 16. Isi diberi tepi 18.
+    private const double ChromeHeight = 6 + 24 + 2 + 6 + 12 + 16;
     private const double SideMargin = 18;
     private static readonly TimeSpan WheelCooldown = TimeSpan.FromMilliseconds(320);
 
