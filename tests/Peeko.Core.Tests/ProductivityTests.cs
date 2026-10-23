@@ -371,3 +371,55 @@ public sealed class JsonFileStoreTests : IDisposable
         Assert.True(File.Exists(Path.Combine(_dir, "todo.json.rusak")));
     }
 }
+
+public class ShelfTextTests
+{
+    private static Shelf NewShelf() => new(new FakeTimeProvider(), Path.Combine(Path.GetTempPath(), "peeko-unused"));
+
+    [Fact]
+    public void Keeps_text_and_skips_duplicates_and_blanks()
+    {
+        var shelf = NewShelf();
+        Assert.True(shelf.AddText("  rapat jam 3  "));
+        Assert.False(shelf.AddText("rapat jam 3"));
+        Assert.False(shelf.AddText("   "));
+        Assert.False(shelf.AddText(null));
+        var item = Assert.Single(shelf.Items);
+        Assert.Equal("rapat jam 3", item.Text);
+        Assert.False(item.IsLink);
+    }
+
+    [Fact]
+    public void Text_items_survive_missing_file_cleanup()
+    {
+        var shelf = NewShelf();
+        shelf.AddText("catatan");
+        shelf.RemoveMissing();
+        Assert.Single(shelf.Items);
+        Assert.Equal(0, shelf.TotalBytes);
+    }
+
+    [Theory]
+    [InlineData("https://github.com/mezlpn/peeko", "github.com")]
+    [InlineData("www.youtube.com/watch?v=1", "youtube.com")]
+    [InlineData("http://localhost:5173/", "localhost")]
+    public void Recognises_links(string text, string label)
+    {
+        Assert.NotNull(Shelf.AsLink(text));
+        Assert.Equal(label, Shelf.TextLabel(text));
+    }
+
+    [Theory]
+    [InlineData("lihat https://x.com nanti")]
+    [InlineData("ftp://files.example.com/a")]
+    [InlineData("javascript:alert(1)")]
+    [InlineData("bukan tautan")]
+    public void Plain_text_is_not_a_link(string text) => Assert.Null(Shelf.AsLink(text));
+
+    [Fact]
+    public void Label_is_the_first_line_of_text()
+    {
+        Assert.Equal("Belanja", Shelf.TextLabel("Belanja\nsusu\ntelur"));
+        Assert.EndsWith("…", Shelf.TextLabel(new string('a', 100)));
+    }
+}

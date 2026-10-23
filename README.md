@@ -6,7 +6,7 @@ layar, dan Peeko terbuka menampilkan:
 - 🎵 **Musik** yang sedang diputar (Spotify, YouTube, dll.) + **lirik yang ikut berjalan**, dengan visualizer
   yang bergoyang mengikuti bass, vokal, dan treble lagunya
 - ⏱️ **Timer fokus** (Pomodoro) dan 💧 **pengingat minum air**
-- ✅ **To-do** singkat dan 📁 **rak file** (tempat menaruh file sementara)
+- ✅ **To-do** singkat dan 📁 **rak** (tempat menaruh file, teks, atau tautan sementara)
 - 🎛️ **Kontrol cepat**: Wi-Fi, Bluetooth, Jangan ganggu, volume, kecerahan, tangkap layar, kunci layar
 - 📅 **Hari ini**: kalender bulan ini, cuaca, dan kondisi baterai
 - 🔄 **Ubah format file**: seret foto, PDF, atau dokumen ke notch, lalu pilih PNG, JPG, PDF, Word… (ditenagai [Filee](https://github.com/KnifeLemon/Filee))
@@ -59,11 +59,13 @@ Butuh **Windows 10 atau 11**. Tidak perlu memasang apa-apa lagi.
   **Musik + lirik** · **Kontrol** · **Hari ini** (kalender + timer fokus) · **Tugas + minum** · **Rak**.
 - Cuaca memakai perkiraan lokasi dari internet. Kalau kotanya meleset, isi kotamu di
   Pengaturan → **Cuaca**.
-- **Seret file** dari Explorer ke notch. Tahan sebentar sampai panel terbuka, lalu lepaskan di:
+- **Seret file, teks, atau tautan** (dari Explorer, browser, chat…) ke notch. Tahan sebentar sampai panel terbuka, lalu lepaskan di:
   - **Simpan di rak** (kiri) untuk menyimpannya sementara, atau
   - **Ubah format** (kanan) untuk mengubahnya, mis. foto HEIC → JPG, gambar → PDF, PDF → Word.
     Pertama kali, Peeko meminta izin mengunduh Filee (±160 MB, sekali saja). Hasilnya tersimpan
     di sebelah file asli dan muncul di Rak.
+  - Di Rak, **klik dua kali** tautan untuk membukanya, atau teks untuk menyalinnya. Seret kartunya keluar untuk
+    menempelkan ke aplikasi lain.
 - Pintasan keyboard: **Win + Alt + C** membuka/menutup notch.
 - Ikon Peeko ada di **pojok kanan bawah**, dekat jam. Kalau tidak terlihat, klik panah **˄** di sana.
   - **Klik** ikonnya untuk membuka **Pengaturan**.

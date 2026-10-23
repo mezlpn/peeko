@@ -7,6 +7,12 @@ public sealed class ShelfItem
     /// <summary>true jika file disalin ke folder rak (sumbernya sementara, mis. dari browser).</summary>
     public bool IsCopy { get; set; }
     public DateTimeOffset AddedAt { get; set; }
+    /// <summary>Isi teks/tautan yang diseret ke rak; null untuk file.</summary>
+    public string? Text { get; set; }
+
+    public bool IsText => Text is not null;
+
+    public bool IsLink => Text is not null && Shelf.AsLink(Text) is not null;
 }
 
 public sealed class ShelfData
@@ -49,7 +55,7 @@ public sealed class Shelf
         {
             var path = System.IO.Path.GetFullPath(raw);
             if (!File.Exists(path) && !Directory.Exists(path)) continue;
-            if (_d.Items.Any(i => string.Equals(i.Path, path, StringComparison.OrdinalIgnoreCase))) continue;
+            if (_d.Items.Any(i => !i.IsText && string.Equals(i.Path, path, StringComparison.OrdinalIgnoreCase))) continue;
 
             bool isTemp = Normalize(path).StartsWith(_tempDir, StringComparison.OrdinalIgnoreCase) && File.Exists(path);
             var stored = isTemp ? CopyToShelf(path) : path;
@@ -60,6 +66,39 @@ public sealed class Shelf
         }
         if (added > 0) Changed?.Invoke();
         return added;
+    }
+
+    public const int MaxTextLength = 100_000;
+
+    /// <summary>Simpan potongan teks atau tautan. Teks yang sama tidak disimpan dua kali.</summary>
+    public bool AddText(string? text)
+    {
+        text = text?.Trim();
+        if (string.IsNullOrEmpty(text)) return false;
+        if (text.Length > MaxTextLength) text = text[..MaxTextLength];
+        if (_d.Items.Any(i => i.Text == text)) return false;
+        _d.Items.Add(new ShelfItem { Text = text, AddedAt = _time.GetUtcNow() });
+        Changed?.Invoke();
+        return true;
+    }
+
+    /// <summary>Tautan web (http/https, atau "www.…") dalam satu baris, atau null bila bukan tautan.</summary>
+    public static Uri? AsLink(string text)
+    {
+        text = text.Trim();
+        if (text.Length == 0 || text.Any(char.IsWhiteSpace)) return null;
+        if (text.StartsWith("www.", StringComparison.OrdinalIgnoreCase)) text = "https://" + text;
+        return Uri.TryCreate(text, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
+            ? uri
+            : null;
+    }
+
+    /// <summary>Label kartu: domain untuk tautan, baris pertama untuk teks.</summary>
+    public static string TextLabel(string text)
+    {
+        if (AsLink(text) is { } uri) return uri.Host.StartsWith("www.", StringComparison.OrdinalIgnoreCase) ? uri.Host[4..] : uri.Host;
+        var line = text.Trim().Split('\n', 2)[0].Trim();
+        return line.Length > 60 ? line[..60] + "…" : line;
     }
 
     public void Remove(Guid id)
@@ -82,13 +121,13 @@ public sealed class Shelf
     /// <summary>Buang item yang filenya sudah tidak ada (dipindah/dihapus di luar rak).</summary>
     public void RemoveMissing()
     {
-        int removed = _d.Items.RemoveAll(i => !File.Exists(i.Path) && !Directory.Exists(i.Path));
+        int removed = _d.Items.RemoveAll(i => !i.IsText && !File.Exists(i.Path) && !Directory.Exists(i.Path));
         if (removed > 0) Changed?.Invoke();
     }
 
     public long TotalBytes => _d.Items.Sum(i =>
     {
-        try { return File.Exists(i.Path) ? new FileInfo(i.Path).Length : 0; }
+        try { return !i.IsText && File.Exists(i.Path) ? new FileInfo(i.Path).Length : 0; }
         catch (IOException) { return 0; }
     });
 
@@ -110,7 +149,7 @@ public sealed class Shelf
 
     private void DeleteCopy(ShelfItem item)
     {
-        if (!item.IsCopy) return; // tautan: file asli pengguna tidak pernah dihapus
+        if (!item.IsCopy || item.IsText) return; // tautan: file asli pengguna tidak pernah dihapus
         try
         {
             if (File.Exists(item.Path)) File.Delete(item.Path);

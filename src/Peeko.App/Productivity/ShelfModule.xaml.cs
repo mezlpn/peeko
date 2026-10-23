@@ -68,7 +68,11 @@ public partial class ShelfModule : UserControl
         bool empty = items.Count == 0;
         Zones.Visibility = empty || _dragOver ? Visibility.Visible : Visibility.Collapsed;
         FilledView.Visibility = empty || _dragOver ? Visibility.Collapsed : Visibility.Visible;
-        SummaryText.Text = $"{items.Count} file · {Shelf.FormatSize(_shelf.TotalBytes)}";
+        int files = items.Count(i => !i.IsText);
+        long bytes = _shelf.TotalBytes;
+        SummaryText.Text = files == items.Count
+            ? $"{items.Count} file · {Shelf.FormatSize(bytes)}"
+            : bytes > 0 ? $"{items.Count} item · {Shelf.FormatSize(bytes)}" : $"{items.Count} item";
 
         Cards.Children.Clear();
         foreach (var item in items) Cards.Children.Add(BuildCard(item));
@@ -78,18 +82,19 @@ public partial class ShelfModule : UserControl
     /// File sedang diseret di atas notch. Zona: garis accent 2 px + latar accent-muted, panah naik-turun
     /// 4 px tiap 800 ms. Dilepas: zona "menelan" file (scale 1 → 0.98 → 1).
     /// </summary>
-    public void SetDragOver(bool over, int count = 0, long bytes = 0, bool dropped = false)
+    /// <param name="text">Diisi saat yang diseret teks/tautan ("1 teks"): tanpa zona Ubah format.</param>
+    public void SetDragOver(bool over, int count = 0, long bytes = 0, bool dropped = false, string? text = null)
     {
         _dragOver = over;
         _overConvert = false;
-        bool split = over && ConvertAvailable;
+        bool split = over && ConvertAvailable && text is null;
         ConvertColumn.Width = split ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
         ConvertZone.Visibility = split ? Visibility.Visible : Visibility.Collapsed;
         ConvertPanelView.Suppressed = over;
         if (over)
         {
             ZoneTitle.Text = split ? "Simpan di rak" : "Lepaskan untuk menyimpan";
-            ZoneDetail.Text = bytes > 0 ? $"{count} file · {Shelf.FormatSize(bytes)}" : $"{count} file";
+            ZoneDetail.Text = text ?? (bytes > 0 ? $"{count} file · {Shelf.FormatSize(bytes)}" : $"{count} file");
             StyleZones();
         }
         else
@@ -99,7 +104,7 @@ public partial class ShelfModule : UserControl
             ZoneBorder.StrokeDashArray = [4, 2.67];
             ZoneFill.Fill = Brushes.Transparent;
             ZoneIcon.Stroke = B("TextSecondary");
-            ZoneTitle.Text = "Seret file ke sini";
+            ZoneTitle.Text = "Seret file, teks, atau tautan ke sini";
             ZoneTitle.Foreground = B("TextPrimary");
             ZoneDetail.Text = "Simpan sementara, lalu seret keluar ke mana saja";
             ZoneDetail.Foreground = B("TextTertiary");
@@ -150,7 +155,13 @@ public partial class ShelfModule : UserControl
 
     private FrameworkElement BuildCard(ShelfItem item)
     {
-        var card = new Grid { Width = 88, Margin = new Thickness(0, 0, 10, 0), Cursor = Cursors.Hand, ToolTip = item.Path };
+        var card = new Grid
+        {
+            Width = 88,
+            Margin = new Thickness(0, 0, 10, 0),
+            Cursor = Cursors.Hand,
+            ToolTip = item.Text is { } t ? (t.Length > 400 ? t[..400] + "…" : t) : item.Path,
+        };
         var bg = new Border { CornerRadius = new CornerRadius(12), Background = Brushes.Transparent };
         card.Children.Add(bg);
 
@@ -163,8 +174,34 @@ public partial class ShelfModule : UserControl
             Background = B("SurfaceRaised"),
             ClipToBounds = true,
         };
-        var image = Thumbnail(item.Path);
-        if (image is not null && ImageExtensions.Contains(System.IO.Path.GetExtension(item.Path).ToLowerInvariant()))
+        var image = item.IsText ? null : Thumbnail(item.Path);
+        if (item.Text is { } snippet && !item.IsLink)
+        {
+            // Teks: cuplikan beberapa baris di dalam kotak, seperti kertas catatan kecil.
+            thumb.Child = new TextBlock
+            {
+                Text = snippet,
+                FontSize = 8.5,
+                LineHeight = 10,
+                Foreground = B("TextSecondary"),
+                TextWrapping = TextWrapping.Wrap,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                Margin = new Thickness(6, 5, 6, 5),
+            };
+        }
+        else if (item.IsLink)
+        {
+            thumb.Background = B("AccentMuted");
+            thumb.Child = new System.Windows.Shapes.Path
+            {
+                Style = (Style)FindResource("Peeko.IconPath"),
+                Data = (Geometry)FindResource("Peeko.Icon.Link"),
+                Stroke = B("Accent"),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+        }
+        else if (image is not null && ImageExtensions.Contains(System.IO.Path.GetExtension(item.Path).ToLowerInvariant()))
         {
             thumb.Background = new ImageBrush(image) { Stretch = Stretch.UniformToFill };
         }
@@ -186,7 +223,7 @@ public partial class ShelfModule : UserControl
         stack.Children.Add(thumb);
         stack.Children.Add(new TextBlock
         {
-            Text = System.IO.Path.GetFileName(item.Path.TrimEnd('\\')),
+            Text = item.Text is { } label ? Shelf.TextLabel(label) : System.IO.Path.GetFileName(item.Path.TrimEnd('\\')),
             Style = (Style)FindResource("Peeko.Text.Caption"),
             Foreground = B("TextPrimary"),
             TextAlignment = TextAlignment.Center,
@@ -215,7 +252,7 @@ public partial class ShelfModule : UserControl
 
         // Ubah format (file saja, bukan folder).
         Button? convert = null;
-        if (ConvertAvailable && File.Exists(item.Path))
+        if (ConvertAvailable && !item.IsText && File.Exists(item.Path))
         {
             convert = new Button
             {
@@ -247,13 +284,14 @@ public partial class ShelfModule : UserControl
             convert?.Animate(OpacityProperty, Motion.To(0, Motion.Fast, Motion.Out));
         };
 
-        // Klik dua kali membuka; seret keluar memindahkan/menyalin ke aplikasi tujuan.
+        // Klik dua kali membuka (tautan: di browser; teks: disalin); seret keluar ke aplikasi tujuan.
         Point? pressedAt = null;
         card.PreviewMouseLeftButtonDown += (_, e) =>
         {
             if (e.ClickCount == 2)
             {
-                Open(item.Path);
+                if (item.Text is { } value) OpenText(value, card);
+                else Open(item.Path);
                 e.Handled = true;
                 return;
             }
@@ -277,7 +315,16 @@ public partial class ShelfModule : UserControl
         BusyChanged?.Invoke(true);
         try
         {
-            var data = new DataObject(DataFormats.FileDrop, new[] { item.Path });
+            DataObject data;
+            if (item.Text is { } text)
+            {
+                data = new DataObject(DataFormats.UnicodeText, text);
+                data.SetData(DataFormats.Text, text);
+            }
+            else
+            {
+                data = new DataObject(DataFormats.FileDrop, new[] { item.Path });
+            }
             DragDrop.DoDragDrop(source, data, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
         }
         finally
@@ -286,6 +333,28 @@ public partial class ShelfModule : UserControl
             // File yang dipindahkan aplikasi tujuan hilang dari tempat asalnya: buang dari rak.
             _shelf?.RemoveMissing();
         }
+    }
+
+    /// <summary>Tautan dibuka di browser; teks disalin ke clipboard dengan tanda singkat di kartunya.</summary>
+    private static void OpenText(string text, FrameworkElement card)
+    {
+        if (Shelf.AsLink(text) is { } uri)
+        {
+            Open(uri.AbsoluteUri);
+            return;
+        }
+        try
+        {
+            Clipboard.SetText(text);
+        }
+        catch (System.Runtime.InteropServices.COMException)
+        {
+            return; // clipboard sedang dipakai aplikasi lain
+        }
+        var tip = new ToolTip { Content = "Disalin", PlacementTarget = card, Placement = System.Windows.Controls.Primitives.PlacementMode.Top, IsOpen = true };
+        var close = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1.2) };
+        close.Tick += (_, _) => { close.Stop(); tip.IsOpen = false; };
+        close.Start();
     }
 
     private static void Open(string path)

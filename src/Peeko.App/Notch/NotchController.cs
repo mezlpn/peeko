@@ -266,37 +266,78 @@ public sealed class NotchController : IDisposable
         _focus.SetDisplayVisible(pill || _window.VisibleModule == NotchWindow.TodayTab);
     }
 
-    // ── Seret file ke notch → rak ───────────────────────────────────────────
+    // ── Seret file, teks, atau tautan ke notch → rak ────────────────────────
 
     private static string[]? DraggedFiles(DragEventArgs e) =>
         e.Data.GetDataPresent(DataFormats.FileDrop) ? e.Data.GetData(DataFormats.FileDrop) as string[] : null;
+
+    /// <summary>
+    /// Teks atau tautan yang diseret (dari browser, Word, chat…), atau null jika yang diseret file.
+    /// Tautan dari browser diambil dari format URL-nya supaya yang tersimpan alamatnya saja.
+    /// </summary>
+    private static string? DraggedText(DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop)) return null;
+        try
+        {
+            if (e.Data.GetDataPresent("UniformResourceLocatorW") && e.Data.GetData("UniformResourceLocatorW") is MemoryStream url)
+            {
+                var link = System.Text.Encoding.Unicode.GetString(url.ToArray()).TrimEnd('\0').Trim();
+                if (link.Length > 0) return link;
+            }
+            if (e.Data.GetDataPresent(DataFormats.UnicodeText, true) && e.Data.GetData(DataFormats.UnicodeText, true) is string text
+                && !string.IsNullOrWhiteSpace(text))
+                return text;
+        }
+        catch (Exception ex) when (ex is System.Runtime.InteropServices.COMException or OutOfMemoryException)
+        {
+            // Sebagian aplikasi menawarkan format yang lalu gagal dibaca.
+        }
+        return null;
+    }
+
+    private static string TextKind(string text) => Peeko.Core.Productivity.Shelf.AsLink(text) is not null ? "1 tautan" : "1 teks";
 
     private void OnDragEnter(object sender, DragEventArgs e)
     {
         _dragLeave.Stop();
         e.Handled = true;
-        if (!_settings.Current.ShelfEnabled || DraggedFiles(e) is not { Length: > 0 } files)
+        var files = _settings.Current.ShelfEnabled ? DraggedFiles(e) : null;
+        var text = _settings.Current.ShelfEnabled && files is null ? DraggedText(e) : null;
+        if (files is not { Length: > 0 } && text is null)
         {
             e.Effects = DragDropEffects.None;
             return;
         }
         e.Effects = DragDropEffects.Copy;
-        long bytes = files.Sum(f => File.Exists(f) ? new FileInfo(f).Length : 0);
-        _window.ShelfModule.SetDragOver(true, files.Length, bytes);
+        string what;
+        if (files is { Length: > 0 })
+        {
+            long bytes = files.Sum(f => File.Exists(f) ? new FileInfo(f).Length : 0);
+            _window.ShelfModule.SetDragOver(true, files.Length, bytes);
+            what = $"{files.Length} file";
+        }
+        else
+        {
+            what = TextKind(text!);
+            _window.ShelfModule.SetDragOver(true, text: what);
+        }
 
         if (_stateMachine.State == NotchState.Expanded)
         {
             _window.SelectModule(NotchWindow.ShelfTab);
             return;
         }
-        ShowPeek(new PeekRequest(PeekKind.ShelfDrop) { Text = $"{files.Length} file" });
+        ShowPeek(new PeekRequest(PeekKind.ShelfDrop) { Text = what });
         if (!_dragExpand.IsEnabled) _dragExpand.Start();
     }
 
     private void OnDragOver(object sender, DragEventArgs e)
     {
         _dragLeave.Stop();
-        e.Effects = _settings.Current.ShelfEnabled && DraggedFiles(e) is { Length: > 0 } ? DragDropEffects.Copy : DragDropEffects.None;
+        e.Effects = _settings.Current.ShelfEnabled && (DraggedFiles(e) is { Length: > 0 } || DraggedText(e) is not null)
+            ? DragDropEffects.Copy
+            : DragDropEffects.None;
         e.Handled = true;
         _window.ShelfModule.UpdateDragTarget(e);
     }
@@ -313,11 +354,20 @@ public sealed class NotchController : IDisposable
             BeginConvert(files);
             return;
         }
-        int added = files is null ? 0 : _lists.Shelf.Add(files);
+        string? what = null;
+        if (files is { Length: > 0 })
+        {
+            int added = _lists.Shelf.Add(files);
+            if (added > 0) what = $"{added} file";
+        }
+        else if (_settings.Current.ShelfEnabled && DraggedText(e) is { } text && _lists.Shelf.AddText(text))
+        {
+            what = TextKind(text);
+        }
         EndDrag(dropped: true);
         // Dilepas langsung tanpa membuka panel: konfirmasi singkat.
-        if (!expanded && added > 0)
-            ShowPeek(new PeekRequest(PeekKind.ShelfDrop) { Flag = true, Text = $"{added} file" });
+        if (!expanded && what is not null)
+            ShowPeek(new PeekRequest(PeekKind.ShelfDrop) { Flag = true, Text = what });
     }
 
     private void EndDrag(bool dropped, bool keepOpen = false)
