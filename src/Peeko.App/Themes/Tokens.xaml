@@ -134,6 +134,8 @@
     <Geometry x:Key="Peeko.Icon.Shelf">M4,13.5 L6,6 H18 L20,13.5 V18 A1,1 0 0 1 19,19 H5 A1,1 0 0 1 4,18 Z M4,13.5 H8.5 L9.5,15.5 H14.5 L15.5,13.5 H20</Geometry>
     <!-- Ubah format: dua panah berlawanan -->
     <Geometry x:Key="Peeko.Icon.Convert">M4,9 H18 M14.5,5.5 L18,9 L14.5,12.5 M20,15 H6 M9.5,11.5 L6,15 L9.5,18.5</Geometry>
+    <!-- Pin: panel tetap terbuka (modul Musik) -->
+    <Geometry x:Key="Peeko.Icon.Pin">M9,4 H15 M10,4 V9.5 L7,14 H17 L14,9.5 V4 M12,14 V20.5</Geometry>
     <Geometry x:Key="Peeko.Icon.Volume">M4,9.5 H7.5 L12,5.5 V18.5 L7.5,14.5 H4 Z M15.5,9 A4,4 0 0 1 15.5,15 M18,6.5 A7.5,7.5 0 0 1 18,17.5</Geometry>
 
     <!-- Command Center dan tab Hari ini (0.3.0) -->

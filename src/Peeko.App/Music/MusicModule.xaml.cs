@@ -21,10 +21,27 @@ public partial class MusicModule : UserControl
 
     public SeekBar SeekBar => Seek;
 
-    /// <summary>Marquee hanya berjalan saat modul terlihat (hemat CPU).</summary>
+    /// <summary>Tombol pin diklik; nilai = pin yang diminta.</summary>
+    public event Action<bool>? PinToggled;
+
+    private bool _pinned;
+
+    public void SetPinned(bool pinned)
+    {
+        _pinned = pinned;
+        if (pinned)
+            PinButton.Foreground = (Brush)FindResource("Peeko.Brush.Accent");
+        else
+            PinButton.ClearValue(ForegroundProperty);
+        PinButton.ToolTip = pinned ? "Lepas pin" : "Pin: tetap terbuka";
+    }
+
+    private void OnPinClick(object sender, RoutedEventArgs e) => PinToggled?.Invoke(!_pinned);
+
     /// <summary>Level visualizer di samping chip sumber.</summary>
     public void SetLevels(double[] levels, bool playing) => Bars.SetLevels(levels, playing);
 
+    /// <summary>Marquee hanya berjalan saat modul terlihat (hemat CPU).</summary>
     public void SetActive(bool active)
     {
         if (_marqueeActive == active) return;

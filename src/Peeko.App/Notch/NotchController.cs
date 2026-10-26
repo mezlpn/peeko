@@ -87,6 +87,7 @@ public sealed class NotchController : IDisposable
         seekBar.Nudged += direction => _ = _music.SeekByAsync(NudgeStep * direction);
         // Panel tetap terbuka selama slider digeser walau kursor keluar dari notch.
         seekBar.DraggingChanged += _stateMachine.SetHoldOpen;
+        _window.MusicModule.PinToggled += SetPinned;
 
         var lyricsView = _window.LyricsModule;
         _lyrics.LinesChanged += lyricsView.SetLines;
@@ -94,6 +95,8 @@ public sealed class NotchController : IDisposable
         lyricsView.LineClicked += _lyrics.SeekToLine;
         _window.VisibleModuleChanged += module => _lyrics.SetVisible(module == NotchWindow.MusicTab);
         _window.VisibleModuleChanged += module => _music.SetMusicTabVisible(module == NotchWindow.MusicTab);
+        // Pin milik tab Musik: pindah tab melepasnya supaya panel tidak tertahan tanpa tombol unpin.
+        _window.VisibleModuleChanged += module => { if (module != NotchWindow.MusicTab) SetPinned(false); };
 
         // Peek sistem bisa dimatikan di Pengaturan; baterai kritis selalu muncul.
         _peeks.PeekRequested += request =>
@@ -226,9 +229,16 @@ public sealed class NotchController : IDisposable
         _stateMachine.ShowPeek(request.Hold, request.BypassHidden);
     }
 
+    private void SetPinned(bool pinned)
+    {
+        _stateMachine.SetPinned(pinned);
+        _window.MusicModule.SetPinned(_stateMachine.IsPinned);
+    }
+
     private void OnStateChanged(NotchState from, NotchState to)
     {
         _log.LogDebug("Notch {From} → {To}", from, to);
+        if (to != NotchState.Expanded) _window.MusicModule.SetPinned(false);
 
         // Hover membuka tab aktivitas terkait (Collapsed.dc.html → Interaksi). Tab Lirik dibiarkan
         // jika terakhir dipilih, supaya pengguna yang membaca lirik tidak dilempar balik ke Musik.

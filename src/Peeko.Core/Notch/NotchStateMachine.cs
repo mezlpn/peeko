@@ -17,6 +17,7 @@ public sealed class NotchStateMachine : IDisposable
 
     private bool _pointerOver;
     private bool _holdOpen;
+    private bool _pinned;
     private bool _fullscreen;
     private bool _suspended;
     private bool _slim;
@@ -86,7 +87,7 @@ public sealed class NotchStateMachine : IDisposable
         _pointerOver = false;
         _hoverOpen.Cancel();
 
-        if (State == NotchState.Expanded && !_holdOpen)
+        if (State == NotchState.Expanded && !_holdOpen && !_pinned)
             _leaveClose.Start(_timings.LeaveCloseDelay);
         else if (State == NotchState.Peek && !_peekEnd.IsPending)
             _peekEnd.Start(_timings.PeekHold);
@@ -98,7 +99,24 @@ public sealed class NotchStateMachine : IDisposable
         _holdOpen = hold;
         if (hold)
             _leaveClose.Cancel();
-        else if (State == NotchState.Expanded && !_pointerOver)
+        else if (State == NotchState.Expanded && !_pointerOver && !_pinned)
+            _leaveClose.Start(_timings.LeaveCloseDelay);
+    }
+
+    public bool IsPinned => _pinned;
+
+    /// <summary>
+    /// Pin dari pengguna (tombol pin di modul Musik): panel tetap terbuka sampai di-unpin.
+    /// Terpisah dari <see cref="SetHoldOpen"/> supaya slider/input yang selesai tidak melepas pin.
+    /// Pin lepas sendiri saat panel tertutup karena alasan lain (fullscreen, disembunyikan).
+    /// </summary>
+    public void SetPinned(bool pinned)
+    {
+        if (_pinned == pinned) return;
+        _pinned = pinned && State == NotchState.Expanded;
+        if (_pinned)
+            _leaveClose.Cancel();
+        else if (State == NotchState.Expanded && !_pointerOver && !_holdOpen)
             _leaveClose.Start(_timings.LeaveCloseDelay);
     }
 
@@ -182,7 +200,7 @@ public sealed class NotchStateMachine : IDisposable
 
     private void OnLeaveCloseElapsed()
     {
-        if (State == NotchState.Expanded && !_pointerOver && !_holdOpen)
+        if (State == NotchState.Expanded && !_pointerOver && !_holdOpen && !_pinned)
             SetState(RestState);
     }
 
@@ -205,6 +223,7 @@ public sealed class NotchStateMachine : IDisposable
         if (State == next) return;
         var previous = State;
         State = next;
+        if (next != NotchState.Expanded) _pinned = false;
         StateChanged?.Invoke(previous, next);
     }
 
