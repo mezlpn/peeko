@@ -40,6 +40,8 @@ public sealed class NotchController : IDisposable
     private readonly DispatcherTimer _dragExpand = new() { Interval = TimeSpan.FromMilliseconds(600) };
     private readonly DispatcherTimer _dragLeave = new() { Interval = TimeSpan.FromMilliseconds(120) };
     private bool _musicLive;
+    private bool _hasSyncedLyrics;
+    private string? _lyricLine;
     private bool _expandingForShelf;
     private ForegroundWindowWatcher? _foreground;
 
@@ -87,7 +89,7 @@ public sealed class NotchController : IDisposable
         seekBar.Nudged += direction => _ = _music.SeekByAsync(NudgeStep * direction);
         // Panel tetap terbuka selama slider digeser walau kursor keluar dari notch.
         seekBar.DraggingChanged += _stateMachine.SetHoldOpen;
-        _window.MusicModule.PinToggled += SetPinned;
+        _window.MusicModule.PinToggled += pinned => _settings.Update(s => s.LyricsPinned = pinned);
 
         var lyricsView = _window.LyricsModule;
         _lyrics.LinesChanged += lyricsView.SetLines;
@@ -95,8 +97,18 @@ public sealed class NotchController : IDisposable
         lyricsView.LineClicked += _lyrics.SeekToLine;
         _window.VisibleModuleChanged += module => _lyrics.SetVisible(module == NotchWindow.MusicTab);
         _window.VisibleModuleChanged += module => _music.SetMusicTabVisible(module == NotchWindow.MusicTab);
-        // Pin milik tab Musik: pindah tab melepasnya supaya panel tidak tertahan tanpa tombol unpin.
-        _window.VisibleModuleChanged += module => { if (module != NotchWindow.MusicTab) SetPinned(false); };
+        // Pin lirik: baris aktif tampil di pil musik saat notch mengecil.
+        _lyrics.LinesChanged += lines =>
+        {
+            _hasSyncedLyrics = lines is not null;
+            UpdateLyricPill();
+        };
+        _lyrics.ActiveTextChanged += text =>
+        {
+            _lyricLine = text;
+            UpdateLyricPill();
+        };
+        UpdateLyricPill();
 
         // Peek sistem bisa dimatikan di Pengaturan; baterai kritis selalu muncul.
         _peeks.PeekRequested += request =>
@@ -229,16 +241,24 @@ public sealed class NotchController : IDisposable
         _stateMachine.ShowPeek(request.Hold, request.BypassHidden);
     }
 
-    private void SetPinned(bool pinned)
+    /// <summary>
+    /// Pin lirik aktif dan lagu punya lirik tersinkron: pil menampilkan baris yang sedang diputar
+    /// ("♪" di jeda antarbaris). Sinkron baris di latar hanya berjalan selama pin aktif.
+    /// </summary>
+    private void UpdateLyricPill()
     {
-        _stateMachine.SetPinned(pinned);
-        _window.MusicModule.SetPinned(_stateMachine.IsPinned);
+        var s = _settings.Current;
+        bool pinned = s.LyricsPinned && s.LyricsEnabled;
+        _window.MusicModule.SetPinned(s.LyricsPinned);
+        _lyrics.SetPillVisible(pinned);
+        _window.SetLyricLine(pinned && _hasSyncedLyrics
+            ? string.IsNullOrWhiteSpace(_lyricLine) ? "♪" : _lyricLine
+            : null);
     }
 
     private void OnStateChanged(NotchState from, NotchState to)
     {
         _log.LogDebug("Notch {From} → {To}", from, to);
-        if (to != NotchState.Expanded) _window.MusicModule.SetPinned(false);
 
         // Hover membuka tab aktivitas terkait (Collapsed.dc.html → Interaksi). Tab Lirik dibiarkan
         // jika terakhir dipilih, supaya pengguna yang membaca lirik tidak dilempar balik ke Musik.
@@ -479,6 +499,7 @@ public sealed class NotchController : IDisposable
         }
 
         UpdateActivity();
+        UpdateLyricPill();
     }
 
     /// <summary>Win + Alt + C: buka panel, atau tutup jika sedang terbuka.</summary>

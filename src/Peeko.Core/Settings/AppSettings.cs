@@ -24,6 +24,8 @@ public sealed class AppSettings
     // ── Modul ──
     public bool MusicEnabled { get; set; } = true;
     public bool LyricsEnabled { get; set; } = true;
+    /// <summary>Pin lirik (issue #1): pil musik saat notch mengecil menampilkan baris lirik yang sedang diputar.</summary>
+    public bool LyricsPinned { get; set; }
     public bool FocusEnabled { get; set; } = true;
     public bool WaterEnabled { get; set; } = true;
     public bool TodoEnabled { get; set; } = true;

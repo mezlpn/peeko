@@ -196,9 +196,9 @@
                     <Button Style="{StaticResource ChevronButton}" Tag="{StaticResource IconChevronRight}"
                             Command="{Binding NextSessionCommand}" ToolTip="Sumber berikutnya" Margin="2,0,0,0"
                             Visibility="{Binding HasMultipleSessions, Converter={StaticResource Vis}}" />
-                    <!-- Pin (issue #1): panel tetap terbuka supaya lirik bisa dibaca sambil kerja -->
+                    <!-- Pin lirik (issue #1): notch yang mengecil menampilkan baris lirik yang sedang diputar -->
                     <Button x:Name="PinButton" Style="{StaticResource ChevronButton}" Tag="{StaticResource Peeko.Icon.Pin}"
-                            Margin="6,0,0,0" ToolTip="Pin: tetap terbuka" Click="OnPinClick" />
+                            Margin="6,0,0,0" ToolTip="Pin lirik: tampilkan di notch saat mengecil" Click="OnPinClick" />
                     <controls:Visualizer x:Name="Bars" Margin="8,0,0,0" BarCount="5" BarWidth="4" BarGap="2"
                                          MaxBarHeight="18" BarBrush="{Binding AccentBrush}" />
                 </StackPanel>

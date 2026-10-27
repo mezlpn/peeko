@@ -41,6 +41,8 @@ public partial class NotchWindow : Window
     private Size _peekSize = PeekSize;
     private NotchState _visualState = NotchState.Collapsed;
     private CollapsedActivity _activity = CollapsedActivity.Idle;
+    private string? _lyricLine;
+    private double _lyricPillWidth;
     private int _moduleIndex;
 
     // Bentuk notch digerakkan pegas, satu per sifat (cara Bloom): lebar, tinggi, radius, bahu, dan
@@ -84,7 +86,7 @@ public partial class NotchWindow : Window
     private Size CollapsedSize => _activity switch
     {
         CollapsedActivity.Water or CollapsedActivity.Update => WaterSize,
-        CollapsedActivity.Music => MusicSize,
+        CollapsedActivity.Music => new Size(Math.Max(MusicSize.Width, _lyricPillWidth), MusicSize.Height),
         _ => IdleSize,
     };
 
@@ -373,6 +375,7 @@ public partial class NotchWindow : Window
 
         bool combined = activity == CollapsedActivity.MusicAndFocus;
         MusicPillView.SetCompact(combined);
+        _lyricPillWidth = MusicPillView.SetLyric(activity == CollapsedActivity.Music ? _lyricLine : null);
         FocusPillView.SetCompact(combined);
         FocusPillView.HorizontalAlignment = combined ? HorizontalAlignment.Right : HorizontalAlignment.Center;
         FocusPillView.Margin = new Thickness(0, 0, combined ? 12 : 0, 0);
@@ -413,6 +416,20 @@ public partial class NotchWindow : Window
     }
 
     public CollapsedActivity CollapsedActivity => _activity;
+
+    /// <summary>
+    /// Pin lirik: baris aktif di pil musik (null → pil biasa). Hanya untuk pil musik sendirian;
+    /// bersama timer fokus pil tetap ringkas.
+    /// </summary>
+    public void SetLyricLine(string? line)
+    {
+        _lyricLine = line;
+        double width = MusicPillView.SetLyric(_activity == CollapsedActivity.Music ? line : null);
+        if (Math.Abs(width - _lyricPillWidth) < 0.5) return;
+        _lyricPillWidth = width;
+        if (_visualState == NotchState.Collapsed && _activity == CollapsedActivity.Music)
+            AnimateShape(CollapsedSize, CollapsedRadius);
+    }
 
     private void ToPeek(NotchState from)
     {

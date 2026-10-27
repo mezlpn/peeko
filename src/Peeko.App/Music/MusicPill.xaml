@@ -5,6 +5,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:Peeko.App.Controls"
+             xmlns:local="clr-namespace:Peeko.App.Music"
              Height="32" IsHitTestVisible="False">
 
     <StackPanel x:Name="Root" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -26,6 +27,11 @@
                 </Border.Background>
             </Border>
         </Border>
+
+        <!-- Pin lirik: baris yang sedang diputar. Lebar pil mengikuti teks (NotchWindow). -->
+        <TextBlock x:Name="LyricText" Margin="10,0,0,0" MaxWidth="{x:Static local:MusicPill.MaxLyricWidth}" VerticalAlignment="Center"
+                   Style="{StaticResource Peeko.Text.Body}" FontWeight="SemiBold" Foreground="{StaticResource Peeko.Brush.TextPrimary}"
+                   TextTrimming="CharacterEllipsis" Visibility="Collapsed" />
 
         <!-- Lebar tetap supaya posisi cover tidak bergeser saat bar naik-turun. -->
         <controls:Visualizer x:Name="Bars" Margin="10,0,0,0" BarCount="5" BarWidth="3" BarGap="2" MaxBarHeight="14"

@@ -33,7 +33,7 @@ public partial class MusicModule : UserControl
             PinButton.Foreground = (Brush)FindResource("Peeko.Brush.Accent");
         else
             PinButton.ClearValue(ForegroundProperty);
-        PinButton.ToolTip = pinned ? "Lepas pin" : "Pin: tetap terbuka";
+        PinButton.ToolTip = pinned ? "Lepas pin lirik" : "Pin lirik: tampilkan di notch saat mengecil";
     }
 
     private void OnPinClick(object sender, RoutedEventArgs e) => PinToggled?.Invoke(!_pinned);
