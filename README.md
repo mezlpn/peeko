@@ -3,7 +3,7 @@
 Notch kecil yang suka mengintip dari tepi atas layar Windows. Arahkan kursor ke tengah atas
 layar, dan Peeko terbuka menampilkan:
 
-- 🎵 **Musik** yang sedang diputar (Spotify, YouTube, dll.) + **lirik yang ikut berjalan**, dengan visualizer
+- 🎵 **Musik** yang sedang diputar (Spotify, YouTube, dll.) + **lirik yang ikut berjalan** (bisa di-pin supaya baris yang diputar tetap tampil di notch), dengan visualizer
   yang bergoyang mengikuti bass, vokal, dan treble lagunya
 - ⏱️ **Timer fokus** (Pomodoro) dan 💧 **pengingat minum air**
 - ✅ **To-do** singkat dan 📁 **rak** (tempat menaruh file, teks, atau tautan sementara)
@@ -78,7 +78,7 @@ Kalau nanti folder Peeko dipindah, matikan lalu nyalakan lagi pilihan ini.
 
 ### Update ke versi baru (otomatis)
 
-Mulai versi **0.1.2**, Peeko mengecek versi baru sendiri setiap kali dinyalakan (dan tiap 6 jam).
+Mulai versi **0.1.2**, Peeko mengecek versi baru sendiri setiap kali dinyalakan, tiap 10 menit, dan saat laptop bangun dari sleep.
 Kalau ada, mata di notch berganti menjadi **"Update 0.x.x"** dan sesekali bergoyang minta perhatian 😄
 
 1. Klik tombol **Pasang** di notch. Tombol yang sama juga ada di samping jam saat panel terbuka,

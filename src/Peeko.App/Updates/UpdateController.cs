@@ -18,7 +18,8 @@ public enum UpdateState
 }
 
 /// <summary>
-/// Update otomatis dari GitHub Releases. Dicek 10 dtk setelah start lalu tiap 6 jam. "Pasang"
+/// Update otomatis dari GitHub Releases. Dicek 10 dtk setelah start, tiap 10 menit (murah berkat
+/// ETag), dan sesaat setelah laptop bangun atau tersambung internet lagi. "Pasang"
 /// mengunduh zip, mengganti Peeko.exe (exe yang berjalan cukup diganti nama), lalu menyalakan
 /// versi baru. Gagal di tengah jalan → exe lama dikembalikan.
 /// </summary>
@@ -26,7 +27,9 @@ public sealed class UpdateController : IDisposable
 {
     public const string UpdatedArg = "--updated";
     private static readonly TimeSpan FirstCheck = TimeSpan.FromSeconds(10);
-    private static readonly TimeSpan Interval = TimeSpan.FromHours(6);
+    private static readonly TimeSpan Interval = TimeSpan.FromMinutes(10);
+    // Setelah bangun dari sleep / internet tersambung: beri waktu jaringan siap dulu.
+    private static readonly TimeSpan WakeCheck = TimeSpan.FromSeconds(15);
 
     private readonly ILogger<UpdateController> _log;
     private readonly HttpClient _http;
@@ -78,6 +81,27 @@ public sealed class UpdateController : IDisposable
     public void Start()
     {
         CleanupPreviousUpdate();
+        _timer.Start();
+        Microsoft.Win32.SystemEvents.PowerModeChanged += OnPowerModeChanged;
+        System.Net.NetworkInformation.NetworkChange.NetworkAvailabilityChanged += OnNetworkAvailabilityChanged;
+    }
+
+    private void OnPowerModeChanged(object? sender, Microsoft.Win32.PowerModeChangedEventArgs e)
+    {
+        if (e.Mode == Microsoft.Win32.PowerModes.Resume) CheckSoon();
+    }
+
+    // Dipanggil dari thread jaringan; jadwalkan di thread UI.
+    private void OnNetworkAvailabilityChanged(object? sender, System.Net.NetworkInformation.NetworkAvailabilityEventArgs e)
+    {
+        if (e.IsAvailable) _timer.Dispatcher.BeginInvoke(CheckSoon);
+    }
+
+    /// <summary>Cek sebentar lagi, lalu kembali ke jadwal biasa (Tick mengembalikan Interval).</summary>
+    private void CheckSoon()
+    {
+        _timer.Stop();
+        _timer.Interval = WakeCheck;
         _timer.Start();
     }
 
@@ -259,6 +283,8 @@ public sealed class UpdateController : IDisposable
 
     public void Dispose()
     {
+        Microsoft.Win32.SystemEvents.PowerModeChanged -= OnPowerModeChanged;
+        System.Net.NetworkInformation.NetworkChange.NetworkAvailabilityChanged -= OnNetworkAvailabilityChanged;
         _timer.Stop();
         _download?.Cancel();
         _http.Dispose();

@@ -12,6 +12,8 @@ public sealed record ReleaseInfo(Version Version, string Tag, string AssetUrl, s
 /// <summary>
 /// Mengecek rilis terbaru di GitHub (<c>/repos/{owner}/{repo}/releases/latest</c>). Rilis draft dan
 /// prerelease tidak dihitung oleh endpoint itu. Yang dikirim hanya permintaan biasa ke GitHub.
+/// Memakai ETag: jika rilis tidak berubah GitHub membalas 304 yang tidak memakan kuota 60
+/// request/jam, sehingga aman dicek sering.
 /// </summary>
 public sealed class UpdateChecker
 {
@@ -22,6 +24,8 @@ public sealed class UpdateChecker
 
     private readonly HttpClient _http;
     private readonly string _feed;
+    private string? _etag;
+    private ReleaseInfo? _lastResult;
 
     public UpdateChecker(HttpClient http, string? feed = null)
     {
@@ -35,11 +39,20 @@ public sealed class UpdateChecker
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, _feed);
         request.Headers.Accept.ParseAdd("application/vnd.github+json");
+        if (_etag is not null) request.Headers.TryAddWithoutValidation("If-None-Match", _etag);
         using var response = await _http.SendAsync(request, ct);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotModified) return _lastResult;
         if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
         response.EnsureSuccessStatusCode();
 
         var dto = await response.Content.ReadFromJsonAsync<ReleaseDto>(Json, ct);
+        _lastResult = ToRelease(dto);
+        _etag = response.Headers.ETag?.ToString();
+        return _lastResult;
+    }
+
+    private static ReleaseInfo? ToRelease(ReleaseDto? dto)
+    {
         if (dto is null || dto.Draft || dto.Prerelease || TryParseVersion(dto.TagName) is not { } version) return null;
 
         var asset = dto.Assets?.FirstOrDefault(a => a.Name.EndsWith(AssetSuffix, StringComparison.OrdinalIgnoreCase));

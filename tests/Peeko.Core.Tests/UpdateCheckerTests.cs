@@ -9,15 +9,34 @@ public class UpdateCheckerTests
     private sealed class Feed(string? body, HttpStatusCode status = HttpStatusCode.OK) : HttpMessageHandler
     {
         public HttpRequestMessage? Last { get; private set; }
+        public string? ETag { get; set; }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
             Last = request;
-            return Task.FromResult(new HttpResponseMessage(status)
+            if (ETag is not null && request.Headers.IfNoneMatch.Any(t => t.Tag == ETag))
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified));
+            var response = new HttpResponseMessage(status)
             {
                 Content = new StringContent(body ?? "{}", Encoding.UTF8, "application/json"),
-            });
+            };
+            if (ETag is not null) response.Headers.ETag = new System.Net.Http.Headers.EntityTagHeaderValue(ETag);
+            return Task.FromResult(response);
         }
+    }
+
+    [Fact]
+    public async Task Unchanged_release_uses_etag_and_keeps_result()
+    {
+        var feed = new Feed(Release) { ETag = "\"abc\"" };
+        var checker = new UpdateChecker(new HttpClient(feed));
+
+        var first = await checker.GetLatestAsync(default);
+        Assert.Empty(feed.Last!.Headers.IfNoneMatch);
+
+        var second = await checker.GetLatestAsync(default);
+        Assert.Contains(feed.Last!.Headers.IfNoneMatch, t => t.Tag == "\"abc\"");
+        Assert.Equal(first, second);
     }
 
     private const string Release = """
