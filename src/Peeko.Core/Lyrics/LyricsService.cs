@@ -35,15 +35,23 @@ public sealed class LyricsService
 
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
+    /// <summary>
+    /// Jeda sebelum mengulang request yang gagal sementara (503/429/5xx, koneksi putus). LRCLIB
+    /// cukup sering membalas 503 sesaat; tanpa ini lirik tampil "gagal" padahal "Cari lagi" berhasil.
+    /// </summary>
+    private static readonly TimeSpan[] DefaultRetryDelays = [TimeSpan.FromSeconds(0.8), TimeSpan.FromSeconds(2)];
+
     private readonly HttpClient _http;
     private readonly string _cacheDir;
     private readonly TimeProvider _time;
+    private readonly TimeSpan[] _retryDelays;
 
-    public LyricsService(HttpClient http, string cacheDir, TimeProvider time)
+    public LyricsService(HttpClient http, string cacheDir, TimeProvider time, TimeSpan[]? retryDelays = null)
     {
         _http = http;
         _cacheDir = cacheDir;
         _time = time;
+        _retryDelays = retryDelays ?? DefaultRetryDelays;
     }
 
     /// <param name="queries">Kandidat dari <see cref="TrackQueryBuilder"/>; yang pertama menentukan kunci cache.</param>
@@ -96,7 +104,7 @@ public sealed class LyricsService
             var url = $"{BaseUrl}/api/get?track_name={E(q.Title)}&artist_name={E(q.Artist)}"
                     + $"&duration={(int)Math.Round(q.Duration.TotalSeconds)}"
                     + (q.Album.Length > 0 ? $"&album_name={E(q.Album)}" : "");
-            using var response = await _http.GetAsync(url, ct);
+            using var response = await GetWithRetryAsync(url, ct);
             if (response.StatusCode == HttpStatusCode.NotFound) continue;
             response.EnsureSuccessStatusCode();
             var record = await response.Content.ReadFromJsonAsync<LrclibRecord>(Json, ct);
@@ -110,7 +118,7 @@ public sealed class LyricsService
         {
             var url = $"{BaseUrl}/api/search?track_name={E(q.Title)}"
                     + (q.Artist.Length > 0 ? $"&artist_name={E(q.Artist)}" : "");
-            using var response = await _http.GetAsync(url, ct);
+            using var response = await GetWithRetryAsync(url, ct);
             if (response.StatusCode == HttpStatusCode.NotFound) continue;
             response.EnsureSuccessStatusCode();
             var results = await response.Content.ReadFromJsonAsync<List<LrclibRecord>>(Json, ct) ?? [];
@@ -122,6 +130,28 @@ public sealed class LyricsService
 
         return fallback;
     }
+
+    /// <summary>GET dengan pengulangan untuk gangguan sementara; 404 dan 4xx lain langsung dikembalikan.</summary>
+    private async Task<HttpResponseMessage> GetWithRetryAsync(string url, CancellationToken ct)
+    {
+        for (int attempt = 0; ; attempt++)
+        {
+            bool last = attempt >= _retryDelays.Length;
+            try
+            {
+                var response = await _http.GetAsync(url, ct);
+                if (last || !IsTransient(response.StatusCode)) return response;
+                response.Dispose();
+            }
+            catch (HttpRequestException) when (!last)
+            {
+            }
+            await Task.Delay(_retryDelays[attempt], _time, ct);
+        }
+    }
+
+    private static bool IsTransient(HttpStatusCode status) =>
+        status == HttpStatusCode.TooManyRequests || (int)status >= 500;
 
     private static bool IsSynced(LrclibRecord r) => !r.Instrumental && !string.IsNullOrWhiteSpace(r.SyncedLyrics);
 

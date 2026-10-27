@@ -121,7 +121,7 @@ public sealed class LyricsServiceTests : IDisposable
 
     public LyricsServiceTests()
     {
-        _service = new LyricsService(new HttpClient(_handler), _dir, _time);
+        _service = new LyricsService(new HttpClient(_handler), _dir, _time, [TimeSpan.Zero, TimeSpan.Zero]);
     }
 
     public void Dispose()
@@ -216,12 +216,33 @@ public sealed class LyricsServiceTests : IDisposable
         Assert.IsType<LyricsResult.Plain>(await _service.GetAsync(Query, false, default));
     }
 
+    [Fact]
+    public async Task Temporary_503_is_retried_before_giving_up()
+    {
+        // Kasus nyata: LRCLIB sesekali membalas 503, lalu "Cari lagi" langsung berhasil.
+        _handler.Respond("/api/get", """{"duration":198,"instrumental":false,"plainLyrics":"a","syncedLyrics":"[00:01.00]a"}""");
+        _handler.FailNext = 2;
+
+        Assert.IsType<LyricsResult.Synced>(await _service.GetAsync(Query, false, default));
+        Assert.Equal(3, _handler.Calls);
+    }
+
+    [Fact]
+    public async Task Persistent_503_reports_failure()
+    {
+        _handler.Respond("/api/get", null, HttpStatusCode.ServiceUnavailable);
+        Assert.IsType<LyricsResult.Failed>(await _service.GetAsync(Query, false, default));
+        Assert.Equal(3, _handler.Calls);
+    }
+
     private sealed class FakeHandler : HttpMessageHandler
     {
         private readonly Dictionary<string, (string? Body, HttpStatusCode Status)> _routes = [];
 
         public int Calls { get; private set; }
         public bool Fail { get; set; }
+        /// <summary>Jumlah request berikutnya yang dibalas 503.</summary>
+        public int FailNext { get; set; }
 
         public void Respond(string path, string? body, HttpStatusCode status = HttpStatusCode.OK) =>
             _routes[path] = (body, status);
@@ -230,6 +251,11 @@ public sealed class LyricsServiceTests : IDisposable
         {
             Calls++;
             if (Fail) throw new HttpRequestException("offline");
+            if (FailNext > 0)
+            {
+                FailNext--;
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
+            }
 
             var path = request.RequestUri!.AbsolutePath;
             var (body, status) = _routes.TryGetValue(path, out var r) ? r : (null, HttpStatusCode.NotFound);

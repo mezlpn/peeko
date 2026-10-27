@@ -10,13 +10,14 @@ namespace Peeko.App.Lyrics;
 /// <summary>
 /// Mengambil lirik saat lagu berganti dan menyinkronkan baris aktif dengan posisi lagu.
 /// Tidak ada polling: satu timer sekali-jalan dipasang tepat sebelum baris berikutnya, dan
-/// hanya selama modul Lirik terlihat.
+/// hanya selama modul Lirik atau pil lirik (pin) terlihat.
 /// </summary>
 public sealed class LyricsController : IDisposable
 {
     // Baris dipicu sedikit lebih awal supaya terasa tepat waktu (Motion.dc.html).
     private static readonly TimeSpan Lead = TimeSpan.FromMilliseconds(120);
-    private static readonly TimeSpan FetchTimeout = TimeSpan.FromSeconds(6);
+    // Cukup untuk enam request LRCLIB plus pengulangan 503 di LyricsService.
+    private static readonly TimeSpan FetchTimeout = TimeSpan.FromSeconds(15);
 
     private readonly MusicController _music;
     private readonly LyricsService _service;
@@ -25,11 +26,16 @@ public sealed class LyricsController : IDisposable
     private readonly DispatcherTimer _trackDebounce = new() { Interval = TimeSpan.FromMilliseconds(300) };
     private readonly DispatcherTimer _loadingDelay = new() { Interval = TimeSpan.FromMilliseconds(250) };
     private readonly DispatcherTimer _lineTimer = new(DispatcherPriority.Render);
+    // Gagal karena server/jaringan: coba sekali lagi otomatis, supaya tidak perlu klik "Cari lagi".
+    private readonly DispatcherTimer _autoRetry = new() { Interval = TimeSpan.FromSeconds(20) };
+    private bool _autoRetried;
 
     private string? _trackKey;
     private CancellationTokenSource? _fetch;
     private SyncedLyrics? _lyrics;
     private int _activeIndex = int.MinValue;
+    private bool _panelVisible;
+    private bool _pillVisible;
     private bool _visible;
 
     public LyricsController(MusicController music, LyricsService service, ILogger<LyricsController> log)
@@ -50,6 +56,12 @@ public sealed class LyricsController : IDisposable
             // "Memuat" baru ditampilkan jika pencarian lebih dari 250 ms (Lyrics.dc.html).
             _loadingDelay.Stop();
             if (_fetch is not null) ViewModel.State = LyricsViewState.Loading;
+        };
+        _autoRetry.Tick += (_, _) =>
+        {
+            _autoRetry.Stop();
+            _autoRetried = true;
+            _ = FetchAsync(retry: false);
         };
         _lineTimer.Tick += (_, _) =>
         {
@@ -83,8 +95,25 @@ public sealed class LyricsController : IDisposable
     /// <summary>(indeks baris aktif, animasikan?) — −1 berarti sebelum baris pertama.</summary>
     public event Action<int, bool>? ActiveLineChanged;
 
+    /// <summary>Teks baris aktif untuk pil lirik; null sebelum baris pertama atau tanpa lirik tersinkron.</summary>
+    public event Action<string?>? ActiveTextChanged;
+
     public void SetVisible(bool visible)
     {
+        _panelVisible = visible;
+        UpdateVisible();
+    }
+
+    /// <summary>Pil lirik (pin) aktif di notch yang mengecil.</summary>
+    public void SetPillVisible(bool visible)
+    {
+        _pillVisible = visible;
+        UpdateVisible();
+    }
+
+    private void UpdateVisible()
+    {
+        bool visible = _panelVisible || _pillVisible;
         if (_visible == visible) return;
         _visible = visible;
         if (visible) Resync(animate: false);
@@ -102,6 +131,7 @@ public sealed class LyricsController : IDisposable
     {
         if (state is null)
         {
+            _autoRetry.Stop();
             CancelFetch();
             _trackDebounce.Stop();
             _trackKey = null;
@@ -113,6 +143,8 @@ public sealed class LyricsController : IDisposable
         if (state.Track.Key != _trackKey)
         {
             _trackKey = state.Track.Key;
+            _autoRetry.Stop();
+            _autoRetried = false;
             CancelFetch();
             SetLyrics(null);
             if (!_fetchEnabled)
@@ -153,7 +185,7 @@ public sealed class LyricsController : IDisposable
         catch (OperationCanceledException)
         {
             if (_fetch != cts) return; // diganti lagu lain
-            result = new LyricsResult.NotFound(); // batas waktu 6 dtk: anggap tidak ditemukan
+            result = new LyricsResult.Failed("batas waktu"); // server lambat, bukan berarti tidak ada
         }
         finally
         {
@@ -184,6 +216,7 @@ public sealed class LyricsController : IDisposable
                 _log.LogWarning("Gagal mengambil lirik: {Reason}", f.Reason);
                 SetLyrics(null);
                 ViewModel.State = LyricsViewState.Failed;
+                if (!_autoRetried) _autoRetry.Start();
                 break;
             default:
                 SetLyrics(null);
@@ -206,6 +239,7 @@ public sealed class LyricsController : IDisposable
         _activeIndex = int.MinValue;
         _lineTimer.Stop();
         LinesChanged?.Invoke(lyrics);
+        ActiveTextChanged?.Invoke(null);
         Resync(animate: false);
     }
 
@@ -221,6 +255,7 @@ public sealed class LyricsController : IDisposable
             bool jump = Math.Abs(index - _activeIndex) > 1; // seek jauh: tanpa animasi geser panjang
             _activeIndex = index;
             ActiveLineChanged?.Invoke(index, animate && !jump);
+            ActiveTextChanged?.Invoke(index >= 0 ? _lyrics.Lines[index].Text : null);
         }
 
         if (_music.State?.Playback.IsPlaying != true) return;
@@ -251,6 +286,7 @@ public sealed class LyricsController : IDisposable
         _music.StateApplied -= OnStateApplied;
         CancelFetch();
         _trackDebounce.Stop();
+        _autoRetry.Stop();
         _lineTimer.Stop();
     }
 }

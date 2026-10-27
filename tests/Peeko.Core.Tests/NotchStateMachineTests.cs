@@ -83,34 +83,6 @@ public class NotchStateMachineTests
     }
 
     [Fact]
-    public void Pin_survives_hold_release_and_unpin_closes()
-    {
-        _sm.PointerEntered();
-        Wait(120);
-        _sm.SetPinned(true);
-        _sm.SetHoldOpen(true);
-        _sm.PointerExited();
-        _sm.SetHoldOpen(false);
-        Wait(5000);
-        Assert.Equal(NotchState.Expanded, _sm.State);
-        Assert.True(_sm.IsPinned);
-
-        _sm.SetPinned(false);
-        Wait(350);
-        Assert.Equal(NotchState.Collapsed, _sm.State);
-    }
-
-    [Fact]
-    public void Pin_is_released_when_hidden()
-    {
-        _sm.PointerEntered();
-        Wait(120);
-        _sm.SetPinned(true);
-        _sm.SetFullscreen(true);
-        Assert.False(_sm.IsPinned);
-    }
-
-    [Fact]
     public void Fullscreen_hides_and_returns_after_settle()
     {
         _sm.SetFullscreen(true);
