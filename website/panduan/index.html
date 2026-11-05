@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panduan Peeko — cara memasang dan memakai</title>
+  <meta name="description" content="Cara memasang Peeko di Windows, membuka notch, berpindah tampilan, menyimpan file di rak, mengubah format, jadwal salat, dan semua pengaturannya.">
+  <meta name="theme-color" content="#050506">
+  <link rel="icon" href="../assets/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="../" aria-label="Peeko, beranda">
+      <span class="brand-mark"><span class="eyes" style="gap:5px"><i style="width:4px;height:7px"></i><i style="width:4px;height:7px"></i></span></span>
+      Peeko
+    </a>
+    <nav class="nav-links" id="nav-links">
+      <a href="../#fitur">Fitur</a>
+      <a href="./" aria-current="page">Panduan</a>
+      <a href="../rilis/">Catatan rilis</a>
+      <a href="../#faq">FAQ</a>
+      <a href="https://github.com/mezlpn/peeko" rel="noopener">GitHub</a>
+    </nav>
+    <a class="btn btn-primary btn-sm nav-dl" href="https://github.com/mezlpn/peeko/releases/latest" data-download>Unduh</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Buka menu" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="page-head">
+    <span class="eyebrow">Panduan</span>
+    <h1>Kenalan dengan Peeko.</h1>
+    <p class="section-lead">Dari memasang sampai mengatur setiap modul.</p>
+  </div>
+
+  <div class="doc">
+    <nav class="toc" aria-label="Isi panduan">
+      <a href="#pasang">Memasang</a>
+      <a href="#dasar">Cara pakai dasar</a>
+      <a href="#musik">Musik &amp; lirik</a>
+      <a href="#kontrol">Kontrol</a>
+      <a href="#hari-ini">Hari ini &amp; fokus</a>
+      <a href="#salat">Jadwal salat</a>
+      <a href="#tugas">Tugas &amp; minum</a>
+      <a href="#rak">Rak &amp; ubah format</a>
+      <a href="#kabar">Kabar sekilas</a>
+      <a href="#pengaturan">Pengaturan</a>
+      <a href="#update">Update &amp; hapus</a>
+      <a href="#masalah">Masalah umum</a>
+    </nav>
+
+    <article class="prose">
+      <h2 id="pasang">Memasang</h2>
+      <ol>
+        <li>Buka halaman <a href="https://github.com/mezlpn/peeko/releases/latest" data-download>unduhan</a> dan ambil <code data-asset>Peeko-…-win-x64.zip</code>.</li>
+        <li>Klik kanan file zip → <strong>Extract All / Ekstrak Semua</strong>. Pindahkan foldernya ke tempat yang tidak akan terhapus, misalnya <strong>Documents</strong>. Jangan menjalankannya dari dalam zip.</li>
+        <li>Klik dua kali <code>Peeko.exe</code>. Kalau muncul layar biru <em>“Windows protected your PC”</em>, klik <strong>More info → Run anyway</strong>. Ini muncul karena Peeko belum memakai sertifikat code signing berbayar, dan hanya sekali.</li>
+        <li>Notch hitam kecil dengan dua mata muncul di tengah atas layar. Selesai.</li>
+      </ol>
+      <p>Supaya Peeko ikut menyala saat laptop dinyalakan: klik ikon Peeko di tray → <strong>Pengaturan</strong> → nyalakan <strong>Mulai bersama Windows</strong>.</p>
+      <div class="note">Butuh Windows 10 versi 2004 (build 19041) atau lebih baru, atau Windows 11, 64-bit. Tidak perlu memasang .NET atau apa pun lagi.</div>
+
+      <h2 id="dasar">Cara pakai dasar</h2>
+      <ul>
+        <li><strong>Buka:</strong> arahkan kursor ke notch. Jauhkan kursor untuk menutup. Dari keyboard: <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd>.</li>
+        <li><strong>Pindah tampilan:</strong> gulir mouse di mana saja di panel, atau klik titik kecil di bawah jam. Gulir cepat melompati beberapa tampilan sekaligus. Daftar yang masih bisa digulir (tugas, rak, lirik) menggulir isinya dulu.</li>
+        <li><strong>Tampilan:</strong> Musik · Kontrol · Hari ini · Salat · Tugas · Rak. Yang dimatikan di Pengaturan otomatis dilewati.</li>
+        <li><strong>Baris atas:</strong> cuaca, jam dengan mata Peeko, dan baterai.</li>
+        <li><strong>Saat tertutup</strong>, notch menampilkan hal yang sedang berjalan: lagu, sisa waktu fokus, pengingat minum, hitung mundur salat, atau tombol update.</li>
+        <li><strong>Garis tipis:</strong> saat jendela seperti Chrome menempel ke tepi atas, notch berubah jadi garis supaya tidak menutupi tab. Arahkan kursor ke garis itu untuk membukanya.</li>
+        <li><strong>Layar penuh:</strong> saat game, video, atau presentasi memenuhi layar, Peeko menyingkir.</li>
+      </ul>
+
+      <h2 id="musik">Musik &amp; lirik</h2>
+      <p>Peeko membaca pemutar yang tampil di kontrol media Windows: Spotify, YouTube atau YouTube Music di Chrome/Edge/Brave, Media Player, dan lainnya.</p>
+      <ul>
+        <li>Tombol putar/jeda, sebelumnya, dan berikutnya; geser garis waktu untuk melompat. Tanda panah di samping nama sumber muncul kalau ada lebih dari satu pemutar.</li>
+        <li><strong>Lirik</strong> diambil dari <a href="https://lrclib.net" rel="noopener">LRCLIB</a> dan ikut berjalan. Klik satu baris untuk melompat ke bagian itu.</li>
+        <li><strong>Pin lirik</strong>: klik ikon pin di samping nama sumber. Saat notch tertutup, pil musik melebar dan menampilkan baris yang sedang diputar.</li>
+        <li>Visualizer bergerak mengikuti bunyi yang benar-benar keluar dari speaker atau headphone.</li>
+      </ul>
+
+      <h2 id="kontrol">Kontrol</h2>
+      <p>Tombol Wi-Fi, Bluetooth, dan Jangan ganggu, slider volume dan kecerahan, tangkap layar, serta kunci layar. Saat <strong>Jangan ganggu</strong> menyala, kabar sekilas dan azan diredam; hanya baterai kritis yang tetap muncul.</p>
+
+      <h2 id="hari-ini">Hari ini &amp; fokus</h2>
+      <p>Kalender bulan ini dan timer fokus (Pomodoro). Tekan <strong>Mulai</strong>; setelah sesi fokus selesai, istirahat langsung berjalan, lalu sesi berikutnya menunggu kamu. Istirahat panjang datang setelah empat sesi. Durasinya bisa diubah di Pengaturan → Timer fokus. Timer tetap akurat walau laptop sempat sleep.</p>
+
+      <h2 id="salat">Jadwal salat <span class="tag" style="font-size:12px;vertical-align:middle">mulai 0.4.0</span></h2>
+      <p>Tab <strong>Salat</strong> menampilkan salat berikutnya beserta sisa waktunya, jadwal hari ini (Imsak sampai Isya), dan tanggal Hijriah perkiraan.</p>
+      <ul>
+        <li>Jadwal dihitung di laptopmu dengan kriteria Kemenag RI: Subuh saat matahari −20°, Isya −18°, Ashar mazhab Syafi'i, ihtiyat 2 menit. Dibandingkan jadwal resmi, selisihnya 0–1 menit.</li>
+        <li>Lokasinya sama dengan cuaca. Isi kotamu di Pengaturan → <strong>Cuaca</strong> supaya tepat.</li>
+        <li>Pengingat muncul beberapa menit sebelum waktunya (default 10 menit), dan notch tertutup menampilkan hitung mundur.</li>
+        <li><strong>Azan:</strong> pilih rekaman sendiri di Pengaturan → Jadwal salat → <strong>Pilih file…</strong>. Saat azan berbunyi, tombol <strong>Hentikan azan</strong> ada di tab Salat.</li>
+        <li><strong>Koreksi waktu</strong> (−10 sampai +10 menit) untuk menyamakan dengan jadwal masjid di sekitarmu.</li>
+      </ul>
+
+      <h2 id="tugas">Tugas &amp; minum</h2>
+      <ul>
+        <li>Klik <strong>+</strong> untuk menulis tugas, Enter untuk menambah dan lanjut menulis, Esc untuk selesai. Klik tugas untuk mencentangnya. Tugas yang selesai dibersihkan sendiri keesokan harinya.</li>
+        <li>Pengingat minum muncul tiap interval (default 60 menit, hanya pukul 08.00–21.00). Klik <strong>+1 gelas</strong> langsung dari notch.</li>
+      </ul>
+
+      <h2 id="rak">Rak &amp; ubah format</h2>
+      <p>Seret file, teks, atau tautan dari Explorer, browser, atau chat ke notch. Tahan sebentar sampai panel terbuka, lalu lepaskan di:</p>
+      <ul>
+        <li><strong>Simpan di rak</strong> (kiri): untuk menyimpannya sementara. Seret kartunya keluar untuk menempel ke aplikasi lain. Klik dua kali tautan untuk membukanya, atau teks untuk menyalinnya.</li>
+        <li><strong>Ubah format</strong> (kanan): pilih format tujuan, misalnya HEIC → JPG, gambar → PDF, PDF → Word. Pertama kali, Peeko meminta izin mengunduh <a href="https://github.com/KnifeLemon/Filee" rel="noopener">Filee</a> (±160 MB, sekali saja, dicek dengan SHA-256). Hasilnya tersimpan di sebelah file asli dan muncul di rak.</li>
+      </ul>
+      <div class="note">Video dan audio butuh mesin FFmpeg: Pengaturan → Ubah format → <strong>Buka Filee</strong>, lalu pasang FFmpeg di menu <em>Engines</em>.</div>
+
+      <h2 id="kabar">Kabar sekilas</h2>
+      <p>Notch turun sebentar saat volume, kecerahan, Caps Lock, bahasa keyboard, baterai, charger, Wi-Fi, atau headphone berubah. Bisa dimatikan di Pengaturan → Modul → <strong>Peek sistem</strong>; peringatan baterai kritis selalu muncul.</p>
+
+      <h2 id="pengaturan">Pengaturan</h2>
+      <p>Klik ikon Peeko di tray (pojok kanan bawah, dekat jam; kalau tidak terlihat, klik panah <strong>˄</strong>). Semua perubahan langsung diterapkan.</p>
+      <table>
+        <tr><th>Bagian</th><th>Isi</th></tr>
+        <tr><td>Umum</td><td>Mulai bersama Windows, garis tipis (otomatis/selalu pil/selalu garis), geser horizontal untuk menghindari webcam, sembunyi saat layar penuh</td></tr>
+        <tr><td>Modul</td><td>Nyalakan/matikan Musik, Lirik, Timer fokus, Minum air, Jadwal salat, To-do, Rak, Kontrol, Hari ini, Peek sistem</td></tr>
+        <tr><td>Baterai</td><td>Ambang peringatan baterai lemah (10–50%)</td></tr>
+        <tr><td>Minum air</td><td>Interval pengingat dan target harian</td></tr>
+        <tr><td>Timer fokus</td><td>Durasi fokus, istirahat pendek, dan istirahat panjang</td></tr>
+        <tr><td>Jadwal salat</td><td>Pengingat, hitung mundur, koreksi waktu, azan</td></tr>
+        <tr><td>Lirik</td><td>Ambil lirik dari internet</td></tr>
+        <tr><td>Cuaca</td><td>Tampilkan cuaca, kota (juga dipakai jadwal salat)</td></tr>
+        <tr><td>Ubah format</td><td>Zona Ubah format, pasang/hapus Filee, mesin tambahan</td></tr>
+      </table>
+      <p>Klik kanan ikon tray untuk <strong>Sembunyikan selama</strong> 30 menit, 1 jam, sampai besok pagi, atau sampai dinyalakan lagi.</p>
+
+      <h2 id="update">Update &amp; hapus</h2>
+      <p>Peeko mengecek versi baru saat dinyalakan, tiap 10 menit, dan saat laptop bangun dari sleep. Kalau ada, mata di notch berganti menjadi <strong>Update</strong>. Klik <strong>Pasang</strong>, dan Peeko mengunduh, memasang, lalu menyala lagi sendiri. Pengaturan dan datamu tetap ada.</p>
+      <div class="note">Kalau Peeko disimpan di folder yang butuh izin admin (mis. <code>C:\Program Files</code>), tombol Pasang hanya membuka halaman unduhan. Simpan di Documents supaya update otomatis bekerja.</div>
+      <p><strong>Menghapus:</strong> klik kanan ikon tray → <strong>Keluar</strong>, matikan “Mulai bersama Windows” bila sempat dinyalakan, lalu hapus foldernya. Datanya ada di <code>%AppData%\Peeko</code>, dan Filee di <code>%LocalAppData%\Peeko</code> (±280 MB).</p>
+
+      <h2 id="masalah">Masalah umum</h2>
+      <table>
+        <tr><th>Masalah</th><th>Solusi</th></tr>
+        <tr><td>Notch tidak terlihat</td><td>Ada aplikasi layar penuh, atau notch sedang jadi garis tipis. Arahkan kursor ke tengah atas layar.</td></tr>
+        <tr><td>Notch menutupi webcam/tombol</td><td>Pengaturan → Geser horizontal.</td></tr>
+        <tr><td>Lagu tidak muncul</td><td>Pemutarnya harus mendukung kontrol media Windows. Coba putar ulang lagunya.</td></tr>
+        <tr><td>Lirik tidak muncul</td><td>Butuh internet, dan tidak semua lagu ada di LRCLIB.</td></tr>
+        <tr><td>Jadwal salat meleset</td><td>Isi kotamu di Pengaturan → Cuaca; lokasi dari IP bisa meleset jauh. Sisa selisih bisa disamakan lewat Koreksi waktu.</td></tr>
+        <tr><td>Antivirus memblokir</td><td>Peeko membaca tombol Caps Lock dan pergantian bahasa keyboard. Kode sumbernya terbuka; tambahkan ke pengecualian bila kamu percaya.</td></tr>
+        <tr><td>Masih bermasalah</td><td><a href="https://github.com/mezlpn/peeko/issues/new/choose" rel="noopener">Laporkan di GitHub</a>.</td></tr>
+      </table>
+    </article>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="../">Peeko</a>
+      <p>Notch gratis dan open source untuk Windows (GPLv3).</p>
+    </div>
+    <nav>
+      <a href="../">Beranda</a>
+      <a href="../rilis/">Catatan rilis</a>
+      <a href="https://github.com/mezlpn/peeko" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="../assets/main.js" defer></script>
+</body>
+</html>

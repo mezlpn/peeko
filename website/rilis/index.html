@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catatan rilis Peeko</title>
+  <meta name="description" content="Apa yang berubah di setiap versi Peeko.">
+  <meta name="theme-color" content="#050506">
+  <link rel="icon" href="../assets/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="../" aria-label="Peeko, beranda">
+      <span class="brand-mark"><span class="eyes" style="gap:5px"><i style="width:4px;height:7px"></i><i style="width:4px;height:7px"></i></span></span>
+      Peeko
+    </a>
+    <nav class="nav-links" id="nav-links">
+      <a href="../#fitur">Fitur</a>
+      <a href="../panduan/">Panduan</a>
+      <a href="./" aria-current="page">Catatan rilis</a>
+      <a href="../#faq">FAQ</a>
+      <a href="https://github.com/mezlpn/peeko" rel="noopener">GitHub</a>
+    </nav>
+    <a class="btn btn-primary btn-sm nav-dl" href="https://github.com/mezlpn/peeko/releases/latest" data-download>Unduh</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Buka menu" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap" style="max-width:820px">
+  <div class="page-head">
+    <span class="eyebrow">Catatan rilis</span>
+    <h1>Apa yang baru.</h1>
+    <p class="section-lead">Diambil langsung dari GitHub Releases, jadi selalu sama dengan versi yang bisa diunduh.</p>
+  </div>
+
+  <div id="releases" style="padding-bottom:96px">
+    <p class="dim">Memuat…</p>
+    <noscript><p>Lihat semua rilis di <a href="https://github.com/mezlpn/peeko/releases">GitHub</a>.</p></noscript>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="../">Peeko</a>
+      <p>Notch gratis dan open source untuk Windows (GPLv3).</p>
+    </div>
+    <nav>
+      <a href="../">Beranda</a>
+      <a href="../panduan/">Panduan</a>
+      <a href="https://github.com/mezlpn/peeko/releases" rel="noopener">Semua rilis di GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="../assets/main.js" defer></script>
+<script>
+(async () => {
+  const host = document.getElementById("releases");
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // Markdown ringkas: judul, daftar, tebal, miring, kode, tautan. Cukup untuk catatan rilis.
+  const inline = s => esc(s)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[\s(])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" rel="noopener">$1</a>')
+    .replace(/(^|\s)@([A-Za-z0-9-]+)/g, '$1<a href="https://github.com/$2" rel="noopener">@$2</a>')
+    .replace(/(^|\s)#(\d+)\b/g, '$1<a href="https://github.com/mezlpn/peeko/issues/$2" rel="noopener">#$2</a>');
+  function md(text) {
+    let html = "", list = false;
+    for (const raw of text.replace(/\r/g, "").split("\n")) {
+      const line = raw.trimEnd();
+      const item = line.match(/^\s*[-*]\s+(.*)/);
+      if (item) { if (!list) { html += "<ul>"; list = true; } html += `<li>${inline(item[1])}</li>`; continue; }
+      if (list && line.trim() === "") continue;
+      if (list) { html += "</ul>"; list = false; }
+      const h = line.match(/^(#{1,4})\s+(.*)/);
+      if (h) html += `<h3>${inline(h[2])}</h3>`;
+      else if (line.trim()) html += `<p>${inline(line)}</p>`;
+    }
+    return html + (list ? "</ul>" : "");
+  }
+  try {
+    const r = await fetch("https://api.github.com/repos/mezlpn/peeko/releases?per_page=30", { headers: { Accept: "application/vnd.github+json" } });
+    if (!r.ok) throw new Error(r.status);
+    const list = (await r.json()).filter(x => !x.draft && !x.prerelease);
+    const date = d => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+    host.innerHTML = list.map((x, i) => `
+      <article class="release reveal in" id="${esc(x.tag_name)}">
+        <header>
+          <h2>${esc(x.name || x.tag_name)}</h2>
+          ${i === 0 ? '<span class="latest">Terbaru</span>' : ""}
+          <time datetime="${x.published_at}">${date(x.published_at)}</time>
+        </header>
+        <div class="body prose">${md(x.body || "")}</div>
+      </article>`).join("");
+  } catch {
+    host.innerHTML = '<p class="muted">Catatan rilis belum bisa dimuat. Lihat langsung di <a href="https://github.com/mezlpn/peeko/releases">GitHub</a>.</p>';
+  }
+})();
+</script>
+</body>
+</html>

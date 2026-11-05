@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Peeko — notch kecil yang suka mengintip, untuk Windows</title>
+  <meta name="description" content="Peeko adalah notch gratis dan open source untuk Windows 10/11: musik dan lirik, jadwal salat, timer fokus, tugas, rak file, dan ubah format file, semuanya di tengah atas layar.">
+  <meta name="theme-color" content="#050506">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Peeko — notch kecil yang suka mengintip">
+  <meta property="og:description" content="Musik, lirik, jadwal salat, fokus, tugas, dan rak file di tengah atas layar Windows. Gratis dan open source.">
+  <meta property="og:image" content="assets/og.png">
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="Peeko, beranda">
+      <span class="brand-mark"><span class="eyes" style="gap:5px"><i style="width:4px;height:7px"></i><i style="width:4px;height:7px"></i></span></span>
+      Peeko
+    </a>
+    <nav class="nav-links" id="nav-links">
+      <a href="#fitur">Fitur</a>
+      <a href="panduan/">Panduan</a>
+      <a href="rilis/">Catatan rilis</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/mezlpn/peeko" rel="noopener">GitHub</a>
+    </nav>
+    <a class="btn btn-primary btn-sm nav-dl" href="#unduh">Unduh</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Buka menu" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="pill-tag"><span class="dot"></span>Gratis &amp; open source · <span data-version>versi terbaru</span></span>
+      <h1>Notch kecil<br><span class="soft">yang suka mengintip.</span></h1>
+      <p class="lead">Peeko tinggal di tengah atas layar Windows. Arahkan kursor, dan ia membuka musik beserta liriknya,
+        jadwal salat, timer fokus, tugas, sampai rak file. Jauhkan kursor, dan ia kembali jadi dua mata kecil.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#unduh" data-download>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3h4v9h5l-7 7-7-7h5zM5 20.5h14V22H5z"/></svg>
+          Unduh untuk Windows
+        </a>
+        <a class="btn btn-ghost" href="#fitur">Lihat fitur</a>
+      </div>
+      <p class="meta">Windows 10 &amp; 11 (64-bit) · <span data-size>±70 MB</span> · update otomatis · tanpa akun, tanpa iklan</p>
+
+      <!-- Demo: arahkan kursor ke notch, lalu gulir untuk berganti tampilan, persis seperti di aplikasi. -->
+      <div class="stage" id="stage" aria-label="Contoh Peeko yang bisa dicoba">
+        <div class="desk-icons" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="notch" id="notch" tabindex="0" role="group" aria-label="Notch Peeko. Arahkan kursor atau tekan Enter untuk membuka.">
+          <div class="shoulder"><svg viewBox="0 0 10 10"><path d="M0,0 L10,0 L10,10 A10,10 0 0 0 0,0 Z" fill="#000"/></svg></div>
+          <div class="body" id="notch-body">
+            <div class="collapsed"><span class="eyes" id="eyes"><i></i><i></i></span></div>
+            <div class="expanded">
+              <div class="status">
+                <span>☁ 30°</span>
+                <span class="clock"><span class="eyes"><i></i><i></i></span><span id="demo-clock">11:26</span></span>
+                <span>▮ 61%</span>
+              </div>
+              <div class="dots" id="dots"></div>
+              <div class="views" id="views">
+                <div class="view v-music" data-name="Musik" data-w="440" data-h="210">
+                  <div class="cover"></div>
+                  <div><b>Senja di Kota</b><small>Lagu contoh · Album contoh</small></div>
+                  <div class="ctrls">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM9.5 12 18 18V6z"/></svg>
+                    <span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 5h4v14h-4zM13.5 5h4v14h-4z"/></svg></span>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
+                  </div>
+                  <div class="bar"></div>
+                  <div class="lyrics">lampu jalan mulai menyala<br><span class="now">kita pulang lewat jalan yang sama</span><br>sambil menghitung bintang</div>
+                </div>
+                <div class="view v-control" data-name="Kontrol" data-w="440" data-h="200">
+                  <div class="tile on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3.5 9.2Q12 1.8 20.5 9.2M6.6 12.4Q12 7.6 17.4 12.4M9.6 15.6Q12 13.6 14.4 15.6M12 19h.01"/></svg>Wi-Fi</div>
+                  <div class="tile on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 7.5l10 9-5 4v-17l5 4-10 9"/></svg>Bluetooth</div>
+                  <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14.5A7.5 7.5 0 1 1 9.5 5a6 6 0 0 0 9.5 9.5z"/></svg>Jangan ganggu</div>
+                  <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 11h11v8.5h-11zM9 11V8.5a3 3 0 0 1 6 0V11"/></svg>Kunci</div>
+                  <div class="slider" style="--v:64%"><span>🔊 Volume 64</span></div>
+                  <div class="slider" style="--v:80%"><span>☀ Kecerahan 80</span></div>
+                </div>
+                <div class="view v-today" data-name="Hari ini" data-w="440" data-h="200">
+                  <div class="cal" id="cal"></div>
+                  <div>
+                    <div class="ring"><small>FOKUS</small><b>18:20</b></div>
+                    <p class="dim" style="font-size:12px;margin:8px 0 0;text-align:center">Sesi 2 dari 4</p>
+                  </div>
+                </div>
+                <div class="view v-prayer" data-name="Salat" data-w="440" data-h="200">
+                  <div>
+                    <div class="over">SALAT BERIKUTNYA</div>
+                    <div class="big">Ashar</div>
+                    <div class="left">3 jam 15 menit lagi</div>
+                    <div class="dim" style="font-size:12px;margin-top:8px">Yogyakarta</div>
+                  </div>
+                  <ul>
+                    <li>Subuh <span>03.51</span></li><li>Terbit <span>05.07</span></li><li>Dzuhur <span>11.26</span></li>
+                    <li class="next">Ashar <span>14.41</span></li><li class="up">Maghrib <span>17.38</span></li><li class="up">Isya <span>18.50</span></li>
+                  </ul>
+                </div>
+                <div class="view v-tasks" data-name="Tugas" data-w="440" data-h="200">
+                  <div>
+                    <div class="task done"><i></i><span>Kumpulkan laporan</span></div>
+                    <div class="task"><i></i><span>Telepon ibu</span><em>19.00</em></div>
+                    <div class="task"><i></i><span>Angkat jemuran</span><em>30 mnt</em></div>
+                    <div class="task"><i></i><span>Belajar flashcard</span></div>
+                  </div>
+                  <div class="water"><span class="dim" style="font-size:11px;font-weight:700;letter-spacing:.1em">MINUM</span><b>5 / 8</b>
+                    <div class="glasses"><span class="full"></span><span class="full"></span><span class="full"></span><span class="full"></span><span class="full"></span><span></span><span></span><span></span></div>
+                  </div>
+                </div>
+                <div class="view v-shelf" data-name="Rak" data-w="480" data-h="190">
+                  <div class="zone"><div><b>Simpan di rak</b>File, teks, atau tautan</div></div>
+                  <div class="zone convert"><div><b>Ubah format</b>foto.heic
+                    <div class="chips"><span>JPG</span><span>PNG</span><span>PDF</span><span>WEBP</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="shoulder"><svg viewBox="0 0 10 10"><path d="M10,0 L0,0 L0,10 A10,10 0 0 1 10,0 Z" fill="#000"/></svg></div>
+        </div>
+        <div class="taskbar" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        <p class="stage-hint"><span class="mouse">Arahkan kursor ke notch, lalu gulir ↕</span><span class="touch">Ketuk notch, lalu geser ↕</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Fitur utama ── -->
+  <section id="fitur">
+    <div class="wrap">
+      <div class="center reveal">
+        <span class="eyebrow">Fitur</span>
+        <h2>Hal yang sering kamu buka,<br>tepat di atas layar.</h2>
+        <p class="section-lead">Nyalakan modul yang kamu perlu, matikan sisanya. Ukuran notch menyesuaikan isinya sendiri.</p>
+      </div>
+
+      <div class="features">
+        <article class="feature reveal">
+          <div>
+            <span class="tag">Musik</span>
+            <h3>Lagu dan liriknya, ikut berjalan.</h3>
+            <p>Peeko membaca pemutar apa pun yang tampil di kontrol media Windows: Spotify, YouTube di browser, Media Player, dan lainnya.</p>
+            <ul>
+              <li>Lirik tersinkron dari LRCLIB, klik baris untuk melompat ke bagian itu</li>
+              <li>Pin lirik: baris yang sedang diputar tampil di notch walau tertutup</li>
+              <li>Visualizer lima pita yang bergoyang mengikuti bass, vokal, dan treble</li>
+            </ul>
+          </div>
+          <div class="feature-art">
+            <div class="mini-notch" style="text-align:center">
+              <div class="lyrics" style="font-size:14px">dan malam pun turun pelan<br><span class="now" style="font-size:18px">kita pulang lewat jalan yang sama</span><br>sambil menghitung bintang</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="feature reveal">
+          <div>
+            <span class="tag only">Hanya di Peeko</span>
+            <h3>Seret file, ubah formatnya.</h3>
+            <p>Lempar foto, PDF, atau dokumen ke notch, lalu lepaskan di zona <b>Ubah format</b>. HEIC jadi JPG, gambar jadi PDF, PDF jadi Word. Semuanya di laptopmu, tidak diunggah ke mana pun.</p>
+            <ul>
+              <li>Ditenagai <a href="https://github.com/KnifeLemon/Filee" rel="noopener">Filee</a> (MIT), dipasang sekali dengan izinmu</li>
+              <li>Hasil tersimpan di sebelah file asli dan langsung muncul di Rak</li>
+              <li>Rak juga menampung teks dan tautan untuk ditempel nanti</li>
+            </ul>
+          </div>
+          <div class="feature-art">
+            <div class="mini-notch">
+              <div class="v-shelf" style="display:grid;height:130px">
+                <div class="zone"><div><b>Simpan di rak</b>3 file</div></div>
+                <div class="zone convert"><div><b>Ubah format</b><div class="chips"><span>JPG</span><span>PDF</span><span>DOCX</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="feature reveal">
+          <div>
+            <span class="tag">Jadwal salat · mulai 0.4.0</span>
+            <h3>Tahu kapan waktunya, tanpa membuka HP.</h3>
+            <p>Jadwal lima waktu dihitung langsung di laptopmu dengan kriteria Kemenag RI, tanpa internet. Hasilnya sama dengan jadwal resmi, paling beda satu menit.</p>
+            <ul>
+              <li>Pengingat beberapa menit sebelum masuk waktu</li>
+              <li>Hitung mundur di notch yang tertutup</li>
+              <li>Azan dari rekaman pilihanmu, diam saat Jangan ganggu</li>
+            </ul>
+          </div>
+          <div class="feature-art">
+            <div class="mini-notch" style="width:240px;border-radius:0 0 16px 16px;padding:8px 16px;display:flex;justify-content:center;gap:10px;align-items:center;font-weight:600;font-size:14px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f2b866" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><path d="M5.5 19.5v-7a6.5 6.5 0 0 1 13 0v7zM12 6V3.5M3.5 19.5h17M10 19.5V16a2 2 0 0 1 4 0v3.5"/></svg>
+              Maghrib <span style="color:#f2b866">8 mnt</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="feature reveal">
+          <div>
+            <span class="tag only">Hanya di Peeko</span>
+            <h3>Gulir untuk pindah, dengan gerak pegas.</h3>
+            <p>Tidak ada deretan tab yang perlu dibidik. Gulir di mana saja di panel untuk berganti tampilan; gulir cepat untuk melompat beberapa sekaligus. Notch melebar dan menyusut mengikuti isinya, bahkan kalau arahnya berubah di tengah jalan.</p>
+            <ul>
+              <li>Kedip, mata Peeko, berkedip dan tersenyum saat ada kabar baik</li>
+              <li>Jadi garis tipis saat jendela menempel ke atas, dan menyingkir saat layar penuh</li>
+              <li>Win + Alt + C untuk membuka dari keyboard</li>
+            </ul>
+          </div>
+          <div class="feature-art">
+            <div class="mini-notch" style="width:200px;height:32px;border-radius:0 0 16px 16px;padding:0;display:grid;place-items:center">
+              <span class="eyes" data-blink><i></i><i></i></span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="grid">
+        <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 13a7.5 7.5 0 1 0 15 0 7.5 7.5 0 1 0-15 0M12 13V9.5M10 2.5h4"/></svg></div><h4>Timer fokus</h4><p>Pomodoro dengan istirahat otomatis. Sisa waktunya tetap terlihat di notch, dan tetap akurat walau laptop sempat sleep.</p></div>
+        <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3.5c3.2 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 2.8-6.5 6-10.5z"/></svg></div><h4>Pengingat minum</h4><p>Ingatkan tiap interval, catat gelas dengan satu klik langsung dari notch.</p></div>
+        <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7l1.8 1.8L9 5.5M4 15l1.8 1.8L9 13.5M12.5 7.5H20M12.5 15.5H20"/></svg></div><h4>Tugas</h4><p>Daftar singkat untuk hari ini. Yang sudah dicentang bersih sendiri besok.</p></div>
+        <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M15 5v4M4 17h3M11 17h9M9 15v4"/></svg></div><h4>Kontrol cepat</h4><p>Wi-Fi, Bluetooth, Jangan ganggu, volume, kecerahan, tangkap layar, dan kunci layar.</p></div>
+        <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 6.5h14V19H5zM5 10.5h14M9 4v4M15 4v4"/></svg></div><h4>Hari ini</h4><p>Kalender bulan ini, cuaca kotamu dari Open-Meteo, dan baterai.</p></div>
+        <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4zM15.5 9a4 4 0 0 1 0 6"/></svg></div><h4>Kabar sekilas</h4><p>Volume, kecerahan, Caps Lock, ganti bahasa keyboard, baterai, Wi-Fi, dan headphone muncul sebentar di notch.</p></div>
+      </div>
+
+      <p class="center dim reveal" style="margin-top:56px">Sedang dikerjakan untuk versi berikutnya:</p>
+      <div class="chips-row reveal">
+        <span class="soon">Tugas dengan tenggat “besok jam 7”</span>
+        <span class="soon">Timer bebas &amp; stopwatch</span>
+        <span class="soon">Catatan &amp; flashcard</span>
+        <span class="soon">Istirahat, napas &amp; 20-20-20</span>
+        <span class="soon">Isi notch tertutup bisa dipilih</span>
+        <span class="soon">Daftar Wi-Fi &amp; Bluetooth</span>
+        <span class="soon">Riwayat clipboard</span>
+        <span class="soon">Kirim file dari HP</span>
+        <span class="soon">Kalender Google/Outlook</span>
+        <span class="soon">AI chat &amp; terjemah</span>
+        <span class="soon">Radio internet</span>
+        <span class="soon">Tema warna &amp; kaca</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Ringan dan privat ── -->
+  <section>
+    <div class="wrap center">
+      <span class="eyebrow reveal">Ringan &amp; privat</span>
+      <h2 class="reveal">Tidak mengganggu kerjamu.</h2>
+      <p class="section-lead reveal">Saat diam, Peeko praktis tidak memakai CPU: tidak ada polling dan tidak ada animasi yang terus berjalan.
+        Datamu tersimpan di <code style="font-size:.9em">%AppData%\Peeko</code>, dan internet hanya dipakai untuk fitur yang memang membutuhkannya.</p>
+      <div class="stats">
+        <div class="stat reveal"><b>≈ 0%</b><span>CPU saat diam</span></div>
+        <div class="stat reveal"><b>± 55 MB</b><span>RAM</span></div>
+        <div class="stat reveal"><b>0</b><span>akun, iklan, pelacak</span></div>
+        <div class="stat reveal"><b>GPLv3</b><span>kode sumber terbuka</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Unduh ── -->
+  <section id="unduh">
+    <div class="wrap">
+      <div class="center reveal">
+        <span class="eyebrow">Pasang</span>
+        <h2>Siap dalam satu menit.</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><h4>Unduh</h4><p>Klik tombol di bawah untuk mengunduh <code data-asset>Peeko-…-win-x64.zip</code> dari GitHub Releases.</p></div>
+        <div class="step reveal"><h4>Ekstrak</h4><p>Klik kanan zip → <b>Extract All</b>. Simpan foldernya di tempat tetap, misalnya Documents, supaya update otomatis bisa bekerja.</p></div>
+        <div class="step reveal"><h4>Jalankan</h4><p>Klik dua kali <code>Peeko.exe</code>. Kalau muncul “Windows protected your PC”, pilih <b>More info → Run anyway</b>. Dua mata kecil muncul di tengah atas layar.</p></div>
+      </div>
+      <div class="center" style="margin-top:36px">
+        <a class="btn btn-primary" href="https://github.com/mezlpn/peeko/releases/latest" data-download>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3h4v9h5l-7 7-7-7h5zM5 20.5h14V22H5z"/></svg>
+          Unduh <span data-version>Peeko</span>
+        </a>
+        <p class="dim" style="font-size:14px;margin-top:14px">Butuh Windows 10 versi 2004 atau lebih baru. Tidak perlu memasang apa-apa lagi.
+          <a href="panduan/">Baca panduan lengkap</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="center reveal">
+        <span class="eyebrow">FAQ</span>
+        <h2>Pertanyaan yang sering muncul.</h2>
+      </div>
+      <div class="faq">
+        <details class="reveal"><summary>Apakah Peeko gratis?</summary><p>Ya, gratis selamanya dan kode sumbernya terbuka di GitHub dengan lisensi GPLv3. Siapa pun boleh membaca, memperbaiki, dan mengusulkan fitur.</p></details>
+        <details class="reveal"><summary>Kenapa Windows menampilkan peringatan SmartScreen?</summary><p>Peeko belum memakai sertifikat code signing berbayar, jadi Windows belum “mengenalnya”. Pilih <b>More info → Run anyway</b>; peringatannya hanya sekali. Kalau ragu, kode sumbernya bisa kamu periksa sendiri.</p></details>
+        <details class="reveal"><summary>Bagaimana cara update?</summary><p>Peeko mengecek versi baru sendiri. Kalau ada, mata di notch berganti menjadi tombol <b>Update</b>; klik, dan Peeko mengunduh, memasang, lalu menyala lagi. Pengaturan dan datamu tetap ada.</p></details>
+        <details class="reveal"><summary>Data apa yang dikirim ke internet?</summary>
+          <ul>
+            <li>Judul, artis, dan durasi lagu ke <b>lrclib.net</b> untuk mengambil lirik (bisa dimatikan).</li>
+            <li>Koordinat kotamu ke <b>Open-Meteo</b> untuk cuaca (bisa dimatikan).</li>
+            <li>Sekali saja, perkiraan lokasi dari alamat IP lewat ipapi.co bila kota belum diisi.</li>
+            <li>Cek versi baru di GitHub.</li>
+          </ul>
+          <p>Jadwal salat dihitung offline. File yang diubah formatnya tidak pernah diunggah.</p>
+        </details>
+        <details class="reveal"><summary>Notch-nya menutupi webcam atau tombol jendela.</summary><p>Buka Pengaturan → <b>Geser horizontal</b> untuk memindahkannya ke kiri atau kanan. Saat jendela seperti Chrome menempel ke atas, Peeko otomatis menjadi garis tipis.</p></details>
+        <details class="reveal"><summary>Antivirus memblokir Peeko.</summary><p>Peeko membaca tombol Caps Lock dan pergantian bahasa keyboard untuk menampilkan kabar sekilas, sehingga beberapa antivirus curiga. Kode untuk itu terbuka di repo; tambahkan Peeko ke pengecualian kalau kamu percaya.</p></details>
+        <details class="reveal"><summary>Bagaimana cara menghapusnya?</summary><p>Klik kanan ikon Peeko di tray → <b>Keluar</b>, matikan “Mulai bersama Windows” bila sempat dinyalakan, lalu hapus foldernya. Data tersimpan di <code>%AppData%\Peeko</code> kalau ingin ikut dihapus.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="wrap">
+      <h2 class="reveal">Atas layarmu,<br><span class="dim">sekarang ada yang mengintip.</span></h2>
+      <div class="hero" style="padding:0"><div class="actions">
+        <a class="btn btn-primary" href="https://github.com/mezlpn/peeko/releases/latest" data-download>Unduh gratis</a>
+        <a class="btn btn-ghost" href="https://github.com/mezlpn/peeko" rel="noopener">Lihat di GitHub</a>
+      </div></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="./">Peeko</a>
+      <p>Notch gratis dan open source untuk Windows (GPLv3). Terima kasih kepada Filee (KnifeLemon), Bloom (Sehajveer Singh), LRCLIB, dan Open-Meteo.</p>
+    </div>
+    <nav>
+      <a href="panduan/">Panduan</a>
+      <a href="rilis/">Catatan rilis</a>
+      <a href="https://github.com/mezlpn/peeko/issues/new/choose" rel="noopener">Laporkan masalah</a>
+      <a href="https://github.com/mezlpn/peeko" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/main.js" defer></script>
+</body>
+</html>
