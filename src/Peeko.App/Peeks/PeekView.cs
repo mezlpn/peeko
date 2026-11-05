@@ -164,6 +164,11 @@ public sealed class PeekView : Grid
                 AddLabel($"Waktunya {r.Text}");
                 AddValue(r.Detail ?? "", "Accent");
                 break;
+            case PeekKind.TaskDue:
+                AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Todo"], "Accent");
+                AddLabel(r.Text ?? "");
+                AddValue(r.Detail ?? "", "Accent");
+                break;
             case PeekKind.ShelfDrop:
                 AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Shelf"], "TextPrimary");
                 AddLabel(r.Flag ? "Tersimpan di rak" : "Simpan di rak");

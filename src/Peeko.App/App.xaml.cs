@@ -129,6 +129,8 @@ public partial class App : Application
         builder.Services.AddSingleton<SettingsService>();
         builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddSingleton<NotchWindow>();
+        builder.Services.AddSingleton<CollapsedSlotsController>();
+        builder.Services.AddSingleton<TaskReminderController>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
 

@@ -35,6 +35,8 @@ public sealed class NotchController : IDisposable
     private readonly UpdateController _updates;
     private readonly ConvertController _convert;
     private readonly Prayer.PrayerController _prayer;
+    private readonly CollapsedSlotsController _slots;
+    private readonly TaskReminderController _tasks;
     private bool _rawFullscreen;
     private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
@@ -49,7 +51,8 @@ public sealed class NotchController : IDisposable
     public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music,
         LyricsController lyrics, SystemPeekController peeks, FocusController focus, WaterController water,
         ListsController lists, SettingsService settings, UpdateController updates, ConvertController convert,
-        Today.WeatherService weather, Prayer.PrayerController prayer, ILogger<NotchController> log)
+        Today.WeatherService weather, Prayer.PrayerController prayer, CollapsedSlotsController slots,
+        TaskReminderController tasks, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -63,6 +66,8 @@ public sealed class NotchController : IDisposable
         _updates = updates;
         _convert = convert;
         _prayer = prayer;
+        _slots = slots;
+        _tasks = tasks;
         _log = log;
         _window.AttachWeather(weather);
     }
@@ -142,6 +147,7 @@ public sealed class NotchController : IDisposable
             _stateMachine.SetHoldOpen(active);
         };
 
+        _window.TodoModule.MenuOpenChanged += _stateMachine.SetHoldOpen;
         _window.ShelfModule.Attach(_lists.Shelf);
         _window.ShelfModule.BusyChanged += _stateMachine.SetHoldOpen;
 
@@ -156,6 +162,20 @@ public sealed class NotchController : IDisposable
             ShowPeek(request);
         };
         _window.VisibleModuleChanged += _ => UpdateFocusDisplay();
+
+        // ── Tugas bertenggat ──
+        _tasks.PeekRequested += ShowPeek;
+        _tasks.Updated += () =>
+        {
+            _window.TaskPill.Update(_tasks.Active);
+            UpdateActivity();
+        };
+        _window.TaskPill.CompleteClicked += _tasks.Complete;
+        _window.TaskPill.SnoozeClicked += _tasks.Snooze;
+        _slots.NextTask = () => _lists.Todo.Next(TaskReminderController.DueWindow) is { Due: { } due } t
+            ? $"{Shorten(t.Text)} {due:HH.mm}"
+            : null;
+        _lists.Todo.Changed += _slots.Refresh;
 
         // ── Jadwal salat ──
         _window.PrayerModule.Attach(_prayer);
@@ -222,6 +242,7 @@ public sealed class NotchController : IDisposable
         _foreground.ForegroundChanged += _window.EnsureTopmost;
         _foreground.ForegroundChanged += _peeks.OnForegroundChanged;
         _foreground.Start();
+        _slots.SetVisible(_stateMachine.State == NotchState.Collapsed);
 
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
         _log.LogInformation("Notch aktif");
@@ -230,6 +251,9 @@ public sealed class NotchController : IDisposable
     public void SetSuspended(bool suspended) => _stateMachine.SetSuspended(suspended);
 
     public void ShowTestPeek() => _peeks.RaiseSample();
+
+    /// <summary>Teks tugas dipendekkan untuk info kiri/kanan notch.</summary>
+    private static string Shorten(string text) => text.Length <= 18 ? text : text[..17].TrimEnd() + "…";
 
     /// <summary>Alat pengembang (--tab=n): buka panel di tampilan itu.</summary>
     public void OpenTab(int index)
@@ -286,14 +310,17 @@ public sealed class NotchController : IDisposable
         // jika terakhir dipilih, supaya pengguna yang membaca lirik tidak dilempar balik ke Musik.
         // Dibuka karena file diseret: tetap di tab Rak walau musik sedang diputar.
         // Sedang mengubah format: tetap di tab Rak.
-        // Hitung mundur salat sedang tampil: buka tab Salat.
+        // Hitung mundur salat/tugas sedang tampil: buka tab terkait.
         if (to == NotchState.Expanded && _window.CollapsedActivity == CollapsedActivity.Prayer && !_expandingForShelf)
             _window.SelectModule(NotchWindow.PrayerTab);
+        else if (to == NotchState.Expanded && _window.CollapsedActivity == CollapsedActivity.Task && !_expandingForShelf)
+            _window.SelectModule(NotchWindow.TodoTab);
         else if (to == NotchState.Expanded && _musicLive && !_expandingForShelf && !_window.ShelfModule.ConvertPanel.IsActive
             && _window.SelectedModule is not (NotchWindow.MusicTab or NotchWindow.ControlTab or NotchWindow.TodayTab))
             _window.SelectModule(NotchWindow.MusicTab);
 
         _window.TransitionTo(from, to);
+        _slots.SetVisible(to == NotchState.Collapsed);
         _music.SetNotchState(to);
         _window.WaterPill.SetPulsing(to == NotchState.Collapsed && _window.CollapsedActivity == CollapsedActivity.Water);
         _window.UpdatePill.SetVisible(to == NotchState.Collapsed && _window.CollapsedActivity == CollapsedActivity.Update);
@@ -310,7 +337,8 @@ public sealed class NotchController : IDisposable
             s.FocusEnabled ? _focus.Timer.Status : Core.Productivity.FocusStatus.Ready,
             _water.ReminderActive && s.WaterEnabled,
             _updates.State != UpdateState.None,
-            s.PrayerEnabled && _prayer.CountdownActive));
+            s.PrayerEnabled && _prayer.CountdownActive,
+            _tasks.Active is not null));
         UpdateFocusDisplay();
     }
 
@@ -320,6 +348,7 @@ public sealed class NotchController : IDisposable
         bool pill = _stateMachine.State == NotchState.Collapsed
             && _window.CollapsedActivity is CollapsedActivity.Focus or CollapsedActivity.MusicAndFocus;
         _focus.SetDisplayVisible(pill || _window.VisibleModule == NotchWindow.TodayTab);
+        _tasks.SetDisplayVisible(_stateMachine.State == NotchState.Collapsed && _window.CollapsedActivity == CollapsedActivity.Task);
         _prayer.SetDisplayVisible(_window.VisibleModule == NotchWindow.PrayerTab
             || _stateMachine.State == NotchState.Collapsed && _window.CollapsedActivity == CollapsedActivity.Prayer);
     }
@@ -459,7 +488,7 @@ public sealed class NotchController : IDisposable
         _window.ShowHoverAck(true);
         // Pengingat minum punya chip "+1 gelas" yang bisa diklik: beri waktu sebelum mengembang.
         // Pengingat minum dan pil update punya tombol yang bisa diklik: beri waktu sebelum mengembang.
-        _stateMachine.PointerEntered(_window.CollapsedActivity is CollapsedActivity.Water or CollapsedActivity.Update
+        _stateMachine.PointerEntered(_window.CollapsedActivity is CollapsedActivity.Water or CollapsedActivity.Update or CollapsedActivity.Task
             ? TimeSpan.FromMilliseconds(450)
             : null);
     }
@@ -504,6 +533,7 @@ public sealed class NotchController : IDisposable
         _window.SetModulesEnabled(s.MusicEnabled, s.LyricsEnabled, s.ControlEnabled, s.TodayEnabled, s.FocusEnabled,
             s.PrayerEnabled, s.TodoEnabled, s.WaterEnabled, s.ShelfEnabled);
         _prayer.Apply();
+        _tasks.Evaluate();
         if (_window.ShelfModule.ConvertAvailable != s.ConvertEnabled)
         {
             _window.ShelfModule.ConvertAvailable = s.ConvertEnabled;
@@ -529,6 +559,7 @@ public sealed class NotchController : IDisposable
 
         UpdateActivity();
         UpdateLyricPill();
+        _slots.Refresh();
     }
 
     /// <summary>Win + Alt + C: buka panel, atau tutup jika sedang terbuka.</summary>
@@ -555,6 +586,8 @@ public sealed class NotchController : IDisposable
         _peeks.Dispose();
         _focus.Dispose();
         _prayer.Dispose();
+        _slots.Dispose();
+        _tasks.Dispose();
         _water.Dispose();
         _lists.Dispose();
         _lyrics.Dispose();

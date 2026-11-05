@@ -28,8 +28,14 @@
                      SelectionBrush="{StaticResource Peeko.Brush.Accent}" FontFamily="{StaticResource Peeko.Font}" FontSize="13"
                      MaxLength="200" KeyDown="OnInputKeyDown" LostKeyboardFocus="OnInputLostFocus" TextChanged="OnInputTextChanged" />
             <TextBlock x:Name="Placeholder" Style="{StaticResource Peeko.Text.Body}" Margin="12,0" VerticalAlignment="Center"
-                       Foreground="{StaticResource Peeko.Brush.TextTertiary}" IsHitTestVisible="False"
-                       Text="Tulis tugas, lalu Enter" />
+                       Foreground="{StaticResource Peeko.Brush.TextTertiary}" IsHitTestVisible="False" TextTrimming="CharacterEllipsis"
+                       Text="mis. besok jam 7 kumpul laporan" />
+            <!-- Tenggat yang terbaca dari ketikan, sebelum Enter -->
+            <Border x:Name="DuePreview" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0" Height="20" Padding="8,0"
+                    CornerRadius="10" Background="{StaticResource Peeko.Brush.AccentMuted}" Visibility="Collapsed" IsHitTestVisible="False">
+                <TextBlock x:Name="DuePreviewText" Style="{StaticResource Peeko.Text.Caption}" FontWeight="SemiBold"
+                           Foreground="{StaticResource Peeko.Brush.Accent}" VerticalAlignment="Center" />
+            </Border>
         </Grid>
 
         <ScrollViewer x:Name="ListScroll" Grid.Row="2" VerticalScrollBarVisibility="Hidden">
@@ -39,8 +45,8 @@
         <!-- Kosong -->
         <StackPanel x:Name="EmptyView" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Style="{StaticResource Peeko.Text.BodyStrong}" HorizontalAlignment="Center" Text="Belum ada tugas" />
-            <TextBlock Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,4,0,10"
-                       Text="Catat hal kecil yang perlu diingat hari ini" />
+            <TextBlock Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,4,0,10" TextAlignment="Center"
+                       Text="Tulis tenggatnya langsung: “jam 3 sore telepon ibu”" />
             <Button Style="{StaticResource Peeko.Button.PillSecondary}" HorizontalAlignment="Center"
                     Tag="{StaticResource Peeko.Fill.Plus}" Content="Tambah tugas" Click="OnAddClick" />
         </StackPanel>

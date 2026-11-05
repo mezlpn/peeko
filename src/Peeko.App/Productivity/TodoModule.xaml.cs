@@ -106,8 +106,32 @@ public partial class TodoModule : UserControl
             ToolTip = "Hapus tugas",
         };
         delete.Click += (_, _) => _list?.Remove(item.Id);
-        Grid.SetColumn(delete, 2);
-        content.Children.Add(delete);
+        var right = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+        if (item.Due is { } due && !item.Done)
+        {
+            bool late = _list?.IsOverdue(item) == true;
+            right.Children.Add(new TextBlock
+            {
+                Text = (item.Repeat != TaskRepeat.None ? "↻ " : "") + DueParser.Describe(due, item.DueHasTime, DateTime.Now),
+                Style = (Style)FindResource("Peeko.Text.Caption"),
+                FontWeight = FontWeights.SemiBold,
+                Foreground = late ? B("Danger") : due.Date == DateTime.Today ? B("Rest") : B("TextSecondary"),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 4, 0),
+                ToolTip = item.Repeat switch
+                {
+                    TaskRepeat.Daily => "Berulang tiap hari",
+                    TaskRepeat.Weekdays => "Berulang tiap hari kerja",
+                    TaskRepeat.Weekly => $"Berulang tiap {due:dddd}",
+                    TaskRepeat.Monthly => $"Berulang tiap tanggal {due.Day}",
+                    _ => late ? "Sudah lewat" : null,
+                },
+            });
+        }
+        right.Children.Add(delete);
+        Grid.SetColumn(right, 2);
+        content.Children.Add(right);
+        if (!item.Done) row.ContextMenu = BuildMenu(item);
 
         // Hover: latar baris dan tombol hapus muncul (140 ms).
         row.MouseEnter += (_, _) =>
@@ -151,6 +175,31 @@ public partial class TodoModule : UserControl
 
         return row;
     }
+
+    /// <summary>Klik kanan tugas: tunda, hapus tenggat, hapus.</summary>
+    private ContextMenu BuildMenu(TodoItem item)
+    {
+        var menu = new ContextMenu { Style = (Style)FindResource("Peeko.TrayMenu") };
+        void Add(string header, Action action)
+        {
+            var mi = new MenuItem { Header = header, Style = (Style)FindResource("Peeko.TrayItem") };
+            mi.Click += (_, _) => action();
+            menu.Items.Add(mi);
+        }
+        Add("Tunda 10 menit", () => _list?.Snooze(item.Id, TimeSpan.FromMinutes(10)));
+        Add("Tunda 1 jam", () => _list?.Snooze(item.Id, TimeSpan.FromHours(1)));
+        Add("Besok pagi", () => _list?.SnoozeToMorning(item.Id));
+        if (item.Due is not null) Add("Hapus tenggat", () => _list?.ClearDue(item.Id));
+        menu.Items.Add(new Separator { Style = (Style)FindResource("Peeko.TraySeparator") });
+        Add("Hapus tugas", () => _list?.Remove(item.Id));
+        // Panel jangan menutup selama menu terbuka.
+        menu.Opened += (_, _) => MenuOpenChanged?.Invoke(true);
+        menu.Closed += (_, _) => MenuOpenChanged?.Invoke(false);
+        return menu;
+    }
+
+    /// <summary>Menu klik kanan dibuka/ditutup: pemilik menahan panel tetap terbuka.</summary>
+    public event Action<bool>? MenuOpenChanged;
 
     private static Path Check() => new()
     {
@@ -224,8 +273,22 @@ public partial class TodoModule : UserControl
         EndInput();
     }
 
-    private void OnInputTextChanged(object sender, TextChangedEventArgs e) =>
+    private void OnInputTextChanged(object sender, TextChangedEventArgs e)
+    {
         Placeholder.Visibility = Input.Text.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+        var parsed = Input.Text.Trim().Length == 0 ? null : DueParser.Parse(Input.Text, DateTime.Now);
+        if (parsed?.Due is { } due)
+        {
+            DuePreviewText.Text = (parsed.Repeat != TaskRepeat.None ? "↻ " : "") + DueParser.Describe(due, parsed.HasTime, DateTime.Now);
+            DuePreview.Visibility = Visibility.Visible;
+            Input.Padding = new Thickness(0, 0, DuePreview.ActualWidth > 0 ? DuePreview.ActualWidth + 8 : 90, 0);
+        }
+        else
+        {
+            DuePreview.Visibility = Visibility.Collapsed;
+            Input.Padding = new Thickness(0);
+        }
+    }
 
     private static Brush B(string token) => (Brush)Application.Current.Resources[$"Peeko.Brush.{token}"];
 }

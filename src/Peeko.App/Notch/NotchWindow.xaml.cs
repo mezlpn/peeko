@@ -25,6 +25,7 @@ public partial class NotchWindow : Window
     // Revisi #12: ukuran pil musik sama dengan pil idle; isinya yang dirapatkan di tengah.
     private static readonly Size MusicSize = IdleSize;
     private static readonly Size WaterSize = new(260, 32);
+    private static readonly Size TaskSize = new(300, 32);
     private static readonly Size PeekSize = new(320, 44);
 
     // Respons hover instan: pil sedikit menggembung sebelum panel terbuka.
@@ -86,9 +87,50 @@ public partial class NotchWindow : Window
     private Size CollapsedSize => _activity switch
     {
         CollapsedActivity.Water or CollapsedActivity.Update => WaterSize,
-        CollapsedActivity.Music => new Size(Math.Max(MusicSize.Width, _lyricPillWidth), MusicSize.Height),
+        CollapsedActivity.Task => TaskSize,
+        CollapsedActivity.Music => new Size(Math.Max(Math.Max(MusicSize.Width, _lyricPillWidth), SlotsShown ? _slotWidth : 0), MusicSize.Height),
+        CollapsedActivity.Idle => new Size(Math.Max(IdleSize.Width, SlotsShown ? _slotWidth : 0), IdleSize.Height),
         _ => IdleSize,
     };
+
+    // ── Info kiri/kanan ─────────────────────────────────────────────────────
+
+    // Setengah lebar isi tengah (mata atau cover + bar), jarak ke teks, dan tepi pil.
+    private const double SlotCenterHalf = 30, SlotGap = 12, SlotEdge = 14;
+    private double _slotWidth;
+
+    /// <summary>Info hanya menemani mata atau pil musik biasa; pil lain (lirik, timer, salat…) butuh ruangnya sendiri.</summary>
+    private bool SlotsShown => _slotWidth > 0
+        && (_activity == CollapsedActivity.Idle || _activity == CollapsedActivity.Music && _lyricPillWidth <= 0);
+
+    /// <summary>Teks kiri/kanan (null = kosong). Pil dibuat simetris supaya mata tetap di tengah layar.</summary>
+    public void SetSlots(string? left, string? right)
+    {
+        if (SlotLeft.Text == (left ?? "") && SlotRight.Text == (right ?? "")) return;
+        SlotLeft.Text = left ?? "";
+        SlotRight.Text = right ?? "";
+        double side = Math.Max(Measure(SlotLeft), Measure(SlotRight));
+        _slotWidth = side > 0 ? 2 * (SlotCenterHalf + SlotGap + side + SlotEdge) : 0;
+        UpdateSlots();
+    }
+
+    /// <summary>Lebar teks tanpa layout (elemen yang masih Collapsed selalu terukur 0).</summary>
+    private double Measure(System.Windows.Controls.TextBlock text)
+    {
+        if (text.Text.Length == 0) return 0;
+        var formatted = new FormattedText(text.Text, System.Globalization.CultureInfo.CurrentUICulture, FlowDirection.LeftToRight,
+            new Typeface(text.FontFamily, text.FontStyle, text.FontWeight, text.FontStretch), text.FontSize, Brushes.White,
+            VisualTreeHelper.GetDpi(this).PixelsPerDip);
+        return Math.Ceiling(formatted.WidthIncludingTrailingWhitespace);
+    }
+
+    private void UpdateSlots()
+    {
+        bool show = SlotsShown;
+        SlotLeft.Visibility = show && SlotLeft.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        SlotRight.Visibility = show && SlotRight.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        if (_visualState == NotchState.Collapsed) AnimateShape(CollapsedSize, CollapsedRadius);
+    }
 
     public MusicPill MusicPill => MusicPillView;
 
@@ -103,6 +145,8 @@ public partial class NotchWindow : Window
     public Updates.UpdatePill UpdatePill => UpdatePillView;
 
     public Prayer.PrayerPill PrayerPill => PrayerPillView;
+
+    public TaskPill TaskPill => TaskPillView;
 
     public Prayer.PrayerModule PrayerModule => PrayerModuleView;
 
@@ -394,14 +438,14 @@ public partial class NotchWindow : Window
             CollapsedActivity.Water => [WaterPillView],
             CollapsedActivity.Update => [UpdatePillView],
             CollapsedActivity.Prayer => [PrayerPillView],
+            CollapsedActivity.Task => [TaskPillView],
             _ => new UIElement[] { Kedip },
         });
 
         bool visible = _visualState == NotchState.Collapsed;
-        if (visible)
-            AnimateShape(CollapsedSize, CollapsedRadius);
+        UpdateSlots();
 
-        foreach (var element in new UIElement[] { Kedip, MusicPillView, FocusPillView, WaterPillView, UpdatePillView, PrayerPillView })
+        foreach (var element in new UIElement[] { Kedip, MusicPillView, FocusPillView, WaterPillView, UpdatePillView, PrayerPillView, TaskPillView })
         {
             bool show = wanted.Contains(element);
             if (visible)
@@ -432,8 +476,7 @@ public partial class NotchWindow : Window
         double width = MusicPillView.SetLyric(_activity == CollapsedActivity.Music ? line : null);
         if (Math.Abs(width - _lyricPillWidth) < 0.5) return;
         _lyricPillWidth = width;
-        if (_visualState == NotchState.Collapsed && _activity == CollapsedActivity.Music)
-            AnimateShape(CollapsedSize, CollapsedRadius);
+        if (_activity == CollapsedActivity.Music) UpdateSlots();
     }
 
     private void ToPeek(NotchState from)

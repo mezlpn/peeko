@@ -247,6 +247,67 @@ public class TodoListTests
         list.Move(c.Id, 0);
         Assert.Equal(["c", "a", "b"], list.Items.Select(i => i.Text));
     }
+
+    [Fact]
+    public void Reads_due_from_text_and_sorts_dated_items_first()
+    {
+        // Jam lokal FakeTimeProvider = UTC: Senin 19 Okt 2026 03.00.
+        var list = new TodoList(_time);
+        list.Add("beli gula");
+        var report = list.Add("besok jam 7 kumpul laporan")!;
+        list.Add("telepon ibu jam 9");
+
+        Assert.Equal("kumpul laporan", report.Text);
+        Assert.Equal(new DateTime(2026, 10, 20, 7, 0, 0), report.Due);
+        Assert.True(report.DueHasTime);
+        Assert.Equal(["telepon ibu", "kumpul laporan", "beli gula"], list.Items.Select(i => i.Text));
+    }
+
+    [Fact]
+    public void Ticking_a_repeating_task_moves_it_to_the_next_time()
+    {
+        var list = new TodoList(_time);
+        var vitamin = list.Add("tiap hari jam 8 minum vitamin")!;
+        Assert.Equal(new DateTime(2026, 10, 19, 8, 0, 0), vitamin.Due);
+
+        list.Toggle(vitamin.Id);
+        Assert.False(vitamin.Done);
+        Assert.Equal(new DateTime(2026, 10, 20, 8, 0, 0), vitamin.Due);
+        Assert.Equal(0, list.DoneCount);
+    }
+
+    [Fact]
+    public void Snooze_and_overdue()
+    {
+        var list = new TodoList(_time);
+        var task = list.Add("jam 2 angkat jemuran")!;
+        Assert.Equal(new DateTime(2026, 10, 19, 14, 0, 0), task.Due);
+        Assert.False(list.IsOverdue(task));
+
+        _time.Advance(TimeSpan.FromHours(12)); // 15.00
+        Assert.True(list.IsOverdue(task));
+        list.Snooze(task.Id, TimeSpan.FromMinutes(10));
+        Assert.Equal(new DateTime(2026, 10, 19, 15, 10, 0), task.Due);
+        Assert.False(list.IsOverdue(task));
+
+        list.SnoozeToMorning(task.Id);
+        Assert.Equal(new DateTime(2026, 10, 20, 7, 0, 0), task.Due);
+        list.ClearDue(task.Id);
+        Assert.Null(task.Due);
+    }
+
+    [Fact]
+    public void Next_timed_task_ignores_undated_and_long_past()
+    {
+        var list = new TodoList(_time);
+        list.Add("tanpa tenggat");
+        list.Add("lusa kumpul KTP");
+        var soon = list.Add("jam 4 pagi sahur")!;
+        Assert.Equal(soon.Id, list.Next(TimeSpan.FromMinutes(10))!.Id);
+
+        _time.Advance(TimeSpan.FromHours(2)); // 05.00: sahur lewat satu jam
+        Assert.Null(list.Next(TimeSpan.FromMinutes(10)));
+    }
 }
 
 public sealed class ShelfTests : IDisposable

@@ -20,6 +20,9 @@ public sealed class AppSettings
     public SlimMode SlimMode { get; set; } = SlimMode.Auto;
     /// <summary>Geser horizontal dari tengah layar, dalam DIP (−300 … 300), mis. untuk menghindari webcam.</summary>
     public double HorizontalOffset { get; set; }
+    /// <summary>Info di kiri dan kanan notch tertutup.</summary>
+    public Notch.CollapsedSlot CollapsedLeft { get; set; } = Notch.CollapsedSlot.Clock;
+    public Notch.CollapsedSlot CollapsedRight { get; set; } = Notch.CollapsedSlot.Battery;
 
     // ── Modul ──
     public bool MusicEnabled { get; set; } = true;
@@ -62,6 +65,12 @@ public sealed class AppSettings
     public double? WeatherLongitude { get; set; }
     public string? WeatherPlace { get; set; }
 
+    // ── Tugas ──
+    /// <summary>Pengingat dan hitung mundur untuk tugas yang punya jam tenggat.</summary>
+    public bool TaskRemindersEnabled { get; set; } = true;
+    /// <summary>Pil hitung mundur muncul sekian menit sebelum tenggat; 0 = hanya saat tenggat.</summary>
+    public int TaskCountdownMinutes { get; set; } = 15;
+
     // ── Jadwal salat ──
     public bool PrayerEnabled { get; set; } = true;
     /// <summary>Peek pengingat sekian menit sebelum waktu salat; 0 = tanpa pengingat awal.</summary>
@@ -88,9 +97,12 @@ public sealed class AppSettings
         LongBreakMinutes = Math.Clamp(LongBreakMinutes, 5, 60);
         HorizontalOffset = Math.Clamp(HorizontalOffset, -MaxOffset, MaxOffset);
         PrayerReminderMinutes = Math.Clamp(PrayerReminderMinutes, 0, 60);
+        TaskCountdownMinutes = Math.Clamp(TaskCountdownMinutes, 0, 60);
         PrayerCountdownMinutes = Math.Clamp(PrayerCountdownMinutes, 0, 60);
         PrayerOffsetMinutes = Math.Clamp(PrayerOffsetMinutes, -10, 10);
         if (!Enum.IsDefined(SlimMode)) SlimMode = SlimMode.Auto;
+        if (!Enum.IsDefined(CollapsedLeft)) CollapsedLeft = Notch.CollapsedSlot.None;
+        if (!Enum.IsDefined(CollapsedRight)) CollapsedRight = Notch.CollapsedSlot.None;
         return this;
     }
 }

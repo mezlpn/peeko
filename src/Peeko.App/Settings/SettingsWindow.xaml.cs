@@ -47,6 +47,26 @@ public partial class SettingsWindow : Window
         menu.IsOpen = true;
     }
 
+    /// <summary>Pilih isi kiri/kanan notch tertutup.</summary>
+    private void OnSlot(object sender, RoutedEventArgs e)
+    {
+        var button = (Button)sender;
+        bool left = (string)button.Tag == "Left";
+        var current = left ? _vm.CollapsedLeft : _vm.CollapsedRight;
+        var menu = new ContextMenu { Style = (Style)FindResource("Peeko.TrayMenu"), PlacementTarget = button };
+        foreach (var slot in Enum.GetValues<Core.Notch.CollapsedSlot>())
+        {
+            var item = new MenuItem { Header = Core.Notch.CollapsedSlots.Label(slot), Style = (Style)FindResource("Peeko.TrayItem"), IsChecked = slot == current };
+            item.Click += (_, _) =>
+            {
+                if (left) _vm.CollapsedLeft = slot;
+                else _vm.CollapsedRight = slot;
+            };
+            menu.Items.Add(item);
+        }
+        menu.IsOpen = true;
+    }
+
     private void OnLink(object sender, RequestNavigateEventArgs e)
     {
         Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });

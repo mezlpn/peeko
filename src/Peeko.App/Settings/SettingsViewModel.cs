@@ -64,6 +64,29 @@ public sealed class SettingsViewModel : ObservableObject
         _ => "Otomatis",
     };
 
+    public Core.Notch.CollapsedSlot CollapsedLeft
+    {
+        get => S.CollapsedLeft;
+        set
+        {
+            Set(value, s => s.CollapsedLeft, (s, v) => s.CollapsedLeft = v);
+            OnPropertyChanged(nameof(CollapsedLeftText));
+        }
+    }
+
+    public Core.Notch.CollapsedSlot CollapsedRight
+    {
+        get => S.CollapsedRight;
+        set
+        {
+            Set(value, s => s.CollapsedRight, (s, v) => s.CollapsedRight = v);
+            OnPropertyChanged(nameof(CollapsedRightText));
+        }
+    }
+
+    public string CollapsedLeftText => Core.Notch.CollapsedSlots.Label(CollapsedLeft);
+    public string CollapsedRightText => Core.Notch.CollapsedSlots.Label(CollapsedRight);
+
     // ── Modul ──
     public bool MusicEnabled { get => S.MusicEnabled; set => Set(value, s => s.MusicEnabled, (s, v) => s.MusicEnabled = v); }
     public bool LyricsEnabled { get => S.LyricsEnabled; set => Set(value, s => s.LyricsEnabled, (s, v) => s.LyricsEnabled = v); }
@@ -116,6 +139,10 @@ public sealed class SettingsViewModel : ObservableObject
         };
         OnPropertyChanged(nameof(WeatherLocationText));
     }
+
+    // ── Tugas ──
+    public bool TaskRemindersEnabled { get => S.TaskRemindersEnabled; set => Set(value, s => s.TaskRemindersEnabled, (s, v) => s.TaskRemindersEnabled = v); }
+    public int TaskCountdownMinutes { get => S.TaskCountdownMinutes; set => Set(value, s => s.TaskCountdownMinutes, (s, v) => s.TaskCountdownMinutes = v); }
 
     // ── Jadwal salat ──
     public bool PrayerEnabled { get => S.PrayerEnabled; set => Set(value, s => s.PrayerEnabled, (s, v) => s.PrayerEnabled = v); }

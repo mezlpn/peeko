@@ -34,6 +34,8 @@ public enum PeekKind
     PrayerSoon,
     /// <summary>Masuk waktu salat (Text = nama salat, Detail = jam).</summary>
     PrayerTime,
+    /// <summary>Tenggat tugas tiba (Text = tugas, Detail = jam).</summary>
+    TaskDue,
 }
 
 /// <summary>Isi satu peek. Arti tiap field bergantung pada <see cref="Kind"/>.</summary>
@@ -67,6 +69,7 @@ public sealed record PeekRequest(PeekKind Kind)
         PeekKind.ConvertDone or PeekKind.ConvertReady => TimeSpan.FromSeconds(3),
         PeekKind.ConvertFailed or PeekKind.PrayerSoon => TimeSpan.FromSeconds(4),
         PeekKind.PrayerTime => TimeSpan.FromSeconds(8),
+        PeekKind.TaskDue => TimeSpan.FromSeconds(5),
         // Ditahan selama file masih diseret di atas notch; setelah tersimpan (Flag) hanya sebentar.
         PeekKind.ShelfDrop => Flag ? TimeSpan.FromMilliseconds(1500) : TimeSpan.FromSeconds(30),
         _ => TimeSpan.FromMilliseconds(1500),
@@ -79,7 +82,7 @@ public sealed record PeekRequest(PeekKind Kind)
     public double Width => Kind switch
     {
         PeekKind.CapsLock => 280,
-        PeekKind.ShelfDrop or PeekKind.ConvertDone or PeekKind.ConvertFailed => 340,
+        PeekKind.ShelfDrop or PeekKind.ConvertDone or PeekKind.ConvertFailed or PeekKind.TaskDue => 340,
         PeekKind.Language or PeekKind.BatteryLow or PeekKind.Charging
             or PeekKind.WifiConnected or PeekKind.WifiDisconnected => 300,
         _ => 320,

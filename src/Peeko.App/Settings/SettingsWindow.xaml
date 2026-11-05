@@ -164,6 +164,7 @@
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Baterai" Content="Baterai" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Minum" Content="Minum air" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Fokus" Content="Timer fokus" Checked="OnNav" />
+                        <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Tugas" Content="Tugas" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Salat" Content="Jadwal salat" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Lirik" Content="Lirik" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Cuaca" Content="Cuaca" Checked="OnNav" />
@@ -207,6 +208,17 @@
                                                 </StackPanel>
                                             </Border>
                                         </Button>
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,150,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Isi notch tertutup" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Kiri dan kanan mata, juga saat lagu diputar" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <Button Style="{StaticResource CardButton}" MinWidth="70" Tag="Left" Click="OnSlot" Content="{Binding CollapsedLeftText}" ToolTip="Kiri" />
+                                            <Button Style="{StaticResource CardButton}" MinWidth="70" Margin="6,0,0,0" Tag="Right" Click="OnSlot" Content="{Binding CollapsedRightText}" ToolTip="Kanan" />
+                                        </StackPanel>
                                     </Grid>
                                     <Border Style="{StaticResource RowLine}" />
                                     <Grid Style="{StaticResource Row}">
@@ -366,6 +378,30 @@
                                         </StackPanel>
                                         <controls:Stepper HorizontalAlignment="Right" VerticalAlignment="Center" Minimum="5" Maximum="60" Step="5" Suffix="mnt"
                                                           Value="{Binding LongBreakMinutes}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="Tugas" Margin="0,0,0,22">
+                            <TextBlock Style="{StaticResource SectionHeader}" Text="TUGAS" />
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Ingatkan tugas bertenggat" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Tulis tenggat langsung di tugasnya, mis. “besok jam 7 kumpul laporan”, “tiap senin jam 6 olahraga”, “30 menit lagi angkat jemuran”" />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding TaskRemindersEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,130,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Hitung mundur di notch" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Sekian menit sebelum tenggat; 0 = hanya saat tenggat" />
+                                        </StackPanel>
+                                        <controls:Stepper HorizontalAlignment="Right" VerticalAlignment="Center" Minimum="0" Maximum="60" Step="5" Suffix="mnt"
+                                                          Value="{Binding TaskCountdownMinutes}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>
