@@ -65,6 +65,14 @@ public sealed class AppSettings
     public double? WeatherLongitude { get; set; }
     public string? WeatherPlace { get; set; }
 
+    // ── Catatan & kesehatan ──
+    public bool NotesEnabled { get; set; } = true;
+    /// <summary>Kartu istirahat gerak, mata, dan latihan napas di tab Sehat.</summary>
+    public bool HealthEnabled { get; set; } = true;
+    public bool BreaksEnabled { get; set; }
+    public int BreakIntervalMinutes { get; set; } = 50;
+    public bool EyeBreaksEnabled { get; set; }
+
     // ── Tugas ──
     /// <summary>Pengingat dan hitung mundur untuk tugas yang punya jam tenggat.</summary>
     public bool TaskRemindersEnabled { get; set; } = true;
@@ -98,6 +106,7 @@ public sealed class AppSettings
         HorizontalOffset = Math.Clamp(HorizontalOffset, -MaxOffset, MaxOffset);
         PrayerReminderMinutes = Math.Clamp(PrayerReminderMinutes, 0, 60);
         TaskCountdownMinutes = Math.Clamp(TaskCountdownMinutes, 0, 60);
+        BreakIntervalMinutes = Math.Clamp(BreakIntervalMinutes, 20, 120);
         PrayerCountdownMinutes = Math.Clamp(PrayerCountdownMinutes, 0, 60);
         PrayerOffsetMinutes = Math.Clamp(PrayerOffsetMinutes, -10, 10);
         if (!Enum.IsDefined(SlimMode)) SlimMode = SlimMode.Auto;

@@ -149,11 +149,14 @@
                             </StackPanel>
                             <prayer:PrayerModule x:Name="PrayerModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
                                                  Visibility="Collapsed" />
-                            <StackPanel x:Name="TasksMode" Orientation="Horizontal" Height="150" HorizontalAlignment="Center"
+                            <prod:TodoModule x:Name="TodoModuleView" Width="400" Height="150" HorizontalAlignment="Center"
+                                             VerticalAlignment="Top" Visibility="Collapsed" />
+                            <StackPanel x:Name="HealthMode" Orientation="Horizontal" Height="150" HorizontalAlignment="Center"
                                         VerticalAlignment="Top" Visibility="Collapsed">
-                                <prod:TodoModule x:Name="TodoModuleView" Width="250" />
-                                <prod:WaterModule x:Name="WaterModuleView" Width="150" Margin="14,0,0,0" />
+                                <prod:WaterModule x:Name="WaterModuleView" Width="150" />
+                                <prod:HealthModule x:Name="HealthModuleView" Margin="14,0,0,0" />
                             </StackPanel>
+                            <prod:NotesModule x:Name="NotesModuleView" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Collapsed" />
                             <prod:ShelfModule x:Name="ShelfModuleView" Width="440" Height="96" HorizontalAlignment="Center"
                                               VerticalAlignment="Top" Visibility="Collapsed" />
                         </Grid>

@@ -131,6 +131,7 @@ public partial class App : Application
         builder.Services.AddSingleton<NotchWindow>();
         builder.Services.AddSingleton<CollapsedSlotsController>();
         builder.Services.AddSingleton<TaskReminderController>();
+        builder.Services.AddSingleton<HealthController>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
 
@@ -251,7 +252,7 @@ public partial class App : Application
         void RefreshStatus()
         {
             var s = settingsService.Current;
-            int modules = new[] { s.MusicEnabled, s.LyricsEnabled, s.FocusEnabled, s.WaterEnabled, s.TodoEnabled, s.ShelfEnabled, s.ControlEnabled, s.TodayEnabled, s.PrayerEnabled }.Count(x => x);
+            int modules = new[] { s.MusicEnabled, s.LyricsEnabled, s.FocusEnabled, s.WaterEnabled, s.TodoEnabled, s.ShelfEnabled, s.ControlEnabled, s.TodayEnabled, s.PrayerEnabled, s.NotesEnabled, s.HealthEnabled }.Count(x => x);
             statusDot.Fill = (Brush)Resources[hiddenUntil is null ? "Peeko.Brush.Accent" : "Peeko.Brush.TextTertiary"];
             statusText.Text = hiddenUntil is null ? $"Peeko aktif · {modules} modul berjalan" : $"Disembunyikan {hiddenUntil}";
         }

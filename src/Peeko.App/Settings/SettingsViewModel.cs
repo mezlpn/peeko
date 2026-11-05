@@ -140,6 +140,13 @@ public sealed class SettingsViewModel : ObservableObject
         OnPropertyChanged(nameof(WeatherLocationText));
     }
 
+    // ── Catatan & kesehatan ──
+    public bool NotesEnabled { get => S.NotesEnabled; set => Set(value, s => s.NotesEnabled, (s, v) => s.NotesEnabled = v); }
+    public bool HealthEnabled { get => S.HealthEnabled; set => Set(value, s => s.HealthEnabled, (s, v) => s.HealthEnabled = v); }
+    public bool BreaksEnabled { get => S.BreaksEnabled; set => Set(value, s => s.BreaksEnabled, (s, v) => s.BreaksEnabled = v); }
+    public int BreakIntervalMinutes { get => S.BreakIntervalMinutes; set => Set(value, s => s.BreakIntervalMinutes, (s, v) => s.BreakIntervalMinutes = v); }
+    public bool EyeBreaksEnabled { get => S.EyeBreaksEnabled; set => Set(value, s => s.EyeBreaksEnabled, (s, v) => s.EyeBreaksEnabled = v); }
+
     // ── Tugas ──
     public bool TaskRemindersEnabled { get => S.TaskRemindersEnabled; set => Set(value, s => s.TaskRemindersEnabled, (s, v) => s.TaskRemindersEnabled = v); }
     public int TaskCountdownMinutes { get => S.TaskCountdownMinutes; set => Set(value, s => s.TaskCountdownMinutes, (s, v) => s.TaskCountdownMinutes = v); }

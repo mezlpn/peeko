@@ -1,0 +1,82 @@
+<!-- Tab Catatan: daftar di kiri, isi di kanan. Baris "tanya :: jawab" jadi flashcard untuk dipelajari. -->
+<UserControl x:Class="Peeko.App.Productivity.NotesModule"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="440" Height="170">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="140" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Daftar -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="28" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Style="{StaticResource Peeko.Text.Overline}" Foreground="{StaticResource Peeko.Brush.TextTertiary}"
+                       VerticalAlignment="Center" Margin="8,0,0,0" Text="CATATAN" />
+            <Button Style="{StaticResource Peeko.Button.Icon}" Tag="{StaticResource Peeko.Icon.Plus}" Width="28" Height="28"
+                    HorizontalAlignment="Right" Foreground="{StaticResource Peeko.Brush.TextPrimary}" ToolTip="Catatan baru" Click="OnNew" />
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
+                <StackPanel x:Name="List" />
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Isi catatan -->
+        <Grid x:Name="EditorView" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="32" />
+            </Grid.RowDefinitions>
+            <Border CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}" />
+            <TextBox x:Name="Editor" Margin="10,8" Background="Transparent" BorderThickness="0" AcceptsReturn="True" AcceptsTab="False"
+                     TextWrapping="Wrap" VerticalScrollBarVisibility="Hidden" Foreground="{StaticResource Peeko.Brush.TextPrimary}"
+                     CaretBrush="{StaticResource Peeko.Brush.Accent}" SelectionBrush="{StaticResource Peeko.Brush.Accent}"
+                     FontFamily="{StaticResource Peeko.Font}" FontSize="13" MaxLength="20000"
+                     PreviewMouseDown="OnEditorMouseDown" LostKeyboardFocus="OnEditorLostFocus" TextChanged="OnEditorChanged"
+                     PreviewKeyDown="OnEditorKey" />
+            <TextBlock x:Name="Placeholder" Style="{StaticResource Peeko.Text.Body}" Margin="12,9" Foreground="{StaticResource Peeko.Brush.TextTertiary}"
+                       TextWrapping="Wrap" IsHitTestVisible="False"
+                       Text="Klik untuk menulis. Baris seperti “ibu kota Jepang :: Tokyo” otomatis jadi flashcard." />
+            <Grid Grid.Row="1">
+                <Button x:Name="StudyButton" Style="{StaticResource Peeko.Button.PillSecondary}" Height="26" Padding="12,0" HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom" Tag="{StaticResource Peeko.Fill.Play}" Click="OnStudy" />
+                <Button x:Name="DeleteButton" Style="{StaticResource Peeko.Button.Icon}" Tag="{StaticResource Peeko.Icon.Close}" Width="26" Height="26"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom" ToolTip="Hapus catatan" Click="OnDelete" />
+            </Grid>
+        </Grid>
+
+        <!-- Belajar flashcard -->
+        <Grid x:Name="StudyView" Grid.Column="2" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="38" />
+            </Grid.RowDefinitions>
+            <Border x:Name="Card" CornerRadius="{StaticResource Peeko.Radius.Lg}" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
+                    Cursor="Hand" MouseLeftButtonUp="OnFlip" RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <ScaleTransform x:Name="CardScale" />
+                </Border.RenderTransform>
+                <Grid Margin="14,10">
+                    <TextBlock x:Name="CardSide" Style="{StaticResource Peeko.Text.Overline}" Foreground="{StaticResource Peeko.Brush.TextTertiary}" />
+                    <TextBlock x:Name="CardText" Style="{StaticResource Peeko.Text.Title}" FontSize="18" TextWrapping="Wrap" TextAlignment="Center"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="CardHint" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+                </Grid>
+            </Border>
+            <Grid Grid.Row="1">
+                <Button Style="{StaticResource Peeko.Button.Icon}" Tag="{StaticResource Peeko.Icon.Close}" Width="28" Height="28"
+                        HorizontalAlignment="Left" VerticalAlignment="Bottom" ToolTip="Selesai belajar" Click="OnStopStudy" />
+                <StackPanel x:Name="StudyButtons" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Button Style="{StaticResource Peeko.Button.PillSecondary}" Height="28" Padding="12,0" Content="Lagi" Click="OnAgain" />
+                    <Button Style="{StaticResource Peeko.Button.Pill}" Height="28" Padding="12,0" Margin="6,0,0,0" Content="Hafal" Click="OnKnown" />
+                </StackPanel>
+                <Button x:Name="RestartButton" Style="{StaticResource Peeko.Button.Pill}" Height="28" Padding="12,0" HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom" Content="Ulangi" Visibility="Collapsed" Click="OnStudy" />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

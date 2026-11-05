@@ -4,11 +4,12 @@ using Peeko.Core.Storage;
 
 namespace Peeko.App.Productivity;
 
-/// <summary>Memuat dan menyimpan otomatis daftar tugas dan rak file.</summary>
+/// <summary>Memuat dan menyimpan otomatis daftar tugas, rak file, dan catatan.</summary>
 public sealed class ListsController : IDisposable
 {
     private readonly AutoSaver _todoSaver;
     private readonly AutoSaver _shelfSaver;
+    private readonly AutoSaver _notesSaver;
 
     public ListsController(TimeProvider time)
     {
@@ -21,7 +22,14 @@ public sealed class ListsController : IDisposable
         Shelf = new Shelf(time, Path.Combine(App.DataDirectory, "shelf"), shelfStore.Load());
         _shelfSaver = new AutoSaver(() => shelfStore.Save(Shelf.Data));
         Shelf.Changed += _shelfSaver.MarkDirty;
+
+        var notesStore = new JsonFileStore<NotesData>(App.DataDirectory, "notes.json");
+        Notes = new NoteBook(time, notesStore.Load());
+        _notesSaver = new AutoSaver(() => notesStore.Save(Notes.Data));
+        Notes.Changed += _notesSaver.MarkDirty;
     }
+
+    public NoteBook Notes { get; }
 
     public TodoList Todo { get; }
 
@@ -31,5 +39,6 @@ public sealed class ListsController : IDisposable
     {
         _todoSaver.Flush();
         _shelfSaver.Flush();
+        _notesSaver.Flush();
     }
 }

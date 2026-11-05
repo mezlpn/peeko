@@ -177,6 +177,10 @@ public partial class NotchWindow : Window
 
     public TodoModule TodoModule => TodoModuleView;
 
+    public HealthModule HealthModule => HealthModuleView;
+
+    public NotesModule NotesModule => NotesModuleView;
+
     public ShelfModule ShelfModule => ShelfModuleView;
 
     public Control.ControlModule ControlModule => ControlModuleView;
@@ -201,6 +205,7 @@ public partial class NotchWindow : Window
         base.OnDeactivated(e);
         // Klik di aplikasi lain: akhiri input supaya panel bisa menutup lagi.
         TodoModuleView.EndInput();
+        NotesModuleView.EndInput();
     }
 
     public IntPtr Handle { get; private set; }

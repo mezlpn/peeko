@@ -163,6 +163,7 @@
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Modul" Content="Modul" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Baterai" Content="Baterai" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Minum" Content="Minum air" Checked="OnNav" />
+                        <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Sehat" Content="Kesehatan" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Fokus" Content="Timer fokus" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Tugas" Content="Tugas" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Salat" Content="Jadwal salat" Checked="OnNav" />
@@ -280,6 +281,16 @@
                                     </Grid>
                                     <Border Style="{StaticResource RowLine}" />
                                     <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Catatan &amp; flashcard" />
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding NotesEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Kesehatan (istirahat, mata, napas)" />
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding HealthEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
                                         <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Rak file" />
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ShelfEnabled}" />
                                     </Grid>
@@ -350,6 +361,35 @@
                                         </StackPanel>
                                         <controls:Stepper HorizontalAlignment="Right" VerticalAlignment="Center" Minimum="1" Maximum="20" Suffix="gelas"
                                                           Value="{Binding WaterGoal}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="Sehat" Margin="0,0,0,22">
+                            <TextBlock Style="{StaticResource SectionHeader}" Text="KESEHATAN" />
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Istirahat gerak" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Ingatkan berdiri setelah lama di depan laptop. Kalau kamu sedang pergi, hitungannya mulai lagi." />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding BreaksEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Setiap" />
+                                        <controls:Stepper HorizontalAlignment="Right" VerticalAlignment="Center" Minimum="20" Maximum="120" Step="10" Suffix="mnt"
+                                                          Value="{Binding BreakIntervalMinutes}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Mata 20-20-20" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Tiap 20 menit, lihat sesuatu sejauh 6 meter selama 20 detik" />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding EyeBreaksEnabled}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>

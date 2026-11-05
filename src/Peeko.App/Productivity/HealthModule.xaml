@@ -1,0 +1,67 @@
+<!-- Tab Sehat (kanan Minum): istirahat gerak, mata 20-20-20, dan latihan napas. Lebar 250. -->
+<UserControl x:Class="Peeko.App.Productivity.HealthModule"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="250" Height="150">
+    <UserControl.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Background" Value="{StaticResource Peeko.Brush.SurfaceRaised}" />
+            <Setter Property="Padding" Value="12,0,8,0" />
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <StackPanel x:Name="Cards">
+            <Border Style="{StaticResource Card}">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Peeko.Text.Pill}" Text="Istirahat gerak" />
+                        <TextBlock x:Name="BreakInfo" Style="{StaticResource Peeko.Text.Caption}" />
+                    </StackPanel>
+                    <CheckBox x:Name="BreakToggle" Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                              Click="OnBreakToggle" ToolTip="Ingatkan berdiri setelah lama di depan laptop" />
+                </Grid>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Peeko.Text.Pill}" Text="Mata 20-20-20" />
+                        <TextBlock x:Name="EyeInfo" Style="{StaticResource Peeko.Text.Caption}" />
+                    </StackPanel>
+                    <CheckBox x:Name="EyeToggle" Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                              Click="OnEyeToggle" ToolTip="Tiap 20 menit, lihat sejauh 6 meter selama 20 detik" />
+                </Grid>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Peeko.Text.Pill}" Text="Latihan napas" />
+                        <TextBlock x:Name="BreathInfo" Style="{StaticResource Peeko.Text.Caption}" />
+                    </StackPanel>
+                    <Button Style="{StaticResource Peeko.Button.PillSecondary}" Height="28" Padding="12,0" HorizontalAlignment="Right"
+                            VerticalAlignment="Center" Tag="{StaticResource Peeko.Fill.Play}" Content="1 menit" Click="OnBreathe" />
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- Latihan napas kotak 4-4-4-4: lingkaran membesar saat tarik, mengecil saat hembus. -->
+        <Grid x:Name="BreathView" Visibility="Collapsed" Background="Transparent">
+            <Ellipse x:Name="BreathRing" Width="120" Height="120" Stroke="{StaticResource Peeko.Brush.Stroke}" StrokeThickness="2" />
+            <Ellipse x:Name="BreathCircle" Width="120" Height="120" Fill="{StaticResource Peeko.Brush.WaterMuted}"
+                     Stroke="{StaticResource Peeko.Brush.Water}" StrokeThickness="2" RenderTransformOrigin="0.5,0.5">
+                <Ellipse.RenderTransform>
+                    <ScaleTransform x:Name="BreathScale" ScaleX="0.45" ScaleY="0.45" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                <TextBlock x:Name="BreathPhase" Style="{StaticResource Peeko.Text.BodyStrong}" HorizontalAlignment="Center" />
+                <TextBlock x:Name="BreathCount" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" />
+            </StackPanel>
+            <Button Style="{StaticResource Peeko.Button.Icon}" Tag="{StaticResource Peeko.Icon.Close}" HorizontalAlignment="Right"
+                    VerticalAlignment="Top" ToolTip="Berhenti" Click="OnStopBreath" />
+        </Grid>
+    </Grid>
+</UserControl>

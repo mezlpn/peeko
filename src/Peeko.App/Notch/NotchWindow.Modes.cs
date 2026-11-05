@@ -23,8 +23,10 @@ public partial class NotchWindow
     public const int TodayTab = 2;
     public const int PrayerTab = 3;
     public const int TodoTab = 4;
-    public const int ShelfTab = 5;
-    private const int ModeCount = 6;
+    public const int HealthTab = 5;
+    public const int NotesTab = 6;
+    public const int ShelfTab = 7;
+    private const int ModeCount = 8;
 
     // Di atas isi: 6 + baris status 24 + 2 + titik 6 + 12; di bawahnya 16. Isi diberi tepi 18.
     private const double ChromeHeight = 6 + 24 + 2 + 6 + 12 + 16;
@@ -33,8 +35,8 @@ public partial class NotchWindow
     private const double WheelStep = 120;
     private static readonly TimeSpan WheelIdleReset = TimeSpan.FromMilliseconds(400);
 
-    private readonly bool[] _modeEnabled = [true, true, true, true, true, true];
-    private bool _lyricsEnabled = true, _calendarEnabled = true, _focusEnabled = true, _todoEnabled = true, _waterEnabled = true;
+    private readonly bool[] _modeEnabled = [true, true, true, true, true, true, true, true];
+    private bool _lyricsEnabled = true, _calendarEnabled = true, _focusEnabled = true, _waterEnabled = true, _healthEnabled = true;
     private readonly Dictionary<FrameworkElement, SpringValue> _modeY = [];
     private readonly List<(Border Dot, SpringValue Width)> _dots = [];
     private DateTime _lastWheel;
@@ -58,7 +60,9 @@ public partial class NotchWindow
         ControlTab => ControlModuleView,
         TodayTab => TodayMode,
         PrayerTab => PrayerModuleView,
-        TodoTab => TasksMode,
+        TodoTab => TodoModuleView,
+        HealthTab => HealthMode,
+        NotesTab => NotesModuleView,
         _ => ShelfModuleView,
     };
 
@@ -81,7 +85,11 @@ public partial class NotchWindow
             case PrayerTab:
                 return new Size(400, 148);
             case TodoTab:
-                return new Size((_todoEnabled ? 250 : 0) + (_waterEnabled ? 150 : 0) + (_todoEnabled && _waterEnabled ? 14 : 0), 150);
+                return new Size(400, 150);
+            case HealthTab:
+                return new Size((_waterEnabled ? 150 : 0) + (_healthEnabled ? 250 : 0) + (_waterEnabled && _healthEnabled ? 14 : 0), 150);
+            case NotesTab:
+                return new Size(440, 170);
             default:
                 // Rak kosong cukup zona drop; berisi: judul + kartu; Ubah format butuh ruang chip.
                 double shelf = ShelfModuleView.ConvertPanel.IsActive ? 160
@@ -139,29 +147,35 @@ public partial class NotchWindow
         if (VisibleModule == TodayTab) TodayModuleView.Refresh();
         if (VisibleModule == PrayerTab) PrayerModuleView.Refresh();
         if (VisibleModule != TodoTab) TodoModuleView.EndInput();
+        if (VisibleModule != NotesTab) NotesModuleView.EndInput();
+        if (VisibleModule != HealthTab) HealthModuleView.StopBreath();
+        else HealthModuleView.Refresh();
         VisibleModuleChanged?.Invoke(VisibleModule);
     }
 
     /// <summary>Bagian yang dimatikan di Pengaturan disembunyikan; tampilan kosong dilewati saat menggulir.</summary>
-    public void SetModulesEnabled(bool music, bool lyrics, bool control, bool calendar, bool focus, bool prayer, bool todo, bool water, bool shelf)
+    public void SetModulesEnabled(bool music, bool lyrics, bool control, bool calendar, bool focus, bool prayer, bool todo, bool water,
+        bool health, bool notes, bool shelf)
     {
         _lyricsEnabled = lyrics;
         _calendarEnabled = calendar;
         _focusEnabled = focus;
-        _todoEnabled = todo;
         _waterEnabled = water;
+        _healthEnabled = health;
         TodayModuleView.Visibility = calendar ? Visibility.Visible : Visibility.Collapsed;
         FocusModuleView.Visibility = focus ? Visibility.Visible : Visibility.Collapsed;
         FocusModuleView.Margin = new Thickness(calendar ? 20 : 0, 0, 0, 0);
-        TodoModuleView.Visibility = todo ? Visibility.Visible : Visibility.Collapsed;
         WaterModuleView.Visibility = water ? Visibility.Visible : Visibility.Collapsed;
-        WaterModuleView.Margin = new Thickness(todo ? 14 : 0, 0, 0, 0);
+        HealthModuleView.Visibility = health ? Visibility.Visible : Visibility.Collapsed;
+        HealthModuleView.Margin = new Thickness(water ? 14 : 0, 0, 0, 0);
 
         _modeEnabled[MusicTab] = music;
         _modeEnabled[ControlTab] = control;
         _modeEnabled[TodayTab] = calendar || focus;
         _modeEnabled[PrayerTab] = prayer;
-        _modeEnabled[TodoTab] = todo || water;
+        _modeEnabled[TodoTab] = todo;
+        _modeEnabled[HealthTab] = water || health;
+        _modeEnabled[NotesTab] = notes;
         _modeEnabled[ShelfTab] = shelf;
         BuildDots();
         if (!_modeEnabled[_moduleIndex])
@@ -293,7 +307,7 @@ public partial class NotchWindow
     {
         Dots.Children.Clear();
         _dots.Clear();
-        string[] names = ["Musik", "Kontrol", "Hari ini", "Salat", "Tugas", "Rak"];
+        string[] names = ["Musik", "Kontrol", "Hari ini", "Salat", "Tugas", "Sehat", "Catatan", "Rak"];
         for (int i = 0; i < ModeCount; i++)
         {
             if (!_modeEnabled[i]) continue;

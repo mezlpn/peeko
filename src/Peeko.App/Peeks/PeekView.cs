@@ -124,6 +124,16 @@ public sealed class PeekView : Grid
                 AddLabel("Sesi selesai");
                 AddValue(r.Detail ?? "", "TextSecondary", small: true);
                 break;
+            case PeekKind.MoveBreak:
+                AddHappyEyes();
+                AddLabel("Waktunya istirahat");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true, maxWidth: 150);
+                break;
+            case PeekKind.EyeBreak:
+                AddIcon(Geometry.Parse("M2.5,12 C5,7 8.5,5 12,5 C15.5,5 19,7 21.5,12 C19,17 15.5,19 12,19 C8.5,19 5,17 2.5,12 Z M9,12 A3,3 0 1 0 15,12 A3,3 0 1 0 9,12"), "Water");
+                AddLabel("Istirahatkan mata");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true, maxWidth: 150);
+                break;
             case PeekKind.TimerDone:
                 AddHappyEyes();
                 AddLabel("Waktu habis");

@@ -37,6 +37,7 @@ public sealed class NotchController : IDisposable
     private readonly Prayer.PrayerController _prayer;
     private readonly CollapsedSlotsController _slots;
     private readonly TaskReminderController _tasks;
+    private readonly HealthController _health;
     private bool _rawFullscreen;
     private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
@@ -52,7 +53,7 @@ public sealed class NotchController : IDisposable
         LyricsController lyrics, SystemPeekController peeks, FocusController focus, WaterController water,
         ListsController lists, SettingsService settings, UpdateController updates, ConvertController convert,
         Today.WeatherService weather, Prayer.PrayerController prayer, CollapsedSlotsController slots,
-        TaskReminderController tasks, ILogger<NotchController> log)
+        TaskReminderController tasks, HealthController health, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -68,6 +69,7 @@ public sealed class NotchController : IDisposable
         _prayer = prayer;
         _slots = slots;
         _tasks = tasks;
+        _health = health;
         _log = log;
         _window.AttachWeather(weather);
     }
@@ -148,6 +150,19 @@ public sealed class NotchController : IDisposable
         };
 
         _window.TodoModule.MenuOpenChanged += _stateMachine.SetHoldOpen;
+
+        // ── Catatan & kesehatan ──
+        _window.NotesModule.Attach(_lists.Notes);
+        _window.NotesModule.TextInputChanged += active =>
+        {
+            _window.SetTextInput(active);
+            _stateMachine.SetHoldOpen(active);
+        };
+        _window.NotesModule.StudyingChanged += _stateMachine.SetHoldOpen;
+        _window.HealthModule.Attach(_health, _settings);
+        _window.HealthModule.BreathingChanged += _stateMachine.SetHoldOpen;
+        _health.Updated += _window.HealthModule.Refresh;
+        _health.PeekRequested += ShowPeek;
         _window.ShelfModule.Attach(_lists.Shelf);
         _window.ShelfModule.BusyChanged += _stateMachine.SetHoldOpen;
 
@@ -531,7 +546,8 @@ public sealed class NotchController : IDisposable
         _window.SetHorizontalOffset(s.HorizontalOffset);
 
         _window.SetModulesEnabled(s.MusicEnabled, s.LyricsEnabled, s.ControlEnabled, s.TodayEnabled, s.FocusEnabled,
-            s.PrayerEnabled, s.TodoEnabled, s.WaterEnabled, s.ShelfEnabled);
+            s.PrayerEnabled, s.TodoEnabled, s.WaterEnabled, s.HealthEnabled, s.NotesEnabled, s.ShelfEnabled);
+        _health.Apply();
         _prayer.Apply();
         _tasks.Evaluate();
         if (_window.ShelfModule.ConvertAvailable != s.ConvertEnabled)
@@ -588,6 +604,7 @@ public sealed class NotchController : IDisposable
         _prayer.Dispose();
         _slots.Dispose();
         _tasks.Dispose();
+        _health.Dispose();
         _water.Dispose();
         _lists.Dispose();
         _lyrics.Dispose();
