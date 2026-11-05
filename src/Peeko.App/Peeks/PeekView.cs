@@ -154,6 +154,16 @@ public sealed class PeekView : Grid
                 AddLabel("Ubah format siap");
                 AddValue($"Filee {r.Text}", "TextSecondary", small: true);
                 break;
+            case PeekKind.PrayerSoon:
+                AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Prayer"], "Rest");
+                AddLabel(r.Text ?? "");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true);
+                break;
+            case PeekKind.PrayerTime:
+                AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Prayer"], "Accent");
+                AddLabel($"Waktunya {r.Text}");
+                AddValue(r.Detail ?? "", "Accent");
+                break;
             case PeekKind.ShelfDrop:
                 AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Shelf"], "TextPrimary");
                 AddLabel(r.Flag ? "Tersimpan di rak" : "Simpan di rak");

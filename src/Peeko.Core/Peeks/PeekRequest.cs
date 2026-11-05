@@ -30,6 +30,10 @@ public enum PeekKind
     ConvertFailed,
     /// <summary>Fitur Ubah format selesai dipasang (Text = versi Filee).</summary>
     ConvertReady,
+    /// <summary>Sebentar lagi waktu salat (Text = nama salat, Detail = "10 menit lagi · 17.38").</summary>
+    PrayerSoon,
+    /// <summary>Masuk waktu salat (Text = nama salat, Detail = jam).</summary>
+    PrayerTime,
 }
 
 /// <summary>Isi satu peek. Arti tiap field bergantung pada <see cref="Kind"/>.</summary>
@@ -61,7 +65,8 @@ public sealed record PeekRequest(PeekKind Kind)
         PeekKind.BatteryCritical => TimeSpan.FromSeconds(5),
         PeekKind.FocusDone or PeekKind.BreakDone or PeekKind.UpdateAvailable or PeekKind.Updated => TimeSpan.FromSeconds(4),
         PeekKind.ConvertDone or PeekKind.ConvertReady => TimeSpan.FromSeconds(3),
-        PeekKind.ConvertFailed => TimeSpan.FromSeconds(4),
+        PeekKind.ConvertFailed or PeekKind.PrayerSoon => TimeSpan.FromSeconds(4),
+        PeekKind.PrayerTime => TimeSpan.FromSeconds(8),
         // Ditahan selama file masih diseret di atas notch; setelah tersimpan (Flag) hanya sebentar.
         PeekKind.ShelfDrop => Flag ? TimeSpan.FromMilliseconds(1500) : TimeSpan.FromSeconds(30),
         _ => TimeSpan.FromMilliseconds(1500),

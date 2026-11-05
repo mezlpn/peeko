@@ -11,12 +11,15 @@ public sealed class SettingsViewModel : ObservableObject
     private readonly SettingsService _service;
     private readonly ConvertController _convert;
     private readonly Today.WeatherService _weather;
+    private readonly Prayer.PrayerController _prayer;
 
-    public SettingsViewModel(SettingsService service, ConvertController convert, Today.WeatherService weather)
+    public SettingsViewModel(SettingsService service, ConvertController convert, Today.WeatherService weather,
+        Prayer.PrayerController prayer)
     {
         _service = service;
         _convert = convert;
         _weather = weather;
+        _prayer = prayer;
         _cityInput = service.Current.WeatherCity ?? "";
         convert.Changed += () =>
         {
@@ -112,6 +115,39 @@ public sealed class SettingsViewModel : ObservableObject
             _ => $"Tersimpan: {found}",
         };
         OnPropertyChanged(nameof(WeatherLocationText));
+    }
+
+    // ── Jadwal salat ──
+    public bool PrayerEnabled { get => S.PrayerEnabled; set => Set(value, s => s.PrayerEnabled, (s, v) => s.PrayerEnabled = v); }
+    public int PrayerReminderMinutes { get => S.PrayerReminderMinutes; set => Set(value, s => s.PrayerReminderMinutes, (s, v) => s.PrayerReminderMinutes = v); }
+    public int PrayerCountdownMinutes { get => S.PrayerCountdownMinutes; set => Set(value, s => s.PrayerCountdownMinutes, (s, v) => s.PrayerCountdownMinutes = v); }
+    public int PrayerOffsetMinutes { get => S.PrayerOffsetMinutes; set => Set(value, s => s.PrayerOffsetMinutes, (s, v) => s.PrayerOffsetMinutes = v); }
+    public bool AdhanEnabled { get => S.AdhanEnabled; set => Set(value, s => s.AdhanEnabled, (s, v) => s.AdhanEnabled = v); }
+
+    public string AdhanFileText => S.AdhanPath is { Length: > 0 } path ? System.IO.Path.GetFileName(path) : "Belum ada file dipilih";
+
+    public bool HasAdhanFile => S.AdhanPath is { Length: > 0 } path && System.IO.File.Exists(path);
+
+    public string PrayerLocationText => S.WeatherPlace is { Length: > 0 } place
+        ? $"Dihitung untuk {place} (lokasi yang sama dengan cuaca)"
+        : "Lokasi diambil dari pengaturan Cuaca";
+
+    public void SetAdhanFile(string path)
+    {
+        _service.Update(s =>
+        {
+            s.AdhanPath = path;
+            s.AdhanEnabled = true;
+        });
+        OnPropertyChanged(nameof(AdhanFileText));
+        OnPropertyChanged(nameof(HasAdhanFile));
+        OnPropertyChanged(nameof(AdhanEnabled));
+    }
+
+    public void ToggleAdhanPreview()
+    {
+        if (_prayer.AdhanPlaying) _prayer.StopAdhan();
+        else if (S.AdhanPath is { } path) _prayer.PreviewAdhan(path);
     }
 
     // ── Ubah format (Filee) ──

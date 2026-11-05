@@ -62,6 +62,18 @@ public sealed class AppSettings
     public double? WeatherLongitude { get; set; }
     public string? WeatherPlace { get; set; }
 
+    // ── Jadwal salat ──
+    public bool PrayerEnabled { get; set; } = true;
+    /// <summary>Peek pengingat sekian menit sebelum waktu salat; 0 = tanpa pengingat awal.</summary>
+    public int PrayerReminderMinutes { get; set; } = 10;
+    /// <summary>Pil hitung mundur muncul sekian menit sebelum waktu salat; 0 = tidak pernah.</summary>
+    public int PrayerCountdownMinutes { get; set; } = 10;
+    /// <summary>Putar azan dari file pilihan pengguna saat masuk waktu salat.</summary>
+    public bool AdhanEnabled { get; set; }
+    public string? AdhanPath { get; set; }
+    /// <summary>Koreksi manual tiap waktu (menit), mis. menyamakan dengan jadwal masjid setempat.</summary>
+    public int PrayerOffsetMinutes { get; set; }
+
     public const int MinBattery = 10, MaxBattery = 50;
     public const double MaxOffset = 300;
 
@@ -75,6 +87,9 @@ public sealed class AppSettings
         ShortBreakMinutes = Math.Clamp(ShortBreakMinutes, 1, 30);
         LongBreakMinutes = Math.Clamp(LongBreakMinutes, 5, 60);
         HorizontalOffset = Math.Clamp(HorizontalOffset, -MaxOffset, MaxOffset);
+        PrayerReminderMinutes = Math.Clamp(PrayerReminderMinutes, 0, 60);
+        PrayerCountdownMinutes = Math.Clamp(PrayerCountdownMinutes, 0, 60);
+        PrayerOffsetMinutes = Math.Clamp(PrayerOffsetMinutes, -10, 10);
         if (!Enum.IsDefined(SlimMode)) SlimMode = SlimMode.Auto;
         return this;
     }

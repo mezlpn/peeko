@@ -164,6 +164,7 @@
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Baterai" Content="Baterai" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Minum" Content="Minum air" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Fokus" Content="Timer fokus" Checked="OnNav" />
+                        <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Salat" Content="Jadwal salat" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Lirik" Content="Lirik" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Cuaca" Content="Cuaca" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Ubah" Content="Ubah format" Checked="OnNav" />
@@ -254,6 +255,11 @@
                                     <Grid Style="{StaticResource Row}" MinHeight="40">
                                         <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Minum air" />
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding WaterEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Jadwal salat" />
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding PrayerEnabled}" />
                                     </Grid>
                                     <Border Style="{StaticResource RowLine}" />
                                     <Grid Style="{StaticResource Row}" MinHeight="40">
@@ -363,6 +369,62 @@
                                     </Grid>
                                 </StackPanel>
                             </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="Salat" Margin="0,0,0,22">
+                            <TextBlock Style="{StaticResource SectionHeader}" Text="JADWAL SALAT" />
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,130,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Ingatkan sebelum waktu salat" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="0 = hanya saat masuk waktu" />
+                                        </StackPanel>
+                                        <controls:Stepper HorizontalAlignment="Right" VerticalAlignment="Center" Minimum="0" Maximum="60" Step="5" Suffix="mnt"
+                                                          Value="{Binding PrayerReminderMinutes}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,130,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Hitung mundur di notch" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Pil menampilkan sisa menit menjelang waktu salat; 0 = mati" />
+                                        </StackPanel>
+                                        <controls:Stepper HorizontalAlignment="Right" VerticalAlignment="Center" Minimum="0" Maximum="60" Step="5" Suffix="mnt"
+                                                          Value="{Binding PrayerCountdownMinutes}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,130,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Koreksi waktu" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Samakan dengan jadwal masjid setempat" />
+                                        </StackPanel>
+                                        <controls:Stepper HorizontalAlignment="Right" VerticalAlignment="Center" Minimum="-10" Maximum="10" Suffix="mnt"
+                                                          Value="{Binding PrayerOffsetMinutes}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Putar azan" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Dari rekaman pilihanmu (mp3, m4a, wav). Diam saat Jangan ganggu." />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                  IsChecked="{Binding AdhanEnabled}" IsEnabled="{Binding HasAdhanFile}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,8,200,8"
+                                                   TextTrimming="CharacterEllipsis" Text="{Binding AdhanFileText}" />
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <Button Style="{StaticResource CardButton}" Content="Coba putar" IsEnabled="{Binding HasAdhanFile}" Click="OnAdhanPreview" />
+                                            <Button Style="{StaticResource CardButton}" Margin="8,0,0,0" Content="Pilih file…" Click="OnPickAdhan" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            <TextBlock Style="{StaticResource Hint}" Margin="2,8,0,0" Foreground="{StaticResource Peeko.Brush.TextTertiary}"
+                                       Text="{Binding PrayerLocationText}" />
+                            <TextBlock Style="{StaticResource Hint}" Margin="2,2,0,0" Foreground="{StaticResource Peeko.Brush.TextTertiary}" TextWrapping="Wrap"
+                                       Text="Dihitung di laptopmu dengan kriteria Kemenag RI (Subuh −20°, Isya −18°, ihtiyat 2 menit), tanpa internet." />
                         </StackPanel>
 
                         <StackPanel x:Name="Lirik" Margin="0,0,0,22">

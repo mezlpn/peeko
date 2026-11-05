@@ -14,18 +14,23 @@ public enum CollapsedActivity
     Water,
     /// <summary>Ada versi baru: menggantikan mata dan musik sampai dipasang.</summary>
     Update,
+    /// <summary>Beberapa menit sebelum waktu salat: hitung mundur.</summary>
+    Prayer,
 }
 
 /// <summary>
 /// Memilih isi pil. Prioritas dari desain (Collapsed.dc.html): pengingat minum → timer fokus →
 /// musik → idle; timer dan musik bisa tampil bersama. Update tersedia menyela setelah timer:
 /// mengganggu dengan sengaja, tapi tidak menyembunyikan hitung mundur orang yang sedang fokus.
+/// Hitung mundur salat (hanya beberapa menit terakhir) menang atas semuanya kecuali pengingat minum.
 /// </summary>
 public static class ActivityArbiter
 {
-    public static CollapsedActivity Pick(bool musicLive, FocusStatus focus, bool waterReminder, bool updateAvailable = false)
+    public static CollapsedActivity Pick(bool musicLive, FocusStatus focus, bool waterReminder, bool updateAvailable = false,
+        bool prayerSoon = false)
     {
         if (waterReminder) return CollapsedActivity.Water;
+        if (prayerSoon) return CollapsedActivity.Prayer;
         bool timer = focus != FocusStatus.Ready;
         if (updateAvailable && !timer) return CollapsedActivity.Update;
         return (timer, musicLive) switch

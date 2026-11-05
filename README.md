@@ -170,7 +170,7 @@ powershell -Command "Invoke-CimMethod -ClassName Win32_Process -MethodName Creat
 ```
 
 Argumen pengembang: `--demo-peeks` memutar semua contoh peek; `--settings` langsung membuka Pengaturan;
-`--convert=<file>` membuka panel Ubah format untuk file itu.
+`--convert=<file>` membuka panel Ubah format untuk file itu; `--tab=<n>` membuka panel di tampilan ke-n (0 = Musik).
 
 ## Test
 

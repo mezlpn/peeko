@@ -102,6 +102,10 @@ public partial class NotchWindow : Window
 
     public Updates.UpdatePill UpdatePill => UpdatePillView;
 
+    public Prayer.PrayerPill PrayerPill => PrayerPillView;
+
+    public Prayer.PrayerModule PrayerModule => PrayerModuleView;
+
     public System.Windows.Controls.Button UpdateButton => UpdateChip;
 
     private bool _updateHighlight;
@@ -389,6 +393,7 @@ public partial class NotchWindow : Window
             CollapsedActivity.MusicAndFocus => [MusicPillView, FocusPillView],
             CollapsedActivity.Water => [WaterPillView],
             CollapsedActivity.Update => [UpdatePillView],
+            CollapsedActivity.Prayer => [PrayerPillView],
             _ => new UIElement[] { Kedip },
         });
 
@@ -396,7 +401,7 @@ public partial class NotchWindow : Window
         if (visible)
             AnimateShape(CollapsedSize, CollapsedRadius);
 
-        foreach (var element in new UIElement[] { Kedip, MusicPillView, FocusPillView, WaterPillView, UpdatePillView })
+        foreach (var element in new UIElement[] { Kedip, MusicPillView, FocusPillView, WaterPillView, UpdatePillView, PrayerPillView })
         {
             bool show = wanted.Contains(element);
             if (visible)

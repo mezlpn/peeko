@@ -55,6 +55,18 @@ public partial class SettingsWindow : Window
 
     private void OnFilee(object sender, RoutedEventArgs e) => _vm.ToggleFilee();
 
+    private void OnPickAdhan(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Pilih rekaman azan",
+            Filter = "Audio (*.mp3;*.m4a;*.wav;*.wma;*.aac)|*.mp3;*.m4a;*.wav;*.wma;*.aac|Semua file|*.*",
+        };
+        if (dialog.ShowDialog(this) == true) _vm.SetAdhanFile(dialog.FileName);
+    }
+
+    private void OnAdhanPreview(object sender, RoutedEventArgs e) => _vm.ToggleAdhanPreview();
+
     private void OnEngines(object sender, RoutedEventArgs e) => _vm.OpenEngines();
 
     private async void OnSaveCity(object sender, RoutedEventArgs e) => await _vm.SaveCityAsync();

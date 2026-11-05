@@ -122,6 +122,7 @@ public partial class App : Application
         builder.Services.AddSingleton<Conversion.FileeService>();
         builder.Services.AddSingleton<Conversion.ConvertController>();
         builder.Services.AddSingleton<Today.WeatherService>();
+        builder.Services.AddSingleton<Prayer.PrayerController>();
         // Alat pengembang: --update-feed=<url> mengganti sumber rilis (untuk menguji update tanpa GitHub).
         var feed = e.Args.FirstOrDefault(a => a.StartsWith("--update-feed="))?["--update-feed=".Length..];
         builder.Services.AddSingleton(sp => new UpdateController(sp.GetRequiredService<ILogger<UpdateController>>(), feed));
@@ -154,6 +155,18 @@ public partial class App : Application
         // Alat pengembang: --convert=<file> membuka panel Ubah format untuk file itu.
         var convertArgs = e.Args.Where(a => a.StartsWith("--convert=")).Select(a => a["--convert=".Length..]).ToList();
         if (convertArgs.Count > 0) controller.ConvertFiles(convertArgs);
+
+        // Alat pengembang: --tab=<n> membuka panel di tampilan ke-n (0 = Musik), untuk mengecek tampilan.
+        if (e.Args.FirstOrDefault(a => a.StartsWith("--tab=")) is { } tabArg && int.TryParse(tabArg["--tab=".Length..], out int tab))
+        {
+            var open = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            open.Tick += (_, _) =>
+            {
+                open.Stop();
+                controller.OpenTab(tab);
+            };
+            open.Start();
+        }
 
         // Alat pengembang: putar semua contoh peek bergantian (dipakai untuk mengecek tampilan).
         if (e.Args.Contains("--demo-peeks"))
@@ -236,7 +249,7 @@ public partial class App : Application
         void RefreshStatus()
         {
             var s = settingsService.Current;
-            int modules = new[] { s.MusicEnabled, s.LyricsEnabled, s.FocusEnabled, s.WaterEnabled, s.TodoEnabled, s.ShelfEnabled, s.ControlEnabled, s.TodayEnabled }.Count(x => x);
+            int modules = new[] { s.MusicEnabled, s.LyricsEnabled, s.FocusEnabled, s.WaterEnabled, s.TodoEnabled, s.ShelfEnabled, s.ControlEnabled, s.TodayEnabled, s.PrayerEnabled }.Count(x => x);
             statusDot.Fill = (Brush)Resources[hiddenUntil is null ? "Peeko.Brush.Accent" : "Peeko.Brush.TextTertiary"];
             statusText.Text = hiddenUntil is null ? $"Peeko aktif · {modules} modul berjalan" : $"Disembunyikan {hiddenUntil}";
         }

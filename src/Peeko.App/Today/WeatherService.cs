@@ -37,6 +37,9 @@ public sealed class WeatherService
 
     public bool IsEnabled => _settings.Current.WeatherEnabled;
 
+    /// <summary>Kota diganti di Pengaturan.</summary>
+    public event Action? LocationChanged;
+
     /// <summary>Data terbaru (dari cache bila masih segar), atau null jika dimatikan/gagal.</summary>
     public Task<WeatherNow?> GetAsync()
     {
@@ -62,6 +65,7 @@ public sealed class WeatherService
             s.WeatherPlace = at?.City;
         });
         Latest = null;
+        LocationChanged?.Invoke();
         return at?.City ?? "";
     }
 
@@ -85,7 +89,34 @@ public sealed class WeatherService
         }
     }
 
-    private async Task<GeoPoint?> ResolveLocationAsync()
+    /// <summary>
+    /// Lokasi tersimpan, atau dicari sekali (kota pilihan / perkiraan IP). Dipakai juga jadwal salat,
+    /// jadi tetap jalan walau cuaca dimatikan.
+    /// </summary>
+    public Task<GeoPoint?> ResolveLocationAsync()
+    {
+        var s = _settings.Current;
+        if (s.WeatherLatitude is { } lat && s.WeatherLongitude is { } lon)
+            return Task.FromResult<GeoPoint?>(new GeoPoint(lat, lon, s.WeatherPlace));
+        // Cuaca dan jadwal salat meminta bersamaan saat start: cukup satu pencarian.
+        return _locating ??= LocateAsync();
+    }
+
+    private Task<GeoPoint?>? _locating;
+
+    private async Task<GeoPoint?> LocateAsync()
+    {
+        try
+        {
+            return await LocateCoreAsync();
+        }
+        finally
+        {
+            _locating = null;
+        }
+    }
+
+    private async Task<GeoPoint?> LocateCoreAsync()
     {
         var s = _settings.Current;
         if (s.WeatherLatitude is { } lat && s.WeatherLongitude is { } lon) return new GeoPoint(lat, lon, s.WeatherPlace);
