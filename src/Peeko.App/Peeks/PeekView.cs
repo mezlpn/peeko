@@ -124,6 +124,11 @@ public sealed class PeekView : Grid
                 AddLabel("Sesi selesai");
                 AddValue(r.Detail ?? "", "TextSecondary", small: true);
                 break;
+            case PeekKind.TimerDone:
+                AddHappyEyes();
+                AddLabel("Waktu habis");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true);
+                break;
             case PeekKind.BreakDone:
                 AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Focus"], "Accent");
                 AddLabel("Istirahat selesai");

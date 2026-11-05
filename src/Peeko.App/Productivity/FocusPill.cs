@@ -40,22 +40,57 @@ public sealed class FocusPill : StackPanel
         _time.Margin = new Thickness(compact ? 6 : 10, 0, 0, 0);
     }
 
-    public void Update(FocusTimer timer)
+    /// <summary>
+    /// Isi pil untuk timer yang sedang aktif: Pomodoro (limau/amber), timer bebas (biru), atau
+    /// stopwatch (cincin berputar tiap menit).
+    /// </summary>
+    public void Update(FocusController focus)
     {
-        bool paused = timer.Status == FocusStatus.Paused;
-        bool rest = timer.Mode != FocusMode.Focus;
-        var color = paused ? B("TextTertiary") : rest ? B("Rest") : B("Accent");
+        switch (focus.PillKind)
+        {
+            case TimerKind.Countdown:
+            {
+                var t = focus.Countdown;
+                bool paused = t.Status == FocusStatus.Paused;
+                Show(FocusController.Format(t.Remaining), t.RemainingFraction, paused ? "TextTertiary" : "Water",
+                    paused ? "TextSecondary" : "TextPrimary", t.Status == FocusStatus.Running && t.Remaining < TimeSpan.FromMinutes(1));
+                break;
+            }
+            case TimerKind.Stopwatch:
+            {
+                var sw = focus.Stopwatch;
+                bool paused = sw.Status == FocusStatus.Paused;
+                var e = sw.Elapsed;
+                Show(FocusController.Format(e), paused ? 1 : e.Seconds / 60.0, paused ? "TextTertiary" : "TextPrimary",
+                    paused ? "TextSecondary" : "TextPrimary", blink: false);
+                break;
+            }
+            default:
+            {
+                var timer = focus.Timer;
+                bool paused = timer.Status == FocusStatus.Paused;
+                bool rest = timer.Mode != FocusMode.Focus;
+                var remaining = timer.Remaining;
+                Show($"{(int)remaining.TotalMinutes:00}:{remaining.Seconds:00}", timer.RemainingFraction,
+                    paused ? "TextTertiary" : rest ? "Rest" : "Accent",
+                    // Mode istirahat: waktu ikut amber supaya terbaca tanpa label.
+                    paused ? "TextSecondary" : rest ? "Rest" : "TextPrimary",
+                    timer.Status == FocusStatus.Running && remaining < TimeSpan.FromMinutes(1));
+                break;
+            }
+        }
+    }
 
-        var remaining = timer.Remaining;
-        _time.Text = $"{(int)remaining.TotalMinutes:00}:{remaining.Seconds:00}";
-        // Mode istirahat: waktu ikut amber supaya terbaca tanpa label.
-        _time.Foreground = paused ? B("TextSecondary") : rest ? B("Rest") : B("TextPrimary");
-        _dot.Fill = color;
-        _arc.Stroke = color;
-        _arc.Data = Arc(timer.RemainingFraction);
+    private void Show(string text, double fraction, string color, string textColor, bool blink)
+    {
+        _time.Text = text;
+        _time.Foreground = B(textColor);
+        _dot.Fill = B(color);
+        _arc.Stroke = B(color);
+        _arc.Data = Arc(fraction);
 
         // Satu menit terakhir: angka berkedip lembut (opacity 1 ↔ 0.6 tiap 1 dtk).
-        bool blink = timer.Status == FocusStatus.Running && remaining < TimeSpan.FromMinutes(1) && !Motion.Reduced;
+        blink &= !Motion.Reduced;
         if (blink == _blinking) return;
         _blinking = blink;
         if (blink)

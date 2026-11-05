@@ -76,7 +76,7 @@ public partial class NotchWindow
                 return new Size(400, 196);
             case TodayTab:
                 double width = (_calendarEnabled ? 196 : 0) + (_focusEnabled ? 224 : 0) + (_calendarEnabled && _focusEnabled ? 20 : 0);
-                double height = Math.Max(_calendarEnabled ? TodayModuleView.ContentHeight : 0, _focusEnabled ? 146 : 0);
+                double height = Math.Max(_calendarEnabled ? TodayModuleView.ContentHeight : 0, _focusEnabled ? Productivity.FocusModule.ContentHeight : 0);
                 return new Size(width, height);
             case PrayerTab:
                 return new Size(400, 148);

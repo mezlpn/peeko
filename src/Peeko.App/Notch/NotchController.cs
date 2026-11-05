@@ -125,11 +125,11 @@ public sealed class NotchController : IDisposable
         };
 
         // ── Fokus, minum, tugas, rak (tahap 5) ──
-        _window.FocusModule.Attach(_focus.Timer);
-        _window.FocusPill.Update(_focus.Timer);
+        _window.FocusModule.Attach(_focus);
+        _window.FocusPill.Update(_focus);
         _focus.Updated += () =>
         {
-            _window.FocusPill.Update(_focus.Timer);
+            _window.FocusPill.Update(_focus);
             _window.FocusModule.Refresh();
             UpdateActivity();
         };
@@ -334,7 +334,7 @@ public sealed class NotchController : IDisposable
         var s = _settings.Current;
         _window.SetCollapsedActivity(ActivityArbiter.Pick(
             _musicLive && s.MusicEnabled,
-            s.FocusEnabled ? _focus.Timer.Status : Core.Productivity.FocusStatus.Ready,
+            s.FocusEnabled ? _focus.CombinedStatus : Core.Productivity.FocusStatus.Ready,
             _water.ReminderActive && s.WaterEnabled,
             _updates.State != UpdateState.None,
             s.PrayerEnabled && _prayer.CountdownActive,

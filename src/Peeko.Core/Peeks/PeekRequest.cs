@@ -36,6 +36,8 @@ public enum PeekKind
     PrayerTime,
     /// <summary>Tenggat tugas tiba (Text = tugas, Detail = jam).</summary>
     TaskDue,
+    /// <summary>Timer bebas habis (Detail = "05:00 selesai").</summary>
+    TimerDone,
 }
 
 /// <summary>Isi satu peek. Arti tiap field bergantung pada <see cref="Kind"/>.</summary>
@@ -65,7 +67,7 @@ public sealed record PeekRequest(PeekKind Kind)
         PeekKind.CapsLock when !Flag => TimeSpan.FromSeconds(1),
         PeekKind.BatteryLow => TimeSpan.FromSeconds(3),
         PeekKind.BatteryCritical => TimeSpan.FromSeconds(5),
-        PeekKind.FocusDone or PeekKind.BreakDone or PeekKind.UpdateAvailable or PeekKind.Updated => TimeSpan.FromSeconds(4),
+        PeekKind.FocusDone or PeekKind.BreakDone or PeekKind.UpdateAvailable or PeekKind.Updated or PeekKind.TimerDone => TimeSpan.FromSeconds(4),
         PeekKind.ConvertDone or PeekKind.ConvertReady => TimeSpan.FromSeconds(3),
         PeekKind.ConvertFailed or PeekKind.PrayerSoon => TimeSpan.FromSeconds(4),
         PeekKind.PrayerTime => TimeSpan.FromSeconds(8),
