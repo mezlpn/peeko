@@ -29,7 +29,9 @@ public partial class NotchWindow
     public const int LauncherTab = 8;
     public const int ShelfTab = 9;
     public const int ClipboardTab = 10;
-    private const int ModeCount = 11;
+    /// <summary>Pilihan zona saat jendela diseret ke notch; bukan tab biasa (tanpa titik, tidak ikut digulir).</summary>
+    public const int SnapTab = 11;
+    private const int ModeCount = 12;
 
     // Di atas isi: 6 + baris status 24 + 2 + titik 6 + 12; di bawahnya 16. Isi diberi tepi 18.
     private const double ChromeHeight = 6 + 24 + 2 + 6 + 12 + 16;
@@ -38,7 +40,7 @@ public partial class NotchWindow
     private const double WheelStep = 120;
     private static readonly TimeSpan WheelIdleReset = TimeSpan.FromMilliseconds(400);
 
-    private readonly bool[] _modeEnabled = [true, true, true, true, true, true, true, true, true, true, false];
+    private readonly bool[] _modeEnabled = [true, true, true, true, true, true, true, true, true, true, false, false];
     private bool _lyricsEnabled = true, _calendarEnabled = true, _focusEnabled = true, _waterEnabled = true, _healthEnabled = true;
     private readonly Dictionary<FrameworkElement, SpringValue> _modeY = [];
     private readonly List<(Border Dot, SpringValue Width)> _dots = [];
@@ -69,6 +71,7 @@ public partial class NotchWindow
         NotesTab => NotesModuleView,
         LauncherTab => LauncherModuleView,
         ClipboardTab => ClipboardModuleView,
+        SnapTab => SnapModuleView,
         _ => ShelfModuleView,
     };
 
@@ -88,6 +91,8 @@ public partial class NotchWindow
                 return new Size(440, 150);
             case ClipboardTab:
                 return new Size(440, 150);
+            case SnapTab:
+                return new Size(Sistem.SnapModule.ContentWidth, Sistem.SnapModule.ContentHeight);
             case LauncherTab:
                 LauncherModuleView.Height = LauncherModuleView.ContentHeight;
                 return new Size(440, LauncherModuleView.ContentHeight);
@@ -208,6 +213,39 @@ public partial class NotchWindow
     }
 
     public bool IsModuleEnabled(int index) => _modeEnabled[index];
+
+    private int _beforeSnap = MusicTab;
+
+    /// <summary>Sedang menampilkan pilihan zona snap.</summary>
+    public bool Snapping { get; private set; }
+
+    public Sistem.SnapModule SnapModule => SnapModuleView;
+
+    /// <summary>Tampilkan/sembunyikan pilihan zona; setelahnya kembali ke tampilan sebelumnya.</summary>
+    public void ShowSnap(bool on)
+    {
+        if (on == Snapping) return;
+        Snapping = on;
+        if (on)
+        {
+            _beforeSnap = _moduleIndex;
+            _modeEnabled[SnapTab] = true;
+            SelectModule(SnapTab);
+            return;
+        }
+        SnapModuleView.Reset();
+        _modeEnabled[SnapTab] = false;
+        int back = _modeEnabled[_beforeSnap] ? _beforeSnap : Array.IndexOf(_modeEnabled, true);
+        if (back >= 0) SelectModule(back);
+    }
+
+    /// <summary>Kursor (piksel layar) berada di atas atau dekat notch?</summary>
+    public bool IsCursorNear(int screenX, int screenY)
+    {
+        if (PresentationSource.FromVisual(Body) is null) return false;
+        var p = Body.PointFromScreen(new Point(screenX, screenY));
+        return p.X >= -40 && p.X <= Body.ActualWidth + 40 && p.Y >= -20 && p.Y <= Body.ActualHeight + 30;
+    }
 
     /// <summary>Pilih tampilan (walau panel tertutup, mis. buka Musik saat lagu diputar).</summary>
     public void SelectModule(int index)
@@ -331,7 +369,7 @@ public partial class NotchWindow
         string[] names = ["Musik", "Kontrol", "Sistem", "Hari ini", "Salat", "Tugas", "Sehat", "Catatan", "Aplikasi", "Rak", "Clipboard"];
         for (int i = 0; i < ModeCount; i++)
         {
-            if (!_modeEnabled[i]) continue;
+            if (!_modeEnabled[i] || i == SnapTab) continue;
             int index = i;
             var dot = new Border
             {

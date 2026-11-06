@@ -50,6 +50,9 @@ public sealed class NotchController : IDisposable
     private string? _lyricLine;
     private bool _expandingForShelf;
     private ForegroundWindowWatcher? _foreground;
+    private readonly WindowSnapper _snapper = new();
+    private readonly DispatcherTimer _snapTrack = new(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(40) };
+    private IntPtr _snapWindow;
 
     public NotchController(NotchWindow window, NotchStateMachine stateMachine, MusicController music,
         LyricsController lyrics, SystemPeekController peeks, FocusController focus, WaterController water,
@@ -280,6 +283,15 @@ public sealed class NotchController : IDisposable
         _foreground.ForegroundChanged += _peeks.OnForegroundChanged;
         _foreground.ForegroundChanged += _screenTime.OnForegroundChanged;
         _foreground.Start();
+
+        // ── Snap zones: seret jendela ke notch ──
+        _snapper.DragStarted += hwnd =>
+        {
+            _snapWindow = hwnd;
+            _snapTrack.Start(); // hanya selama seretan berlangsung
+        };
+        _snapper.DragEnded += OnSnapDragEnded;
+        _snapTrack.Tick += (_, _) => TrackSnap();
         _slots.SetVisible(_stateMachine.State == NotchState.Collapsed);
 
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
@@ -572,6 +584,13 @@ public sealed class NotchController : IDisposable
             s.PrayerEnabled, s.TodoEnabled, s.WaterEnabled, s.HealthEnabled, s.NotesEnabled, s.LauncherEnabled, s.ShelfEnabled,
             s.ClipboardEnabled);
         _health.Apply();
+        if (s.SnapZonesEnabled) _snapper.Start();
+        else
+        {
+            _snapper.Stop();
+            _snapTrack.Stop();
+            if (_window.Snapping) EndSnap();
+        }
         _screenTime.Apply();
         _clipboard.Apply();
         _prayer.Apply();
@@ -604,6 +623,46 @@ public sealed class NotchController : IDisposable
         _slots.Refresh();
     }
 
+    private void TrackSnap()
+    {
+        var (x, y) = WindowSnapper.Cursor();
+        if (!_window.Snapping)
+        {
+            if (!_window.IsCursorNear(x, y)) return;
+            _window.ShowSnap(true);
+            _stateMachine.ExpandNow();
+            _stateMachine.SetHoldOpen(true);
+        }
+        else if (!_window.IsCursorNear(x, y))
+        {
+            // Menjauh dari notch: batal.
+            EndSnap();
+            return;
+        }
+        _window.SnapModule.Hover(x, y);
+    }
+
+    private void OnSnapDragEnded(IntPtr hwnd)
+    {
+        _snapTrack.Stop();
+        if (!_window.Snapping) return;
+        var zone = _window.SnapModule.Hovered;
+        var target = _snapWindow;
+        EndSnap();
+        if (zone is not null && target != IntPtr.Zero)
+        {
+            // Tunggu Windows selesai dengan seretannya sendiri, baru atur posisi.
+            _window.Dispatcher.BeginInvoke(() => WindowSnapper.Snap(target, zone), DispatcherPriority.Background);
+        }
+    }
+
+    private void EndSnap()
+    {
+        _window.ShowSnap(false);
+        _stateMachine.SetHoldOpen(false);
+        _stateMachine.PointerExited();
+    }
+
     /// <summary>Win + Alt + C: buka panel, atau tutup jika sedang terbuka.</summary>
     private void ToggleFromHotkey()
     {
@@ -625,6 +684,7 @@ public sealed class NotchController : IDisposable
     {
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
         _foreground?.Dispose();
+        _snapper.Dispose();
         _peeks.Dispose();
         _focus.Dispose();
         _prayer.Dispose();

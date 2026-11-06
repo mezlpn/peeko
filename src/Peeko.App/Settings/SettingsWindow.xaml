@@ -322,6 +322,14 @@
                                     </Grid>
                                     <Border Style="{StaticResource RowLine}" />
                                     <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,0,56,0">
+                                            <TextBlock Style="{StaticResource Label}" Text="Snap zones" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Seret jendela ke notch, lalu lepas di zona (kiri, kanan, sepertiga…) untuk menatanya." />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding SnapZonesEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
                                         <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Kontrol (Wi-Fi, Bluetooth, volume…)" />
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ControlEnabled}" />
                                     </Grid>
