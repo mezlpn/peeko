@@ -40,6 +40,7 @@ public sealed class NotchController : IDisposable
     private readonly HealthController _health;
     private readonly Sistem.ScreenTimeController _screenTime;
     private readonly ClipboardController _clipboard;
+    private readonly Today.CalendarService _calendar;
     private bool _rawFullscreen;
     private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
@@ -59,7 +60,7 @@ public sealed class NotchController : IDisposable
         ListsController lists, SettingsService settings, UpdateController updates, ConvertController convert,
         Today.WeatherService weather, Prayer.PrayerController prayer, CollapsedSlotsController slots,
         TaskReminderController tasks, HealthController health, Sistem.ScreenTimeController screenTime,
-        ClipboardController clipboard, ILogger<NotchController> log)
+        ClipboardController clipboard, Today.CalendarService calendar, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -78,6 +79,7 @@ public sealed class NotchController : IDisposable
         _health = health;
         _screenTime = screenTime;
         _clipboard = clipboard;
+        _calendar = calendar;
         _log = log;
         _window.AttachWeather(weather);
     }
@@ -185,6 +187,16 @@ public sealed class NotchController : IDisposable
             _stateMachine.SetHoldOpen(active);
         };
         _window.ClipboardModule.Attach(_clipboard);
+
+        // ── Kalender (.ics) ──
+        _window.Agenda.Attach(_calendar);
+        _calendar.PeekRequested += ShowPeek;
+        _window.VisibleModuleChanged += module =>
+        {
+            if (module != NotchWindow.TodayTab) return;
+            _window.Agenda.Refresh();
+            _calendar.RefreshIfStale();
+        };
         _window.ClipboardModule.PeekRequested += request =>
         {
             // Disalin dari tab Clipboard yang sedang terbuka: cukup banner kecil di dalam panel.
@@ -598,6 +610,8 @@ public sealed class NotchController : IDisposable
         }
         _screenTime.Apply();
         _clipboard.Apply();
+        _calendar.Apply();
+        _window.Agenda.Refresh();
         _prayer.Apply();
         _tasks.Evaluate();
         if (_window.ShelfModule.ConvertAvailable != s.ConvertEnabled)
@@ -698,6 +712,7 @@ public sealed class NotchController : IDisposable
         _health.Dispose();
         _screenTime.Dispose();
         _clipboard.Dispose();
+        _calendar.Dispose();
         _window.LauncherModule.Flush();
         _water.Dispose();
         _lists.Dispose();

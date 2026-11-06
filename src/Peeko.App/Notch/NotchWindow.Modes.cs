@@ -99,7 +99,9 @@ public partial class NotchWindow
             case TodayTab:
                 double width = (_calendarEnabled ? 196 : 0) + (_focusEnabled ? 224 : 0) + (_calendarEnabled && _focusEnabled ? 20 : 0);
                 double height = Math.Max(_calendarEnabled ? TodayModuleView.ContentHeight : 0, _focusEnabled ? Productivity.FocusModule.ContentHeight : 0);
-                return new Size(width, height);
+                double agenda = AgendaView.ContentHeight;
+                AgendaView.Width = Math.Max(width, 400);
+                return new Size(Math.Max(width, agenda > 0 ? 400 : 0), height + agenda);
             case PrayerTab:
                 return new Size(400, 148);
             case TodoTab:
@@ -149,6 +151,7 @@ public partial class NotchWindow
         ShelfModuleView.FilledView.IsVisibleChanged += (_, _) => RefreshExpandedShape();
         LauncherModuleView.SizeChanged += RefreshExpandedShape;
         ShelfModuleView.PhoneChanged += RefreshExpandedShape;
+        AgendaView.SizeChanged2 += RefreshExpandedShape;
         ShelfModuleView.ConvertPanel.IsVisibleChanged += (_, _) => RefreshExpandedShape();
         if (LyricsModuleView.DataContext is INotifyPropertyChanged lyrics)
             lyrics.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(LyricsViewModel.State)) RefreshExpandedShape(); };

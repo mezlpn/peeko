@@ -91,6 +91,8 @@ public partial class SettingsWindow : Window
 
     private async void OnSaveCity(object sender, RoutedEventArgs e) => await _vm.SaveCityAsync();
 
+    private void OnSaveCalendar(object sender, RoutedEventArgs e) => _vm.SaveCalendar();
+
     private async void OnCityKey(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key != System.Windows.Input.Key.Enter) return;

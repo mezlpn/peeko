@@ -14,8 +14,11 @@ public sealed class SettingsViewModel : ObservableObject
     private readonly Prayer.PrayerController _prayer;
 
     public SettingsViewModel(SettingsService service, ConvertController convert, Today.WeatherService weather,
-        Prayer.PrayerController prayer)
+        Prayer.PrayerController prayer, Today.CalendarService calendar)
     {
+        _calendar = calendar;
+        _calendarInput = string.Join(Environment.NewLine, service.Current.CalendarUrls);
+        calendar.Updated += () => OnPropertyChanged(nameof(CalendarStatus));
         _service = service;
         _convert = convert;
         _weather = weather;
@@ -118,6 +121,25 @@ public sealed class SettingsViewModel : ObservableObject
 
     private string _cityInput;
     public string CityInput { get => _cityInput; set => SetProperty(ref _cityInput, value); }
+
+    // ── Kalender ──
+    private readonly Today.CalendarService _calendar;
+    private string _calendarInput;
+
+    public string CalendarUrlsInput { get => _calendarInput; set => SetProperty(ref _calendarInput, value); }
+
+    public string CalendarStatus => !_calendar.IsEnabled ? "Belum ada kalender"
+        : _calendar.LastError ?? $"{_calendar.Events.Count} acara dalam seminggu ini";
+
+    public void SaveCalendar()
+    {
+        var urls = CalendarUrlsInput.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(u => u.StartsWith("http", StringComparison.OrdinalIgnoreCase) || u.StartsWith("webcal", StringComparison.OrdinalIgnoreCase))
+            .Distinct().ToList();
+        _service.Update(s => s.CalendarUrls = urls);
+        CalendarUrlsInput = string.Join(Environment.NewLine, urls);
+        OnPropertyChanged(nameof(CalendarStatus));
+    }
 
     private string _cityStatus = "";
     public string CityStatus { get => _cityStatus; private set => SetProperty(ref _cityStatus, value); }

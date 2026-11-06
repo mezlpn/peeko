@@ -191,6 +191,8 @@ public partial class NotchWindow : Window
 
     public ClipboardModule ClipboardModule => ClipboardModuleView;
 
+    public Today.AgendaView Agenda => AgendaView;
+
     public Today.TodayModule TodayModule => TodayModuleView;
 
     public FrameworkElement DropTarget => ShapeHost;

@@ -103,6 +103,12 @@ public sealed class AppSettings
     /// <summary>Seret jendela ke notch untuk menatanya. Mati dari awal.</summary>
     public bool SnapZonesEnabled { get; set; }
 
+    // ── Kalender ──
+    /// <summary>Tautan iCal (.ics) rahasia dari Google/Outlook. Kosong = kalender mati.</summary>
+    public List<string> CalendarUrls { get; set; } = [];
+    /// <summary>Peek pengingat sekian menit sebelum acara.</summary>
+    public int CalendarReminderMinutes { get; set; } = 5;
+
     public const int MinBattery = 10, MaxBattery = 50;
     public const double MaxOffset = 300;
 

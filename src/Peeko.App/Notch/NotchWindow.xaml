@@ -145,10 +145,12 @@
                                                Visibility="Collapsed" />
                             <sistem:SystemModule x:Name="SystemModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
                                                  Visibility="Collapsed" />
-                            <StackPanel x:Name="TodayMode" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top"
-                                        Visibility="Collapsed">
-                                <today:TodayModule x:Name="TodayModuleView" />
-                                <prod:FocusModule x:Name="FocusModuleView" Margin="20,0,0,0" />
+                            <StackPanel x:Name="TodayMode" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Collapsed">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <today:TodayModule x:Name="TodayModuleView" />
+                                    <prod:FocusModule x:Name="FocusModuleView" Margin="20,0,0,0" />
+                                </StackPanel>
+                                <today:AgendaView x:Name="AgendaView" Visibility="Collapsed" />
                             </StackPanel>
                             <prayer:PrayerModule x:Name="PrayerModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
                                                  Visibility="Collapsed" />

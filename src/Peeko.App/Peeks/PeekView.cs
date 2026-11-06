@@ -174,6 +174,11 @@ public sealed class PeekView : Grid
                 AddLabel(r.Text ?? "Selesai");
                 AddValue(r.Detail ?? "", "TextSecondary", small: true);
                 break;
+            case PeekKind.Meeting:
+                AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Today"], "Accent");
+                AddLabel(r.Text ?? "");
+                AddValue(r.Flag ? $"{r.Detail} · buka tab Hari ini untuk gabung" : r.Detail ?? "", "TextSecondary", small: true, maxWidth: 170);
+                break;
             case PeekKind.FileAction:
                 AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Shelf"], r.Flag ? "Accent" : "Danger");
                 AddLabel(r.Text ?? "");
