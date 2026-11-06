@@ -559,6 +559,15 @@
                                     <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding FetchLyrics}" />
                                 </Grid>
                             </Border>
+                            <Border Style="{StaticResource Card}" Margin="0,8,0,0">
+                                <Grid Style="{StaticResource Row}">
+                                    <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                        <TextBlock Style="{StaticResource Label}" Text="Romanisasi lirik Korea dan Jepang" />
+                                        <TextBlock Style="{StaticResource Hint}" TextWrapping="Wrap" Text="Hangul dan kana ditulis dengan huruf Latin (사랑해 → saranghae), tanpa internet. Kanji/Hanzi tetap seperti aslinya." />
+                                    </StackPanel>
+                                    <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding RomanizeLyrics}" />
+                                </Grid>
+                            </Border>
                         </StackPanel>
 
                         <StackPanel x:Name="Cuaca" Margin="0,0,0,22">

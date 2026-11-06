@@ -115,6 +115,7 @@ public sealed class SettingsViewModel : ObservableObject
 
     // ── Lirik ──
     public bool FetchLyrics { get => S.FetchLyrics; set => Set(value, s => s.FetchLyrics, (s, v) => s.FetchLyrics = v); }
+    public bool RomanizeLyrics { get => S.RomanizeLyrics; set => Set(value, s => s.RomanizeLyrics, (s, v) => s.RomanizeLyrics = v); }
 
     // ── Cuaca ──
     public bool WeatherEnabled { get => S.WeatherEnabled; set => Set(value, s => s.WeatherEnabled, (s, v) => s.WeatherEnabled = v); }

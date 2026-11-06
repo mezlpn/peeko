@@ -74,6 +74,9 @@ public sealed class LyricsController : IDisposable
 
     public LyricsViewModel ViewModel { get; }
 
+    /// <summary>Romanisasi lirik Hangul/kana (diatur NotchController dari Pengaturan).</summary>
+    public bool Romanize { get; set; }
+
     /// <summary>Tombol "Buka pengaturan" di state lirik dimatikan.</summary>
     public event Action? OpenSettingsRequested;
 
@@ -172,6 +175,11 @@ public sealed class LyricsController : IDisposable
         return q is null ? state.Track.Title : $"{q.Artist} {q.Title}".Trim();
     }
 
+    /// <summary>Muat ulang lirik lagu sekarang (dari cache) setelah pengaturan tampilan berubah.</summary>
+    public Task ReloadAsync() => _music.State is null || ViewModel.State is not (LyricsViewState.Synced or LyricsViewState.Plain)
+        ? Task.CompletedTask
+        : FetchAsync(retry: false);
+
     /// <summary>Cari lirik dengan kata kunci sendiri untuk lagu yang sedang diputar.</summary>
     public async Task SearchManualAsync(string text)
     {
@@ -245,12 +253,12 @@ public sealed class LyricsController : IDisposable
         switch (result)
         {
             case LyricsResult.Synced s:
-                SetLyrics(s.Lyrics);
+                SetLyrics(Romanize ? new SyncedLyrics([.. s.Lyrics.Lines.Select(l => l with { Text = Romanizer.Romanize(l.Text) })]) : s.Lyrics);
                 ViewModel.State = LyricsViewState.Synced;
                 break;
             case LyricsResult.Plain p:
                 SetLyrics(null);
-                ViewModel.PlainText = p.Text.Trim();
+                ViewModel.PlainText = Romanize ? Romanizer.Romanize(p.Text.Trim()) : p.Text.Trim();
                 ViewModel.State = LyricsViewState.Plain;
                 break;
             case LyricsResult.Instrumental:

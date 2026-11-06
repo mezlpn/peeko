@@ -55,6 +55,8 @@ public sealed class AppSettings
 
     // ── Lirik ──
     public bool FetchLyrics { get; set; } = true;
+    /// <summary>Tulis lirik Hangul/kana dengan huruf Latin.</summary>
+    public bool RomanizeLyrics { get; set; }
 
     // ── Cuaca (tab Hari ini) ──
     public bool WeatherEnabled { get; set; } = true;

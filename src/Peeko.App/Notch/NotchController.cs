@@ -644,6 +644,11 @@ public sealed class NotchController : IDisposable
             if (!s.ConvertEnabled) _convert.Close();
         }
 
+        if (_lyrics.Romanize != s.RomanizeLyrics)
+        {
+            _lyrics.Romanize = s.RomanizeLyrics;
+            _ = _lyrics.ReloadAsync();
+        }
         _lyrics.SetFetchEnabled(s.LyricsEnabled && s.FetchLyrics);
         _peeks.SetBatteryThreshold(s.BatteryThreshold);
         _water.Apply(s.WaterEnabled, s.WaterGoal, s.WaterIntervalMinutes);
