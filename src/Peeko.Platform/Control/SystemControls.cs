@@ -134,6 +134,49 @@ public static class SystemControls
         return (s.BatteryLifePercent, s.ACLineStatus == 1, (s.BatteryFlag & 8) != 0, remaining);
     }
 
+    // ── Tetap terjaga ──────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Layar tidak mati dan laptop tidak tidur selama aktif (seperti PowerToys Awake). Harus dipanggil
+    /// dari thread yang hidup terus (thread UI), karena Windows mengikat permintaan ini ke thread pemanggil.
+    /// Peeko keluar = permintaan otomatis dilepas.
+    /// </summary>
+    public static void SetKeepAwake(bool on)
+    {
+        const uint ES_CONTINUOUS = 0x80000000, ES_SYSTEM_REQUIRED = 0x1, ES_DISPLAY_REQUIRED = 0x2;
+        SetThreadExecutionState(on ? ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED : ES_CONTINUOUS);
+    }
+
+    // ── Mode gelap ─────────────────────────────────────────────────────────
+
+    private const string PersonalizeKey = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
+
+    /// <summary>Windows dan aplikasi memakai mode gelap? Null jika tidak terbaca.</summary>
+    public static bool? IsDarkMode()
+    {
+        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(PersonalizeKey);
+        return key?.GetValue("AppsUseLightTheme") is int light ? light == 0 : null;
+    }
+
+    /// <summary>Ganti mode gelap/terang untuk Windows dan aplikasi, sama seperti Pengaturan → Warna.</summary>
+    public static bool SetDarkMode(bool dark)
+    {
+        try
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(PersonalizeKey);
+            key.SetValue("AppsUseLightTheme", dark ? 0 : 1, Microsoft.Win32.RegistryValueKind.DWord);
+            key.SetValue("SystemUsesLightTheme", dark ? 0 : 1, Microsoft.Win32.RegistryValueKind.DWord);
+            // Kabari jendela lain supaya langsung berganti tanpa logout.
+            const int HWND_BROADCAST = 0xFFFF, WM_SETTINGCHANGE = 0x001A, SMTO_ABORTIFHUNG = 0x2;
+            SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero, "ImmersiveColorSet", SMTO_ABORTIFHUNG, 200, out _);
+            return true;
+        }
+        catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+        {
+            return false;
+        }
+    }
+
     // ── Pintasan ───────────────────────────────────────────────────────────
 
     /// <summary>Buka halaman Pengaturan Windows, mis. "ms-settings:batterysaver".</summary>
@@ -186,4 +229,10 @@ public static class SystemControls
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool LockWorkStation();
+
+    [DllImport("kernel32.dll")]
+    private static extern uint SetThreadExecutionState(uint flags);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr SendMessageTimeout(int hWnd, int msg, IntPtr wParam, string lParam, int flags, int timeout, out IntPtr result);
 }

@@ -174,8 +174,6 @@
     <Geometry x:Key="Peeko.Icon.Apps">M5,5 H10 V10 H5 Z M14,5 H19 V10 H14 Z M5,14 H10 V19 H5 Z M14,14 H19 V19 H14 Z</Geometry>
     <Geometry x:Key="Peeko.Icon.Chevron">M10,7 L15,12 L10,17</Geometry>
     <Geometry x:Key="Peeko.Icon.Back">M14,7 L9,12 L14,17</Geometry>
-    <Geometry x:Key="Peeko.Icon.Check">M5.5,12.5 L10,17 L18.5,7.5</Geometry>
-    <Geometry x:Key="Peeko.Icon.Plus">M12,5.5 V18.5 M5.5,12 H18.5</Geometry>
     <Geometry x:Key="Peeko.Icon.Refresh">M19,12 A7,7 0 1 1 16.9,7 M19,4.5 V8 H15.5</Geometry>
 
     <!-- Digambar di kanvas 24 × 24 seperti viewBox SVG-nya, lalu diskalakan ke 16 px. -->

@@ -122,6 +122,7 @@ public sealed class NotchController : IDisposable
         // Peek sistem bisa dimatikan di Pengaturan; baterai kritis selalu muncul.
         _peeks.PeekRequested += request =>
         {
+            if (request.Kind == PeekKind.MicMute) _window.ControlModule.SetMicMuted(request.Flag);
             if (_settings.Current.SystemPeeksEnabled || request.Kind == PeekKind.BatteryCritical)
                 ShowPeek(request);
         };
@@ -150,6 +151,11 @@ public sealed class NotchController : IDisposable
         };
 
         _window.TodoModule.MenuOpenChanged += _stateMachine.SetHoldOpen;
+        _window.ControlModule.TextInputChanged += active =>
+        {
+            _window.SetTextInput(active);
+            _stateMachine.SetHoldOpen(active);
+        };
 
         // ── Catatan & kesehatan ──
         _window.NotesModule.Attach(_lists.Notes);
@@ -290,7 +296,7 @@ public sealed class NotchController : IDisposable
         // Jangan Ganggu (Command Center): hanya baterai kritis yang tetap muncul.
         if (_window.ControlModule.Quiet && request.Kind != PeekKind.BatteryCritical) return;
         // Volume/kecerahan sedang digeser di Command Center; angkanya sudah terlihat di sana.
-        if (request.Kind is PeekKind.Volume or PeekKind.Brightness && _window.VisibleModule == NotchWindow.ControlTab) return;
+        if (request.Kind is PeekKind.Volume or PeekKind.Brightness or PeekKind.MicMute && _window.VisibleModule == NotchWindow.ControlTab) return;
         if (_stateMachine.State == NotchState.Expanded)
         {
             _window.ShowBanner(request);

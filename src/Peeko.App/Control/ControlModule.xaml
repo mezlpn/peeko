@@ -22,7 +22,7 @@
                                 <Ellipse x:Name="IconBg" Width="30" Height="30" Fill="{StaticResource Peeko.Brush.SurfaceHover}" />
                                 <Path x:Name="Icon" Style="{StaticResource Peeko.IconPath}" Data="{TemplateBinding Tag}"
                                       Stroke="{TemplateBinding Foreground}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <ContentPresenter Grid.Column="1" Margin="9,0,0,0" VerticalAlignment="Center" />
+                                <ContentPresenter Grid.Column="1" Margin="9,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -81,10 +81,71 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Tombol bundar yang bisa nyala/mati (tetap terjaga, mode gelap, mikrofon). -->
+        <Style x:Key="RoundToggle" TargetType="ToggleButton">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextSecondary}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bg" CornerRadius="18" Background="{StaticResource Peeko.Brush.SurfaceRaised}">
+                            <Path Style="{StaticResource Peeko.IconPath}" Data="{TemplateBinding Tag}" Stroke="{TemplateBinding Foreground}"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Peeko.Brush.SurfaceHover}" />
+                                <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextPrimary}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Peeko.Brush.Accent}" />
+                                <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.AccentInk}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Panah kecil untuk membuka daftar (Wi-Fi, Bluetooth, perangkat audio). -->
+        <Style x:Key="Chevron" TargetType="Button">
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" CornerRadius="12" Background="Transparent">
+                            <Path Style="{StaticResource Peeko.IconPath}" Data="{StaticResource Peeko.Icon.Chevron}" Stroke="{TemplateBinding Foreground}"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Path.LayoutTransform>
+                                    <ScaleTransform ScaleX="0.75" ScaleY="0.75" />
+                                </Path.LayoutTransform>
+                            </Path>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#26FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
+    <Grid Height="196">
     <!-- Susunan Bloom: ubin 2 × 2, baris tombol bundar, lalu slider. Lebar 400 × 196. -->
-    <Grid VerticalAlignment="Top">
+    <Grid x:Name="MainView" VerticalAlignment="Top">
         <Grid.RowDefinitions>
             <RowDefinition Height="92" />
             <RowDefinition Height="10" />
@@ -106,16 +167,32 @@
             </Grid.RowDefinitions>
 
             <ToggleButton x:Name="WifiTile" Style="{StaticResource Tile}" Tag="{StaticResource Peeko.Icon.Wifi}" Click="OnWifi">
-                <StackPanel>
-                    <TextBlock Style="{StaticResource TileTitle}" Text="Wi-Fi" />
-                    <TextBlock x:Name="WifiStatus" Style="{StaticResource TileStatus}" Text="…" />
-                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TileTitle}" Text="Wi-Fi" />
+                        <TextBlock x:Name="WifiStatus" Style="{StaticResource TileStatus}" Text="…" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Style="{StaticResource Chevron}" Margin="0,0,-6,0" Tag="Wifi" Click="OnOpenDetail"
+                            ToolTip="Lihat daftar Wi-Fi" />
+                </Grid>
             </ToggleButton>
             <ToggleButton x:Name="BluetoothTile" Grid.Column="2" Style="{StaticResource Tile}" Tag="{StaticResource Peeko.Icon.Bluetooth}" Click="OnBluetooth">
-                <StackPanel>
-                    <TextBlock Style="{StaticResource TileTitle}" Text="Bluetooth" />
-                    <TextBlock x:Name="BluetoothStatus" Style="{StaticResource TileStatus}" Text="…" />
-                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TileTitle}" Text="Bluetooth" />
+                        <TextBlock x:Name="BluetoothStatus" Style="{StaticResource TileStatus}" Text="…" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Style="{StaticResource Chevron}" Margin="0,0,-6,0" Tag="Bluetooth" Click="OnOpenDetail"
+                            ToolTip="Lihat daftar Bluetooth" />
+                </Grid>
             </ToggleButton>
             <ToggleButton x:Name="QuietTile" Grid.Row="2" Style="{StaticResource Tile}" Tag="{StaticResource Peeko.Icon.Moon}" Click="OnQuiet">
                 <StackPanel>
@@ -134,9 +211,15 @@
         </Grid>
 
         <!-- Pintasan -->
-        <UniformGrid Grid.Row="2" Columns="4">
-            <Button Style="{StaticResource Round}" Tag="{StaticResource Peeko.Icon.Bell}" ToolTip="Pusat notifikasi" Click="OnNotifications" />
+        <UniformGrid Grid.Row="2" Columns="7">
+            <ToggleButton x:Name="AwakeButton" Style="{StaticResource RoundToggle}" Tag="{StaticResource Peeko.Icon.Cup}"
+                          ToolTip="Tetap terjaga: layar tidak mati selama aktif" Click="OnAwake" />
+            <ToggleButton x:Name="DarkButton" Style="{StaticResource RoundToggle}" Tag="{StaticResource Peeko.Icon.Contrast}"
+                          ToolTip="Mode gelap Windows" Click="OnDark" />
+            <ToggleButton x:Name="MicButton" Style="{StaticResource RoundToggle}" Tag="{StaticResource Peeko.Icon.MicOff}"
+                          ToolTip="Bisukan mikrofon" Click="OnMic" />
             <Button Style="{StaticResource Round}" Tag="{StaticResource Peeko.Icon.Crop}" ToolTip="Tangkap layar" Click="OnSnip" />
+            <Button Style="{StaticResource Round}" Tag="{StaticResource Peeko.Icon.Bell}" ToolTip="Pusat notifikasi" Click="OnNotifications" />
             <Button Style="{StaticResource Round}" Tag="{StaticResource Peeko.Icon.Lock}" ToolTip="Kunci layar" Click="OnLock" />
             <Button Style="{StaticResource Round}" Tag="{StaticResource Peeko.Icon.Gear}" ToolTip="Pengaturan Windows" Click="OnWindowsSettings" />
         </UniformGrid>
@@ -147,6 +230,7 @@
                 <ColumnDefinition Width="24" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="44" />
+                <ColumnDefinition Width="28" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="22" />
@@ -160,6 +244,8 @@
                     VerticalAlignment="Center" ValueChanged="OnVolumeChanged" />
             <TextBlock x:Name="VolumeText" Grid.Column="2" Style="{StaticResource Peeko.Text.Caption}" TextAlignment="Right"
                        VerticalAlignment="Center" Text="–" />
+            <Button Grid.Column="3" Style="{StaticResource Chevron}" Foreground="{StaticResource Peeko.Brush.TextSecondary}"
+                    HorizontalAlignment="Right" Tag="Audio" Click="OnOpenDetail" ToolTip="Pilih speaker dan mikrofon" />
 
             <Path Grid.Row="2" Style="{StaticResource Peeko.IconPath}" Data="{StaticResource Peeko.Icon.Sun}"
                   Stroke="{StaticResource Peeko.Brush.TextSecondary}" HorizontalAlignment="Left" VerticalAlignment="Center" />
@@ -168,5 +254,41 @@
             <TextBlock x:Name="BrightnessText" Grid.Row="2" Grid.Column="2" Style="{StaticResource Peeko.Text.Caption}" TextAlignment="Right"
                        VerticalAlignment="Center" Text="–" />
         </Grid>
+    </Grid>
+
+    <!-- Daftar Wi-Fi / Bluetooth / perangkat audio: judul + daftar yang bisa digulir. -->
+    <Grid x:Name="DetailView" Visibility="Collapsed">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28" />
+            <RowDefinition Height="6" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Button Style="{StaticResource Round}" Width="28" Height="28" HorizontalAlignment="Left" Tag="{StaticResource Peeko.Icon.Back}"
+                ToolTip="Kembali" Click="OnCloseDetail" />
+        <TextBlock x:Name="DetailTitle" Style="{StaticResource Peeko.Text.BodyStrong}" Margin="38,0,0,0" VerticalAlignment="Center" />
+        <TextBlock x:Name="DetailHint" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Right" Margin="0,0,38,0"
+                   VerticalAlignment="Center" />
+        <Button x:Name="DetailRefresh" Style="{StaticResource Round}" Width="28" Height="28" HorizontalAlignment="Right"
+                Tag="{StaticResource Peeko.Icon.Refresh}" ToolTip="Muat ulang" Click="OnRefreshDetail" />
+
+        <!-- Password Wi-Fi: muncul saat jaringan baru butuh password. Enter = sambung, Esc = batal. -->
+        <Grid x:Name="PasswordRow" Grid.Row="2" Height="32" Margin="0,0,0,6" Visibility="Collapsed">
+            <Border CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
+                    BorderBrush="{StaticResource Peeko.Brush.StrokeStrong}" BorderThickness="1" />
+            <PasswordBox x:Name="PasswordInput" Margin="10,0,90,0" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
+                         Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{StaticResource Peeko.Brush.Accent}"
+                         SelectionBrush="{StaticResource Peeko.Brush.Accent}" FontSize="13" KeyDown="OnPasswordKey"
+                         PasswordChanged="OnPasswordChanged" />
+            <TextBlock x:Name="PasswordPlaceholder" Style="{StaticResource Peeko.Text.Body}" Margin="12,0,90,0" VerticalAlignment="Center"
+                       Foreground="{StaticResource Peeko.Brush.TextTertiary}" IsHitTestVisible="False" TextTrimming="CharacterEllipsis" />
+            <Button Style="{StaticResource Peeko.Button.Pill}" Height="24" Padding="10,0" Margin="0,0,4,0" HorizontalAlignment="Right"
+                    Content="Sambung" Click="OnPasswordConnect" />
+        </Grid>
+
+        <ScrollViewer x:Name="DetailScroll" Grid.Row="3" VerticalScrollBarVisibility="Hidden">
+            <StackPanel x:Name="DetailList" />
+        </ScrollViewer>
+    </Grid>
     </Grid>
 </UserControl>
