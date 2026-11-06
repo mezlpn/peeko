@@ -1,0 +1,7 @@
+<!-- Tab Aplikasi: ubin aplikasi favorit (ikon + nama), enam per baris, plus ubin "+" untuk menambah. -->
+<UserControl x:Class="Peeko.App.Sistem.LauncherModule"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="440">
+    <WrapPanel x:Name="Tiles" ItemWidth="72" ItemHeight="76" HorizontalAlignment="Center" Width="432" />
+</UserControl>

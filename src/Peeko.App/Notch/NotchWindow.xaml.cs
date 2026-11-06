@@ -185,6 +185,10 @@ public partial class NotchWindow : Window
 
     public Control.ControlModule ControlModule => ControlModuleView;
 
+    public Sistem.SystemModule SystemModule => SystemModuleView;
+
+    public Sistem.LauncherModule LauncherModule => LauncherModuleView;
+
     public Today.TodayModule TodayModule => TodayModuleView;
 
     public FrameworkElement DropTarget => ShapeHost;

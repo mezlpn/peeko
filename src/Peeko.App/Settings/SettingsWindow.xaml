@@ -296,6 +296,24 @@
                                     </Grid>
                                     <Border Style="{StaticResource RowLine}" />
                                     <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Sistem (CPU, RAM, progres hari)" />
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding SystemEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,0,56,0">
+                                            <TextBlock Style="{StaticResource Label}" Text="Screen time" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Lama tiap aplikasi dipakai, tampil di tab Sistem. Hanya nama aplikasi yang dicatat, di laptop ini saja." />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ScreenTimeEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Aplikasi favorit" />
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding LauncherEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
                                         <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Kontrol (Wi-Fi, Bluetooth, volume…)" />
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ControlEnabled}" />
                                     </Grid>

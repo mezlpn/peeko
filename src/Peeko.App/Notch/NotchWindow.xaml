@@ -10,6 +10,7 @@
         xmlns:ctl="clr-namespace:Peeko.App.Control"
         xmlns:today="clr-namespace:Peeko.App.Today"
         xmlns:prayer="clr-namespace:Peeko.App.Prayer"
+        xmlns:sistem="clr-namespace:Peeko.App.Sistem"
         Title="Peeko"
         Width="640" Height="320"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
@@ -142,6 +143,8 @@
                             </StackPanel>
                             <ctl:ControlModule x:Name="ControlModuleView" Width="400" HorizontalAlignment="Center" VerticalAlignment="Top"
                                                Visibility="Collapsed" />
+                            <sistem:SystemModule x:Name="SystemModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
+                                                 Visibility="Collapsed" />
                             <StackPanel x:Name="TodayMode" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top"
                                         Visibility="Collapsed">
                                 <today:TodayModule x:Name="TodayModuleView" />
@@ -157,6 +160,8 @@
                                 <prod:HealthModule x:Name="HealthModuleView" Margin="14,0,0,0" />
                             </StackPanel>
                             <prod:NotesModule x:Name="NotesModuleView" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Collapsed" />
+                            <sistem:LauncherModule x:Name="LauncherModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
+                                                   Visibility="Collapsed" />
                             <prod:ShelfModule x:Name="ShelfModuleView" Width="440" Height="96" HorizontalAlignment="Center"
                                               VerticalAlignment="Top" Visibility="Collapsed" />
                         </Grid>

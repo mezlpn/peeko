@@ -91,6 +91,14 @@ public sealed class AppSettings
     /// <summary>Koreksi manual tiap waktu (menit), mis. menyamakan dengan jadwal masjid setempat.</summary>
     public int PrayerOffsetMinutes { get; set; }
 
+    // ── Sistem & aplikasi ──
+    /// <summary>Tab Sistem: CPU/RAM/GPU, progres hari, screen time.</summary>
+    public bool SystemEnabled { get; set; } = true;
+    /// <summary>Hitung lama tiap aplikasi di depan. Mati dari awal (privasi).</summary>
+    public bool ScreenTimeEnabled { get; set; }
+    /// <summary>Tab Aplikasi: peluncur aplikasi favorit.</summary>
+    public bool LauncherEnabled { get; set; } = true;
+
     public const int MinBattery = 10, MaxBattery = 50;
     public const double MaxOffset = 300;
 

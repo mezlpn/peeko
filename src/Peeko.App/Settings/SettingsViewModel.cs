@@ -143,6 +143,9 @@ public sealed class SettingsViewModel : ObservableObject
     // ── Catatan & kesehatan ──
     public bool NotesEnabled { get => S.NotesEnabled; set => Set(value, s => s.NotesEnabled, (s, v) => s.NotesEnabled = v); }
     public bool HealthEnabled { get => S.HealthEnabled; set => Set(value, s => s.HealthEnabled, (s, v) => s.HealthEnabled = v); }
+    public bool SystemEnabled { get => S.SystemEnabled; set => Set(value, s => s.SystemEnabled, (s, v) => s.SystemEnabled = v); }
+    public bool ScreenTimeEnabled { get => S.ScreenTimeEnabled; set => Set(value, s => s.ScreenTimeEnabled, (s, v) => s.ScreenTimeEnabled = v); }
+    public bool LauncherEnabled { get => S.LauncherEnabled; set => Set(value, s => s.LauncherEnabled, (s, v) => s.LauncherEnabled = v); }
     public bool BreaksEnabled { get => S.BreaksEnabled; set => Set(value, s => s.BreaksEnabled, (s, v) => s.BreaksEnabled = v); }
     public int BreakIntervalMinutes { get => S.BreakIntervalMinutes; set => Set(value, s => s.BreakIntervalMinutes, (s, v) => s.BreakIntervalMinutes = v); }
     public bool EyeBreaksEnabled { get => S.EyeBreaksEnabled; set => Set(value, s => s.EyeBreaksEnabled, (s, v) => s.EyeBreaksEnabled = v); }
