@@ -636,6 +636,44 @@
                                        TextWrapping="Wrap"
                                        Text="Acara hari ini tampil di tab Hari ini, dengan pengingat 5 menit sebelumnya dan tombol Gabung untuk Meet, Zoom, atau Teams. Tautan rahasia hanya disimpan di laptopmu." />
 
+                            <TextBlock Style="{StaticResource SectionHeader}" Margin="2,22,0,8" Text="AI" />
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Asisten AI dan terjemah" />
+                                            <TextBlock Style="{StaticResource Hint}" TextWrapping="Wrap" Text="Tab AI: tanya, terjemahkan, atau minta tambah tugas, catatan, atur musik dan volume. Pertanyaanmu dikirim ke penyedia yang kamu pilih." />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding AiEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,10,0,10">
+                                            <TextBlock Style="{StaticResource Hint}" Text="Penyedia" />
+                                            <ComboBox SelectedIndex="{Binding AiProviderIndex}" Height="30" Margin="0,4,0,0" FontSize="13">
+                                                <ComboBoxItem Content="Claude (Anthropic)" />
+                                                <ComboBoxItem Content="Gemini (Google)" />
+                                                <ComboBoxItem Content="Kompatibel OpenAI (ChatGPT, OpenRouter, Groq, Ollama)" />
+                                            </ComboBox>
+                                            <StackPanel Visibility="{Binding AiBaseUrlVisible}">
+                                                <TextBlock Style="{StaticResource Hint}" Margin="0,8,0,0" Text="Alamat API, mis. https://api.openai.com/v1 atau http://localhost:11434/v1" />
+                                                <TextBox Text="{Binding AiBaseUrl, UpdateSourceTrigger=LostFocus}" Height="30" Margin="0,4,0,0" VerticalContentAlignment="Center" Padding="8,0" FontSize="12"
+                                                         Background="{StaticResource Peeko.Brush.WinBg}" Foreground="{StaticResource Peeko.Brush.TextPrimary}"
+                                                         BorderBrush="{StaticResource Peeko.Brush.WinStroke}" CaretBrush="{StaticResource Peeko.Brush.TextPrimary}" />
+                                            </StackPanel>
+                                            <TextBlock Style="{StaticResource Hint}" Margin="0,8,0,0" Text="Kunci API (Ollama lokal boleh kosong)" />
+                                            <TextBox Text="{Binding AiKey, UpdateSourceTrigger=LostFocus}" Height="30" Margin="0,4,0,0" VerticalContentAlignment="Center" Padding="8,0" FontSize="12"
+                                                     Background="{StaticResource Peeko.Brush.WinBg}" Foreground="{StaticResource Peeko.Brush.TextPrimary}"
+                                                     BorderBrush="{StaticResource Peeko.Brush.WinStroke}" CaretBrush="{StaticResource Peeko.Brush.TextPrimary}" />
+                                            <TextBlock Style="{StaticResource Hint}" Margin="0,8,0,0" Text="{Binding AiModelHint}" />
+                                            <TextBox Text="{Binding AiModel, UpdateSourceTrigger=LostFocus}" Height="30" Margin="0,4,0,0" VerticalContentAlignment="Center" Padding="8,0" FontSize="12"
+                                                     Background="{StaticResource Peeko.Brush.WinBg}" Foreground="{StaticResource Peeko.Brush.TextPrimary}"
+                                                     BorderBrush="{StaticResource Peeko.Brush.WinStroke}" CaretBrush="{StaticResource Peeko.Brush.TextPrimary}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
                             <TextBlock Style="{StaticResource SectionHeader}" Margin="2,22,0,8" Text="CLAUDE CODE" />
                             <Border Style="{StaticResource Card}">
                                 <StackPanel>

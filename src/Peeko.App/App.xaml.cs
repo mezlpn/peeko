@@ -142,6 +142,7 @@ public partial class App : Application
         builder.Services.AddSingleton<RadioService>();
         builder.Services.AddSingleton<Today.GitHubService>();
         builder.Services.AddSingleton<Sistem.ClaudeCodeService>();
+        builder.Services.AddSingleton<Sistem.AiService>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
 

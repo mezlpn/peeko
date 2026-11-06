@@ -195,6 +195,8 @@ public partial class NotchWindow : Window
 
     public RadioModule RadioModule => RadioModuleView;
 
+    public Sistem.AiModule AiModule => AiModuleView;
+
     public Today.TodayModule TodayModule => TodayModuleView;
 
     public FrameworkElement DropTarget => ShapeHost;

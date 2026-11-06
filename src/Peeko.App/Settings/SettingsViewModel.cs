@@ -190,6 +190,32 @@ public sealed class SettingsViewModel : ObservableObject
 
     public void RefreshClaudeStatus() => OnPropertyChanged(nameof(ClaudeStatus));
 
+    public bool AiEnabled { get => S.AiEnabled; set => Set(value, s => s.AiEnabled, (s, v) => s.AiEnabled = v); }
+
+    public int AiProviderIndex
+    {
+        get => S.AiProvider switch { "gemini" => 1, "openai" => 2, _ => 0 };
+        set
+        {
+            Set(value switch { 1 => "gemini", 2 => "openai", _ => "anthropic" }, s => s.AiProvider, (s, v) => s.AiProvider = v);
+            OnPropertyChanged(nameof(AiModelHint));
+            OnPropertyChanged(nameof(AiBaseUrlVisible));
+        }
+    }
+
+    public string AiKey { get => S.AiKey ?? ""; set => Set(string.IsNullOrWhiteSpace(value) ? null : value.Trim(), s => s.AiKey, (s, v) => s.AiKey = v); }
+    public string AiModel { get => S.AiModel ?? ""; set => Set(string.IsNullOrWhiteSpace(value) ? null : value.Trim(), s => s.AiModel, (s, v) => s.AiModel = v); }
+    public string AiBaseUrl { get => S.AiBaseUrl ?? ""; set => Set(string.IsNullOrWhiteSpace(value) ? null : value.Trim(), s => s.AiBaseUrl, (s, v) => s.AiBaseUrl = v); }
+
+    public string AiModelHint => S.AiProvider switch
+    {
+        "gemini" => "Model (kosong = gemini-2.5-flash)",
+        "openai" => "Model, mis. gpt-4o-mini, llama3.2 (wajib)",
+        _ => "Model (kosong = claude-haiku-5-5)",
+    };
+
+    public System.Windows.Visibility AiBaseUrlVisible => S.AiProvider == "openai" ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+
     public bool RadioEnabled { get => S.RadioEnabled; set => Set(value, s => s.RadioEnabled, (s, v) => s.RadioEnabled = v); }
     public bool SnapZonesEnabled { get => S.SnapZonesEnabled; set => Set(value, s => s.SnapZonesEnabled, (s, v) => s.SnapZonesEnabled = v); }
     public bool BreaksEnabled { get => S.BreaksEnabled; set => Set(value, s => s.BreaksEnabled, (s, v) => s.BreaksEnabled = v); }

@@ -45,6 +45,7 @@ public sealed class NotchController : IDisposable
     private readonly RadioService _radio;
     private readonly Today.GitHubService _github;
     private readonly Sistem.ClaudeCodeService _claude;
+    private readonly Sistem.AiService _ai;
     private readonly SemaphoreSlim _claudeOne = new(1, 1);
     private bool _rawFullscreen;
     private bool _rawCoversTop;
@@ -66,7 +67,8 @@ public sealed class NotchController : IDisposable
         Today.WeatherService weather, Prayer.PrayerController prayer, CollapsedSlotsController slots,
         TaskReminderController tasks, HealthController health, Sistem.ScreenTimeController screenTime,
         ClipboardController clipboard, Today.CalendarService calendar, RadioService radio,
-        Today.GitHubService github, Sistem.ClaudeCodeService claude, ILogger<NotchController> log)
+        Today.GitHubService github, Sistem.ClaudeCodeService claude, Sistem.AiService ai,
+        ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -89,6 +91,7 @@ public sealed class NotchController : IDisposable
         _radio = radio;
         _github = github;
         _claude = claude;
+        _ai = ai;
         _log = log;
         _window.AttachWeather(weather);
     }
@@ -216,6 +219,16 @@ public sealed class NotchController : IDisposable
             });
         });
         _claude.Bridge.PermissionHandler = (request, ct) => _window.Dispatcher.InvokeAsync(() => AskClaudeAsync(request, ct)).Task.Unwrap();
+
+        // ── AI ──
+        _window.AiModule.Attach(_ai);
+        _window.AiModule.Execute = ExecuteAiAction;
+        _window.AiModule.OpenSettingsRequested += () => OpenSettingsRequested?.Invoke();
+        _window.AiModule.TextInputChanged += active =>
+        {
+            _window.SetTextInput(active);
+            _stateMachine.SetHoldOpen(active);
+        };
 
         // ── Radio ──
         _window.RadioModule.Attach(_radio);
@@ -641,7 +654,7 @@ public sealed class NotchController : IDisposable
 
         _window.SetModulesEnabled(s.MusicEnabled, s.LyricsEnabled, s.ControlEnabled, s.SystemEnabled, s.TodayEnabled, s.FocusEnabled,
             s.PrayerEnabled, s.TodoEnabled, s.WaterEnabled, s.HealthEnabled, s.NotesEnabled, s.LauncherEnabled, s.ShelfEnabled,
-            s.ClipboardEnabled, s.RadioEnabled);
+            s.ClipboardEnabled, s.RadioEnabled, s.AiEnabled);
         if (!s.RadioEnabled && _radio.Playing is not null) _radio.Stop();
         _health.Apply();
         if (s.SnapZonesEnabled) _snapper.Start();
@@ -690,6 +703,49 @@ public sealed class NotchController : IDisposable
         UpdateActivity();
         UpdateLyricPill();
         _slots.Refresh();
+    }
+
+    /// <summary>Aksi dari asisten AI. Hanya lima jenis aksi ini yang bisa dijalankan.</summary>
+    private (bool Ok, Action? Undo) ExecuteAiAction(Core.Productivity.AiAction a)
+    {
+        switch (a.Kind)
+        {
+            case Core.Productivity.AiActionKind.Task:
+                if (_lists.Todo.Add(a.Value) is not { } task) return (false, null);
+                return (true, () => _lists.Todo.Remove(task.Id));
+            case Core.Productivity.AiActionKind.Note:
+                if (_lists.Notes.Add(a.Value) is not { } note) return (false, null);
+                return (true, () => _lists.Notes.Remove(note.Id));
+            case Core.Productivity.AiActionKind.Music:
+            {
+                var vm = _music.ViewModel;
+                bool playing = vm.IsPlaying;
+                switch (a.Value)
+                {
+                    case "putar" when !playing:
+                    case "jeda" when playing:
+                        vm.PlayPauseCommand.Execute(null);
+                        return (true, () => vm.PlayPauseCommand.Execute(null));
+                    case "putar" or "jeda":
+                        return (true, null); // sudah begitu
+                    case "lanjut":
+                        vm.NextCommand.Execute(null);
+                        return (true, () => vm.PreviousCommand.Execute(null));
+                    default:
+                        vm.PreviousCommand.Execute(null);
+                        return (true, () => vm.NextCommand.Execute(null));
+                }
+            }
+            case Core.Productivity.AiActionKind.Volume:
+            {
+                var before = Peeko.Platform.Control.SystemControls.GetVolume();
+                if (before is null) return (false, null);
+                Peeko.Platform.Control.SystemControls.SetVolume(int.Parse(a.Value) / 100f);
+                return (true, () => Peeko.Platform.Control.SystemControls.SetVolume(before.Value.Level));
+            }
+            default:
+                return (Sistem.AppFinder.Open(a.Value, _window.LauncherModule.Launcher), null);
+        }
     }
 
     /// <summary>Tampilkan permintaan izin di notch dan tunggu jawabannya (satu per satu).</summary>
@@ -799,6 +855,7 @@ public sealed class NotchController : IDisposable
         _radio.Dispose();
         _github.Dispose();
         _claude.Dispose();
+        _ai.Dispose();
         _window.LauncherModule.Flush();
         _water.Dispose();
         _lists.Dispose();

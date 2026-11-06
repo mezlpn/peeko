@@ -34,7 +34,8 @@ public partial class NotchWindow
     public const int SnapTab = 12;
     /// <summary>Permintaan izin Claude Code; seperti Snap, bukan tab biasa.</summary>
     public const int ClaudeTab = 13;
-    private const int ModeCount = 14;
+    public const int AiTab = 14;
+    private const int ModeCount = 15;
 
     // Di atas isi: 6 + baris status 24 + 2 + titik 6 + 12; di bawahnya 16. Isi diberi tepi 18.
     private const double ChromeHeight = 6 + 24 + 2 + 6 + 12 + 16;
@@ -43,7 +44,7 @@ public partial class NotchWindow
     private const double WheelStep = 120;
     private static readonly TimeSpan WheelIdleReset = TimeSpan.FromMilliseconds(400);
 
-    private readonly bool[] _modeEnabled = [true, true, true, true, true, true, true, true, true, true, false, false, false, false];
+    private readonly bool[] _modeEnabled = [true, true, true, true, true, true, true, true, true, true, false, false, false, false, false];
     private bool _lyricsEnabled = true, _calendarEnabled = true, _focusEnabled = true, _waterEnabled = true, _healthEnabled = true;
     private readonly Dictionary<FrameworkElement, SpringValue> _modeY = [];
     private readonly List<(Border Dot, SpringValue Width)> _dots = [];
@@ -76,6 +77,7 @@ public partial class NotchWindow
         ClipboardTab => ClipboardModuleView,
         SnapTab => SnapModuleView,
         ClaudeTab => ClaudeModuleView,
+        AiTab => AiModuleView,
         RadioTab => RadioModuleView,
         _ => ShelfModuleView,
     };
@@ -98,6 +100,8 @@ public partial class NotchWindow
                 return new Size(440, 150);
             case RadioTab:
                 return new Size(440, 150);
+            case AiTab:
+                return new Size(Sistem.AiModule.ContentWidth, Sistem.AiModule.ContentHeight);
             case ClaudeTab:
                 return new Size(Sistem.ClaudeModule.ContentWidth, Sistem.ClaudeModule.ContentHeight);
             case SnapTab:
@@ -180,6 +184,7 @@ public partial class NotchWindow
         SystemModuleView.SetVisible(VisibleModule == SystemTab);
         ClipboardModuleView.SetVisible(VisibleModule == ClipboardTab);
         RadioModuleView.SetVisible(VisibleModule == RadioTab);
+        AiModuleView.SetVisible(VisibleModule == AiTab);
         if (VisibleModule == TodayTab) TodayModuleView.Refresh();
         if (VisibleModule == PrayerTab) PrayerModuleView.Refresh();
         if (VisibleModule != TodoTab) TodoModuleView.EndInput();
@@ -192,7 +197,7 @@ public partial class NotchWindow
 
     /// <summary>Bagian yang dimatikan di Pengaturan disembunyikan; tampilan kosong dilewati saat menggulir.</summary>
     public void SetModulesEnabled(bool music, bool lyrics, bool control, bool system, bool calendar, bool focus, bool prayer, bool todo,
-        bool water, bool health, bool notes, bool launcher, bool shelf, bool clipboard, bool radio)
+        bool water, bool health, bool notes, bool launcher, bool shelf, bool clipboard, bool radio, bool ai)
     {
         _lyricsEnabled = lyrics;
         _calendarEnabled = calendar;
@@ -212,6 +217,7 @@ public partial class NotchWindow
         _modeEnabled[LauncherTab] = launcher;
         _modeEnabled[ClipboardTab] = clipboard;
         _modeEnabled[RadioTab] = radio;
+        _modeEnabled[AiTab] = ai;
         _modeEnabled[TodayTab] = calendar || focus;
         _modeEnabled[PrayerTab] = prayer;
         _modeEnabled[TodoTab] = todo;
@@ -405,7 +411,7 @@ public partial class NotchWindow
     {
         Dots.Children.Clear();
         _dots.Clear();
-        string[] names = ["Musik", "Kontrol", "Sistem", "Hari ini", "Salat", "Tugas", "Sehat", "Catatan", "Aplikasi", "Rak", "Clipboard", "Radio"];
+        string[] names = ["Musik", "Kontrol", "Sistem", "Hari ini", "Salat", "Tugas", "Sehat", "Catatan", "Aplikasi", "Rak", "Clipboard", "Radio", "Snap", "Claude", "AI"];
         for (int i = 0; i < ModeCount; i++)
         {
             if (!_modeEnabled[i] || i is SnapTab or ClaudeTab) continue;

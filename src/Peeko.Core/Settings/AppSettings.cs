@@ -128,6 +128,16 @@ public sealed class AppSettings
     /// <summary>Token acak yang dipasang di perintah hook supaya hanya hook Peeko yang diterima.</summary>
     public string? ClaudeToken { get; set; }
 
+    // ── AI ──
+    /// <summary>Tab AI. Mati dari awal.</summary>
+    public bool AiEnabled { get; set; }
+    /// <summary>"anthropic", "gemini", atau "openai" (API kompatibel OpenAI, termasuk Ollama).</summary>
+    public string AiProvider { get; set; } = "anthropic";
+    public string? AiKey { get; set; }
+    public string? AiModel { get; set; }
+    /// <summary>Alamat API kompatibel OpenAI, mis. https://api.openai.com/v1 atau http://localhost:11434/v1.</summary>
+    public string? AiBaseUrl { get; set; }
+
     public const int MinBattery = 10, MaxBattery = 50;
     public const double MaxOffset = 300;
 

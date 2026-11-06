@@ -168,6 +168,8 @@
                                                   Visibility="Collapsed" />
                             <music:RadioModule x:Name="RadioModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
                                                Visibility="Collapsed" />
+                            <sistem:AiModule x:Name="AiModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
+                                             Visibility="Collapsed" />
                             <sistem:ClaudeModule x:Name="ClaudeModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
                                                  Visibility="Collapsed" />
                             <sistem:SnapModule x:Name="SnapModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
