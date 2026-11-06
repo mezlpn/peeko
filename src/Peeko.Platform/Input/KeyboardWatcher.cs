@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 namespace Peeko.Platform.Input;
 
 /// <summary>
-/// Caps Lock dan pergantian bahasa keyboard. Memakai low-level keyboard hook di thread sendiri
-/// (supaya tidak dilepas Windows saat thread UI sibuk). Yang dibaca hanya kode tombol Caps Lock
+/// Caps Lock, Num Lock, dan pergantian bahasa keyboard. Memakai low-level keyboard hook di thread sendiri
+/// (supaya tidak dilepas Windows saat thread UI sibuk). Yang dibaca hanya kode tombol Caps Lock, Num Lock,
 /// dan tombol pengubah bahasa (Shift, Alt, Ctrl, Win, Spasi); tidak ada ketikan yang disimpan.
 /// </summary>
 public sealed class KeyboardWatcher : IDisposable
@@ -13,6 +13,7 @@ public sealed class KeyboardWatcher : IDisposable
     private const int WM_KEYDOWN = 0x0100, WM_KEYUP = 0x0101, WM_SYSKEYDOWN = 0x0104, WM_SYSKEYUP = 0x0105;
     private const int WM_QUIT = 0x0012;
     private const int VK_CAPITAL = 0x14;
+    private const int VK_NUMLOCK = 0x90;
     private static readonly TimeSpan LanguageCheckDelay = TimeSpan.FromMilliseconds(150);
 
     private readonly HookProc _proc;
@@ -21,6 +22,8 @@ public sealed class KeyboardWatcher : IDisposable
     private uint _threadId;
     private bool _capsDown;
     private bool _capsOn;
+    private bool _numDown;
+    private bool _numOn;
     private int _lcid;
 
     public KeyboardWatcher()
@@ -31,6 +34,9 @@ public sealed class KeyboardWatcher : IDisposable
 
     /// <summary>Caps Lock berubah: aktif?</summary>
     public event Action<bool>? CapsLockChanged;
+
+    /// <summary>Num Lock berubah: aktif?</summary>
+    public event Action<bool>? NumLockChanged;
 
     /// <summary>(LCID baru, LCID lama)</summary>
     public event Action<int, int>? LanguageChanged;
@@ -43,6 +49,7 @@ public sealed class KeyboardWatcher : IDisposable
         {
             _threadId = GetCurrentThreadId();
             _capsOn = (GetKeyState(VK_CAPITAL) & 1) != 0;
+            _numOn = (GetKeyState(VK_NUMLOCK) & 1) != 0;
             var hook = SetWindowsHookEx(WH_KEYBOARD_LL, _proc, GetModuleHandle(null), 0);
             ready.Set();
             while (GetMessage(out var msg, IntPtr.Zero, 0, 0) > 0)
@@ -87,6 +94,20 @@ public sealed class KeyboardWatcher : IDisposable
                 else if (up)
                 {
                     _capsDown = false;
+                }
+            }
+            else if (vk == VK_NUMLOCK)
+            {
+                if (down && !_numDown)
+                {
+                    _numDown = true;
+                    _numOn = !_numOn;
+                    bool on = _numOn;
+                    ThreadPool.QueueUserWorkItem(_ => NumLockChanged?.Invoke(on));
+                }
+                else if (up)
+                {
+                    _numDown = false;
                 }
             }
             else if (up && IsLanguageKey(vk))

@@ -21,6 +21,8 @@ public sealed class AudioDeviceWatcher : IDisposable
 
     private MMDeviceEnumerator? _enumerator;
     private MMDevice? _device;
+    private MMDevice? _mic;
+    private bool _micMuted;
     private string? _defaultId;
     private float _lastVolume = -1;
     private bool _lastMuted;
@@ -37,6 +39,9 @@ public sealed class AudioDeviceWatcher : IDisposable
     /// <summary>(level 0–1, bisu)</summary>
     public event Action<float, bool>? VolumeChanged;
 
+    /// <summary>Mikrofon default dibisukan/dinyalakan (dari Peeko, tombol mute laptop, atau aplikasi lain).</summary>
+    public event Action<bool>? MicMuteChanged;
+
     /// <summary>Perangkat output default berganti: (nama, headphone?)</summary>
     public event Action<string, bool>? DeviceConnected;
 
@@ -52,6 +57,7 @@ public sealed class AudioDeviceWatcher : IDisposable
                 _names[d.ID] = d.FriendlyName;
             _enumerator.RegisterEndpointNotificationCallback(_client);
             AttachDefault();
+            AttachMic();
         }
     });
 
@@ -76,6 +82,45 @@ public sealed class AudioDeviceWatcher : IDisposable
         {
             _defaultId = null; // tidak ada perangkat output
         }
+    }
+
+    private void AttachMic()
+    {
+        if (_mic is not null)
+        {
+            _mic.AudioEndpointVolume.OnVolumeNotification -= OnMicVolume;
+            _mic.Dispose();
+            _mic = null;
+        }
+        try
+        {
+            _mic = _enumerator!.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Communications);
+            _micMuted = _mic.AudioEndpointVolume.Mute;
+            _mic.AudioEndpointVolume.OnVolumeNotification += OnMicVolume;
+        }
+        catch (COMException)
+        {
+            _mic = null; // tidak ada mikrofon
+        }
+    }
+
+    private void OnMicVolume(AudioVolumeNotificationData data)
+    {
+        // Notifikasi juga datang saat level mikrofon digeser; yang dikabarkan hanya bisu/tidak.
+        if (data.Muted == _micMuted) return;
+        _micMuted = data.Muted;
+        MicMuteChanged?.Invoke(data.Muted);
+    }
+
+    private void OnMicDefaultChanged()
+    {
+        ThreadPool.QueueUserWorkItem(_ =>
+        {
+            lock (_gate)
+            {
+                if (_enumerator is not null) AttachMic();
+            }
+        });
     }
 
     private void OnVolume(AudioVolumeNotificationData data)
@@ -183,6 +228,11 @@ public sealed class AudioDeviceWatcher : IDisposable
                 _device.AudioEndpointVolume.OnVolumeNotification -= OnVolume;
                 _device.Dispose();
             }
+            if (_mic is not null)
+            {
+                _mic.AudioEndpointVolume.OnVolumeNotification -= OnMicVolume;
+                _mic.Dispose();
+            }
             _enumerator?.Dispose();
             _enumerator = null;
         }
@@ -199,6 +249,7 @@ public sealed class AudioDeviceWatcher : IDisposable
         public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
         {
             if (flow == DataFlow.Render && role == Role.Multimedia) owner.OnDefaultChanged();
+            else if (flow == DataFlow.Capture && role == Role.Communications) owner.OnMicDefaultChanged();
         }
 
         public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }

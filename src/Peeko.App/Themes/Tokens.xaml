@@ -165,6 +165,18 @@
     <Geometry x:Key="Peeko.Icon.Fog">M5,9 H19 M3.5,13 H20.5 M6,17 H18</Geometry>
     <Geometry x:Key="Peeko.Icon.Thermo">M10,14.5 V5.5 A2,2 0 0 1 14,5.5 V14.5 A3.5,3.5 0 1 1 10,14.5 Z</Geometry>
     <Geometry x:Key="Peeko.Icon.Bolt">M13,3 L6,13.5 H11.5 L10.5,21 L17.5,10.5 H12 Z</Geometry>
+    <Geometry x:Key="Peeko.Icon.Mic">M9,6 A3,3 0 0 1 15,6 V11.5 A3,3 0 0 1 9,11.5 Z M5.5,11 A6.5,6.5 0 0 0 18.5,11 M12,17.5 V20.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.MicOff">M9,6 A3,3 0 0 1 15,6 V11.5 A3,3 0 0 1 9,11.5 Z M5.5,11 A6.5,6.5 0 0 0 18.5,11 M12,17.5 V20.5 M4,4 L20,20</Geometry>
+    <Geometry x:Key="Peeko.Icon.Plane">M10.5,4.5 A1.5,1.5 0 0 1 13.5,4.5 V9.5 L20.5,13.5 V15.5 L13.5,13.5 V17.5 L15.5,19 V20.5 L12,19.5 L8.5,20.5 V19 L10.5,17.5 V13.5 L3.5,15.5 V13.5 L10.5,9.5 Z</Geometry>
+    <Geometry x:Key="Peeko.Icon.Cup">M5,9 H16 V14 A4.5,4.5 0 0 1 11.5,18.5 H9.5 A4.5,4.5 0 0 1 5,14 Z M16,10.5 H17.5 A2,2 0 0 1 17.5,14.5 H16 M8,3.5 V6 M11,3.5 V6</Geometry>
+    <Geometry x:Key="Peeko.Icon.Contrast">M12,3.5 A8.5,8.5 0 1 1 12,20.5 A8.5,8.5 0 1 1 12,3.5 Z M12,3.5 V20.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.Chip">M7.5,7.5 H16.5 V16.5 H7.5 Z M10,3.5 V7.5 M14,3.5 V7.5 M10,16.5 V20.5 M14,16.5 V20.5 M3.5,10 H7.5 M3.5,14 H7.5 M16.5,10 H20.5 M16.5,14 H20.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.Apps">M5,5 H10 V10 H5 Z M14,5 H19 V10 H14 Z M5,14 H10 V19 H5 Z M14,14 H19 V19 H14 Z</Geometry>
+    <Geometry x:Key="Peeko.Icon.Chevron">M10,7 L15,12 L10,17</Geometry>
+    <Geometry x:Key="Peeko.Icon.Back">M14,7 L9,12 L14,17</Geometry>
+    <Geometry x:Key="Peeko.Icon.Check">M5.5,12.5 L10,17 L18.5,7.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.Plus">M12,5.5 V18.5 M5.5,12 H18.5</Geometry>
+    <Geometry x:Key="Peeko.Icon.Refresh">M19,12 A7,7 0 1 1 16.9,7 M19,4.5 V8 H15.5</Geometry>
 
     <!-- Digambar di kanvas 24 × 24 seperti viewBox SVG-nya, lalu diskalakan ke 16 px. -->
     <Style x:Key="Peeko.IconPath" TargetType="Path">

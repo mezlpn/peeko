@@ -76,6 +76,21 @@ public sealed class PeekView : Grid
                 AddLabel("Caps Lock");
                 AddChip(r.Flag ? "AKTIF" : "MATI", r.Flag ? "Accent" : "TextSecondary", r.Flag ? "AccentMuted" : "SurfaceRaised");
                 break;
+            case PeekKind.NumLock:
+                AddIcon(Geometry.Parse("M5,4.5 H19 V19.5 H5 Z M9,9 L11,7.5 V16.5 M9,16.5 H13 M15,9 H15.01"), r.Flag ? "Accent" : "TextTertiary");
+                AddLabel("Num Lock");
+                AddChip(r.Flag ? "AKTIF" : "MATI", r.Flag ? "Accent" : "TextSecondary", r.Flag ? "AccentMuted" : "SurfaceRaised");
+                break;
+            case PeekKind.MicMute:
+                AddIcon((Geometry)Application.Current.Resources[r.Flag ? "Peeko.Icon.MicOff" : "Peeko.Icon.Mic"], r.Flag ? "Danger" : "Accent");
+                AddLabel("Mikrofon");
+                AddChip(r.Flag ? "BISU" : "NYALA", r.Flag ? "Danger" : "Accent", r.Flag ? "DangerMuted" : "AccentMuted");
+                break;
+            case PeekKind.Airplane:
+                AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Plane"], r.Flag ? "Accent" : "TextTertiary");
+                AddLabel("Mode pesawat");
+                AddChip(r.Flag ? "AKTIF" : "MATI", r.Flag ? "Accent" : "TextSecondary", r.Flag ? "AccentMuted" : "SurfaceRaised");
+                break;
             case PeekKind.Language:
                 AddIcon(KeyboardIcon, "TextPrimary");
                 AddLanguageSwitch(r.Detail ?? "", r.Text ?? "");
@@ -192,7 +207,8 @@ public sealed class PeekView : Grid
         }
     }
 
-    private static bool HasChip(PeekRequest r) => r.Kind is PeekKind.CapsLock or PeekKind.BatteryCritical;
+    private static bool HasChip(PeekRequest r) => r.Kind is PeekKind.CapsLock or PeekKind.NumLock or PeekKind.MicMute
+        or PeekKind.Airplane or PeekKind.BatteryCritical;
 
     // ── Bagian ──────────────────────────────────────────────────────────────
 

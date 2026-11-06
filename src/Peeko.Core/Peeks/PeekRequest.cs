@@ -42,6 +42,12 @@ public enum PeekKind
     MoveBreak,
     /// <summary>20-20-20: istirahatkan mata (Detail = ajakan).</summary>
     EyeBreak,
+    /// <summary>Num Lock berubah (Flag = aktif).</summary>
+    NumLock,
+    /// <summary>Mikrofon dibisukan (Flag = bisu).</summary>
+    MicMute,
+    /// <summary>Mode pesawat berubah (Flag = aktif).</summary>
+    Airplane,
 }
 
 /// <summary>Isi satu peek. Arti tiap field bergantung pada <see cref="Kind"/>.</summary>
@@ -68,7 +74,8 @@ public sealed record PeekRequest(PeekKind Kind)
     /// <summary>Lama tampil. Caps Lock mati lebih singkat; baterai lebih lama (Peek.dc.html).</summary>
     public TimeSpan Hold => Kind switch
     {
-        PeekKind.CapsLock when !Flag => TimeSpan.FromSeconds(1),
+        PeekKind.CapsLock or PeekKind.NumLock when !Flag => TimeSpan.FromSeconds(1),
+        PeekKind.Airplane => TimeSpan.FromSeconds(2),
         PeekKind.BatteryLow => TimeSpan.FromSeconds(3),
         PeekKind.BatteryCritical => TimeSpan.FromSeconds(5),
         PeekKind.FocusDone or PeekKind.BreakDone or PeekKind.UpdateAvailable or PeekKind.Updated or PeekKind.TimerDone => TimeSpan.FromSeconds(4),
@@ -89,10 +96,10 @@ public sealed record PeekRequest(PeekKind Kind)
     /// <summary>Lebar pil peek (280–340 sesuai isi).</summary>
     public double Width => Kind switch
     {
-        PeekKind.CapsLock => 280,
+        PeekKind.CapsLock or PeekKind.NumLock or PeekKind.MicMute => 280,
         PeekKind.ShelfDrop or PeekKind.ConvertDone or PeekKind.ConvertFailed or PeekKind.TaskDue
             or PeekKind.MoveBreak or PeekKind.EyeBreak => 340,
-        PeekKind.Language or PeekKind.BatteryLow or PeekKind.Charging
+        PeekKind.Language or PeekKind.Airplane or PeekKind.BatteryLow or PeekKind.Charging
             or PeekKind.WifiConnected or PeekKind.WifiDisconnected => 300,
         _ => 320,
     };

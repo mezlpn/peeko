@@ -23,6 +23,7 @@ public sealed class SystemPeekController : IDisposable
     private readonly KeyboardWatcher _keyboard = new();
     private readonly PowerWatcher _power = new();
     private readonly WifiWatcher _wifi = new();
+    private readonly AirplaneWatcher _airplane = new();
 
     private readonly BatteryPeekLogic _battery = new();
     private readonly WifiPeekLogic _wifiLogic = new();
@@ -48,6 +49,9 @@ public sealed class SystemPeekController : IDisposable
         });
         _brightness.Changed += value => Raise(new PeekRequest(PeekKind.Brightness) { Level = value / 100.0 });
         _keyboard.CapsLockChanged += on => Raise(new PeekRequest(PeekKind.CapsLock) { Flag = on });
+        _keyboard.NumLockChanged += on => Raise(new PeekRequest(PeekKind.NumLock) { Flag = on });
+        _audio.MicMuteChanged += muted => Raise(new PeekRequest(PeekKind.MicMute) { Flag = muted });
+        _airplane.Changed += on => Raise(new PeekRequest(PeekKind.Airplane) { Flag = on });
         _keyboard.LanguageChanged += (lcid, previous) =>
         {
             var (code, name) = KeyboardLanguage.FromLcid(lcid);
@@ -72,6 +76,7 @@ public sealed class SystemPeekController : IDisposable
         Try("keyboard", _keyboard.Start);
         Try("daya", _power.Start);
         Try("Wi-Fi", _wifi.Start);
+        Try("mode pesawat", () => _airplane.Start());
         try
         {
             await _audio.StartAsync();
@@ -97,6 +102,9 @@ public sealed class SystemPeekController : IDisposable
             new(PeekKind.Brightness) { Level = 0.8 },
             new(PeekKind.CapsLock) { Flag = true },
             new(PeekKind.CapsLock) { Flag = false },
+            new(PeekKind.NumLock) { Flag = true },
+            new(PeekKind.MicMute) { Flag = true },
+            new(PeekKind.Airplane) { Flag = true },
             new(PeekKind.Language) { Text = "ID", Detail = "EN", Caption = "Bahasa Indonesia" },
             new(PeekKind.BatteryLow) { Percent = 18 },
             new(PeekKind.BatteryCritical) { Percent = 8 },
@@ -132,5 +140,6 @@ public sealed class SystemPeekController : IDisposable
         _keyboard.Dispose();
         _power.Dispose();
         _wifi.Dispose();
+        _airplane.Dispose();
     }
 }
