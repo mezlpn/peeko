@@ -15,24 +15,32 @@ public sealed class AgendaView : StackPanel
     public const int MaxRows = 3;
     private const double RowHeight = 28;
     private CalendarService? _calendar;
+    private GitHubService? _github;
 
-    public void Attach(CalendarService calendar)
+    public void Attach(CalendarService calendar, GitHubService github)
     {
         _calendar = calendar;
+        _github = github;
         calendar.Updated += () => Refresh();
+        github.Updated += () => Refresh();
     }
 
-    /// <summary>Tinggi termasuk jarak di atasnya; 0 jika kalender tidak dipakai.</summary>
-    public double ContentHeight => _calendar?.IsEnabled == true ? 12 + 20 + Math.Max(1, Rows) * RowHeight : 0;
+    /// <summary>Tinggi termasuk jarak di atasnya; 0 jika kalender dan GitHub tidak dipakai.</summary>
+    public double ContentHeight =>
+        (_calendar?.IsEnabled == true ? 12 + 20 + Math.Max(1, Rows) * RowHeight : 0)
+        + (_github?.IsEnabled == true ? 12 + 20 + Math.Max(1, PrRows) * RowHeight : 0);
 
     private int Rows => Math.Min(MaxRows, _calendar?.Today(DateTime.Now).Count ?? 0);
+
+    private int PrRows => Math.Min(MaxRows, _github?.Reviews.Count ?? 0);
 
     public event Action? SizeChanged2;
 
     public void Refresh()
     {
         Children.Clear();
-        if (_calendar is null || !_calendar.IsEnabled)
+        bool calendar = _calendar?.IsEnabled == true, github = _github?.IsEnabled == true;
+        if (!calendar && !github)
         {
             Visibility = Visibility.Collapsed;
             SizeChanged2?.Invoke();
@@ -40,8 +48,77 @@ public sealed class AgendaView : StackPanel
         }
         Visibility = Visibility.Visible;
         Margin = new Thickness(0, 12, 0, 0);
+        if (calendar) AddCalendar();
+        if (github) AddReviews(spaced: calendar);
+        SizeChanged2?.Invoke();
+    }
+
+    private void AddReviews(bool spaced)
+    {
+        var reviews = _github!.Reviews;
+        var head = new Grid { Height = 20, Margin = new Thickness(0, spaced ? 12 : 0, 0, 0) };
+        head.Children.Add(new TextBlock { Text = "MENUNGGU REVIEW", Style = S("Peeko.Text.Overline"), VerticalAlignment = VerticalAlignment.Center });
+        head.Children.Add(new TextBlock
+        {
+            Text = _github.LastError ?? (reviews.Count > MaxRows ? $"+{reviews.Count - MaxRows} lagi" : ""),
+            Style = S("Peeko.Text.Caption"),
+            Foreground = B(_github.LastError is null ? "TextTertiary" : "Warning"),
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Center,
+        });
+        Children.Add(head);
+        if (reviews.Count == 0)
+        {
+            Children.Add(new TextBlock
+            {
+                Text = "Tidak ada pull request yang menunggu review-mu",
+                Style = S("Peeko.Text.Caption"),
+                Height = RowHeight,
+                Padding = new Thickness(0, 6, 0, 0),
+            });
+            return;
+        }
+        foreach (var pr in reviews.Take(MaxRows))
+        {
+            var grid = new Grid { Height = RowHeight, Background = Brushes.Transparent, Cursor = System.Windows.Input.Cursors.Hand, ToolTip = pr.Url };
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            grid.Children.Add(new TextBlock
+            {
+                Text = pr.Title,
+                Style = S("Peeko.Text.Body"),
+                FontSize = 12.5,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+            var repo = new TextBlock
+            {
+                Text = $"{pr.Repo.Split('/').Last()} #{pr.Number}",
+                Style = S("Peeko.Text.Caption"),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(10, 0, 0, 0),
+            };
+            Grid.SetColumn(repo, 1);
+            grid.Children.Add(repo);
+            var url = pr.Url;
+            grid.MouseLeftButtonUp += (_, _) =>
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true })?.Dispose();
+                }
+                catch (System.ComponentModel.Win32Exception)
+                {
+                }
+            };
+            Children.Add(grid);
+        }
+    }
+
+    private void AddCalendar()
+    {
         var now = DateTime.Now;
-        var today = _calendar.Today(now);
+        var today = _calendar!.Today(now);
 
         var head = new Grid { Height = 20 };
         head.Children.Add(new TextBlock { Text = "ACARA HARI INI", Style = S("Peeko.Text.Overline"), VerticalAlignment = VerticalAlignment.Center });
@@ -68,7 +145,6 @@ public sealed class AgendaView : StackPanel
             });
         }
         foreach (var e in today.Take(MaxRows)) Children.Add(Row(e, now));
-        SizeChanged2?.Invoke();
     }
 
     private FrameworkElement Row(CalendarEvent e, DateTime now)

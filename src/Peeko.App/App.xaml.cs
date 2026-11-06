@@ -136,6 +136,7 @@ public partial class App : Application
         builder.Services.AddSingleton<ClipboardController>();
         builder.Services.AddSingleton<Today.CalendarService>();
         builder.Services.AddSingleton<RadioService>();
+        builder.Services.AddSingleton<Today.GitHubService>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
 

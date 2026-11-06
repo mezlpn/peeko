@@ -131,6 +131,9 @@ public sealed class SettingsViewModel : ObservableObject
     public string CalendarStatus => !_calendar.IsEnabled ? "Belum ada kalender"
         : _calendar.LastError ?? $"{_calendar.Events.Count} acara dalam seminggu ini";
 
+    public string GitHubUser { get => S.GitHubUser ?? ""; set => Set(string.IsNullOrWhiteSpace(value) ? null : value.Trim(), s => s.GitHubUser, (s, v) => s.GitHubUser = v); }
+    public string GitHubToken { get => S.GitHubToken ?? ""; set => Set(string.IsNullOrWhiteSpace(value) ? null : value.Trim(), s => s.GitHubToken, (s, v) => s.GitHubToken = v); }
+
     public void SaveCalendar()
     {
         var urls = CalendarUrlsInput.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)

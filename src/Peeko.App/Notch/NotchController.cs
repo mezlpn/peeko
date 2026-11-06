@@ -42,6 +42,7 @@ public sealed class NotchController : IDisposable
     private readonly ClipboardController _clipboard;
     private readonly Today.CalendarService _calendar;
     private readonly RadioService _radio;
+    private readonly Today.GitHubService _github;
     private bool _rawFullscreen;
     private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
@@ -62,7 +63,7 @@ public sealed class NotchController : IDisposable
         Today.WeatherService weather, Prayer.PrayerController prayer, CollapsedSlotsController slots,
         TaskReminderController tasks, HealthController health, Sistem.ScreenTimeController screenTime,
         ClipboardController clipboard, Today.CalendarService calendar, RadioService radio,
-        ILogger<NotchController> log)
+        Today.GitHubService github, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -83,6 +84,7 @@ public sealed class NotchController : IDisposable
         _clipboard = clipboard;
         _calendar = calendar;
         _radio = radio;
+        _github = github;
         _log = log;
         _window.AttachWeather(weather);
     }
@@ -200,8 +202,9 @@ public sealed class NotchController : IDisposable
         };
 
         // ── Kalender (.ics) ──
-        _window.Agenda.Attach(_calendar);
+        _window.Agenda.Attach(_calendar, _github);
         _calendar.PeekRequested += ShowPeek;
+        _github.PeekRequested += ShowPeek;
         _window.VisibleModuleChanged += module =>
         {
             if (module != NotchWindow.TodayTab) return;
@@ -623,6 +626,7 @@ public sealed class NotchController : IDisposable
         _screenTime.Apply();
         _clipboard.Apply();
         _calendar.Apply();
+        _github.Apply();
         _window.Agenda.Refresh();
         _prayer.Apply();
         _tasks.Evaluate();
@@ -726,6 +730,7 @@ public sealed class NotchController : IDisposable
         _clipboard.Dispose();
         _calendar.Dispose();
         _radio.Dispose();
+        _github.Dispose();
         _window.LauncherModule.Flush();
         _water.Dispose();
         _lists.Dispose();

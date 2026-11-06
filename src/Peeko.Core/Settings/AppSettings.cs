@@ -114,6 +114,12 @@ public sealed class AppSettings
     public bool RadioEnabled { get; set; }
     public List<Media.RadioStation> RadioFavorites { get; set; } = [];
 
+    // ── GitHub ──
+    /// <summary>Username untuk pull request yang menunggu review. Kosong = mati.</summary>
+    public string? GitHubUser { get; set; }
+    /// <summary>Token opsional (repo privat), diisi sendiri oleh pengguna.</summary>
+    public string? GitHubToken { get; set; }
+
     public const int MinBattery = 10, MaxBattery = 50;
     public const double MaxOffset = 300;
 

@@ -52,6 +52,8 @@ public enum PeekKind
     FileAction,
     /// <summary>Acara kalender sebentar lagi (Text = judul, Detail = "5 menit lagi · 09.00", Flag = ada tautan rapat).</summary>
     Meeting,
+    /// <summary>Pull request baru menunggu review (Text = judul, Detail = "repo #12").</summary>
+    PullRequest,
 }
 
 /// <summary>Isi satu peek. Arti tiap field bergantung pada <see cref="Kind"/>.</summary>
@@ -88,6 +90,7 @@ public sealed record PeekRequest(PeekKind Kind)
         PeekKind.PrayerTime => TimeSpan.FromSeconds(8),
         PeekKind.TaskDue => TimeSpan.FromSeconds(5),
         PeekKind.Meeting => TimeSpan.FromSeconds(8),
+        PeekKind.PullRequest => TimeSpan.FromSeconds(5),
         PeekKind.MoveBreak => TimeSpan.FromSeconds(6),
         PeekKind.EyeBreak => TimeSpan.FromSeconds(20),
         // Ditahan selama file masih diseret di atas notch; setelah tersimpan (Flag) hanya sebentar.
@@ -102,7 +105,7 @@ public sealed record PeekRequest(PeekKind Kind)
     public double Width => Kind switch
     {
         PeekKind.CapsLock or PeekKind.NumLock or PeekKind.MicMute => 280,
-        PeekKind.ShelfDrop or PeekKind.ConvertDone or PeekKind.ConvertFailed or PeekKind.TaskDue or PeekKind.FileAction or PeekKind.Meeting
+        PeekKind.ShelfDrop or PeekKind.ConvertDone or PeekKind.ConvertFailed or PeekKind.TaskDue or PeekKind.FileAction or PeekKind.Meeting or PeekKind.PullRequest
             or PeekKind.MoveBreak or PeekKind.EyeBreak => 340,
         PeekKind.Language or PeekKind.Airplane or PeekKind.BatteryLow or PeekKind.Charging
             or PeekKind.WifiConnected or PeekKind.WifiDisconnected => 300,

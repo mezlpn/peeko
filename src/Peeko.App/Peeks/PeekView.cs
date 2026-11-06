@@ -174,6 +174,11 @@ public sealed class PeekView : Grid
                 AddLabel(r.Text ?? "Selesai");
                 AddValue(r.Detail ?? "", "TextSecondary", small: true);
                 break;
+            case PeekKind.PullRequest:
+                AddIcon(Geometry.Parse("M7,5 A2,2 0 1 0 7,9 A2,2 0 1 0 7,5 M7,9 V19 M17,15 A2,2 0 1 0 17,19 A2,2 0 1 0 17,15 M17,15 V9 A2,2 0 0 0 15,7 H11 M13,5 L11,7 L13,9"), "Accent");
+                AddLabel(r.Text ?? "");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true, maxWidth: 130);
+                break;
             case PeekKind.Meeting:
                 AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Today"], "Accent");
                 AddLabel(r.Text ?? "");
