@@ -28,7 +28,8 @@ public partial class NotchWindow
     public const int NotesTab = 7;
     public const int LauncherTab = 8;
     public const int ShelfTab = 9;
-    private const int ModeCount = 10;
+    public const int ClipboardTab = 10;
+    private const int ModeCount = 11;
 
     // Di atas isi: 6 + baris status 24 + 2 + titik 6 + 12; di bawahnya 16. Isi diberi tepi 18.
     private const double ChromeHeight = 6 + 24 + 2 + 6 + 12 + 16;
@@ -37,7 +38,7 @@ public partial class NotchWindow
     private const double WheelStep = 120;
     private static readonly TimeSpan WheelIdleReset = TimeSpan.FromMilliseconds(400);
 
-    private readonly bool[] _modeEnabled = [true, true, true, true, true, true, true, true, true, true];
+    private readonly bool[] _modeEnabled = [true, true, true, true, true, true, true, true, true, true, false];
     private bool _lyricsEnabled = true, _calendarEnabled = true, _focusEnabled = true, _waterEnabled = true, _healthEnabled = true;
     private readonly Dictionary<FrameworkElement, SpringValue> _modeY = [];
     private readonly List<(Border Dot, SpringValue Width)> _dots = [];
@@ -67,6 +68,7 @@ public partial class NotchWindow
         HealthTab => HealthMode,
         NotesTab => NotesModuleView,
         LauncherTab => LauncherModuleView,
+        ClipboardTab => ClipboardModuleView,
         _ => ShelfModuleView,
     };
 
@@ -83,6 +85,8 @@ public partial class NotchWindow
             case ControlTab:
                 return new Size(400, 196);
             case SystemTab:
+                return new Size(440, 150);
+            case ClipboardTab:
                 return new Size(440, 150);
             case LauncherTab:
                 LauncherModuleView.Height = LauncherModuleView.ContentHeight;
@@ -155,6 +159,7 @@ public partial class NotchWindow
         LyricsModuleView.SetVisible(VisibleModule == MusicTab);
         ControlModuleView.SetVisible(VisibleModule == ControlTab);
         SystemModuleView.SetVisible(VisibleModule == SystemTab);
+        ClipboardModuleView.SetVisible(VisibleModule == ClipboardTab);
         if (VisibleModule == TodayTab) TodayModuleView.Refresh();
         if (VisibleModule == PrayerTab) PrayerModuleView.Refresh();
         if (VisibleModule != TodoTab) TodoModuleView.EndInput();
@@ -166,7 +171,7 @@ public partial class NotchWindow
 
     /// <summary>Bagian yang dimatikan di Pengaturan disembunyikan; tampilan kosong dilewati saat menggulir.</summary>
     public void SetModulesEnabled(bool music, bool lyrics, bool control, bool system, bool calendar, bool focus, bool prayer, bool todo,
-        bool water, bool health, bool notes, bool launcher, bool shelf)
+        bool water, bool health, bool notes, bool launcher, bool shelf, bool clipboard)
     {
         _lyricsEnabled = lyrics;
         _calendarEnabled = calendar;
@@ -184,6 +189,7 @@ public partial class NotchWindow
         _modeEnabled[ControlTab] = control;
         _modeEnabled[SystemTab] = system;
         _modeEnabled[LauncherTab] = launcher;
+        _modeEnabled[ClipboardTab] = clipboard;
         _modeEnabled[TodayTab] = calendar || focus;
         _modeEnabled[PrayerTab] = prayer;
         _modeEnabled[TodoTab] = todo;
@@ -320,7 +326,7 @@ public partial class NotchWindow
     {
         Dots.Children.Clear();
         _dots.Clear();
-        string[] names = ["Musik", "Kontrol", "Sistem", "Hari ini", "Salat", "Tugas", "Sehat", "Catatan", "Aplikasi", "Rak"];
+        string[] names = ["Musik", "Kontrol", "Sistem", "Hari ini", "Salat", "Tugas", "Sehat", "Catatan", "Aplikasi", "Rak", "Clipboard"];
         for (int i = 0; i < ModeCount; i++)
         {
             if (!_modeEnabled[i]) continue;

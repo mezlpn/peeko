@@ -146,6 +146,7 @@ public sealed class SettingsViewModel : ObservableObject
     public bool SystemEnabled { get => S.SystemEnabled; set => Set(value, s => s.SystemEnabled, (s, v) => s.SystemEnabled = v); }
     public bool ScreenTimeEnabled { get => S.ScreenTimeEnabled; set => Set(value, s => s.ScreenTimeEnabled, (s, v) => s.ScreenTimeEnabled = v); }
     public bool LauncherEnabled { get => S.LauncherEnabled; set => Set(value, s => s.LauncherEnabled, (s, v) => s.LauncherEnabled = v); }
+    public bool ClipboardEnabled { get => S.ClipboardEnabled; set => Set(value, s => s.ClipboardEnabled, (s, v) => s.ClipboardEnabled = v); }
     public bool BreaksEnabled { get => S.BreaksEnabled; set => Set(value, s => s.BreaksEnabled, (s, v) => s.BreaksEnabled = v); }
     public int BreakIntervalMinutes { get => S.BreakIntervalMinutes; set => Set(value, s => s.BreakIntervalMinutes, (s, v) => s.BreakIntervalMinutes = v); }
     public bool EyeBreaksEnabled { get => S.EyeBreaksEnabled; set => Set(value, s => s.EyeBreaksEnabled, (s, v) => s.EyeBreaksEnabled = v); }

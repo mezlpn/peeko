@@ -39,6 +39,7 @@ public sealed class NotchController : IDisposable
     private readonly TaskReminderController _tasks;
     private readonly HealthController _health;
     private readonly Sistem.ScreenTimeController _screenTime;
+    private readonly ClipboardController _clipboard;
     private bool _rawFullscreen;
     private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
@@ -54,7 +55,8 @@ public sealed class NotchController : IDisposable
         LyricsController lyrics, SystemPeekController peeks, FocusController focus, WaterController water,
         ListsController lists, SettingsService settings, UpdateController updates, ConvertController convert,
         Today.WeatherService weather, Prayer.PrayerController prayer, CollapsedSlotsController slots,
-        TaskReminderController tasks, HealthController health, Sistem.ScreenTimeController screenTime, ILogger<NotchController> log)
+        TaskReminderController tasks, HealthController health, Sistem.ScreenTimeController screenTime,
+        ClipboardController clipboard, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -72,6 +74,7 @@ public sealed class NotchController : IDisposable
         _tasks = tasks;
         _health = health;
         _screenTime = screenTime;
+        _clipboard = clipboard;
         _log = log;
         _window.AttachWeather(weather);
     }
@@ -173,6 +176,12 @@ public sealed class NotchController : IDisposable
         // ── Sistem & aplikasi ──
         _window.SystemModule.Attach(_screenTime, _settings);
         _window.LauncherModule.MenuOpenChanged += _stateMachine.SetHoldOpen;
+        _window.ClipboardModule.Attach(_clipboard);
+        _window.ClipboardModule.PeekRequested += request =>
+        {
+            // Disalin dari tab Clipboard yang sedang terbuka: cukup banner kecil di dalam panel.
+            ShowPeek(request);
+        };
         _health.Updated += _window.HealthModule.Refresh;
         _health.PeekRequested += ShowPeek;
         _window.ShelfModule.Attach(_lists.Shelf);
@@ -560,9 +569,11 @@ public sealed class NotchController : IDisposable
         _window.SetHorizontalOffset(s.HorizontalOffset);
 
         _window.SetModulesEnabled(s.MusicEnabled, s.LyricsEnabled, s.ControlEnabled, s.SystemEnabled, s.TodayEnabled, s.FocusEnabled,
-            s.PrayerEnabled, s.TodoEnabled, s.WaterEnabled, s.HealthEnabled, s.NotesEnabled, s.LauncherEnabled, s.ShelfEnabled);
+            s.PrayerEnabled, s.TodoEnabled, s.WaterEnabled, s.HealthEnabled, s.NotesEnabled, s.LauncherEnabled, s.ShelfEnabled,
+            s.ClipboardEnabled);
         _health.Apply();
         _screenTime.Apply();
+        _clipboard.Apply();
         _prayer.Apply();
         _tasks.Evaluate();
         if (_window.ShelfModule.ConvertAvailable != s.ConvertEnabled)
@@ -621,6 +632,7 @@ public sealed class NotchController : IDisposable
         _tasks.Dispose();
         _health.Dispose();
         _screenTime.Dispose();
+        _clipboard.Dispose();
         _window.LauncherModule.Flush();
         _water.Dispose();
         _lists.Dispose();

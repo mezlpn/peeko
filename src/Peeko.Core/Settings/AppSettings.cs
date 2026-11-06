@@ -98,6 +98,8 @@ public sealed class AppSettings
     public bool ScreenTimeEnabled { get; set; }
     /// <summary>Tab Aplikasi: peluncur aplikasi favorit.</summary>
     public bool LauncherEnabled { get; set; } = true;
+    /// <summary>Riwayat clipboard (tab Clipboard). Mati dari awal (privasi).</summary>
+    public bool ClipboardEnabled { get; set; }
 
     public const int MinBattery = 10, MaxBattery = 50;
     public const double MaxOffset = 300;

@@ -314,6 +314,14 @@
                                     </Grid>
                                     <Border Style="{StaticResource RowLine}" />
                                     <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,0,56,0">
+                                            <TextBlock Style="{StaticResource Label}" Text="Riwayat clipboard" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Teks yang disalin muncul di tab Clipboard. Hanya yang di-pin yang disimpan; isi dari password manager diabaikan." />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ClipboardEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
                                         <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Kontrol (Wi-Fi, Bluetooth, volume…)" />
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ControlEnabled}" />
                                     </Grid>

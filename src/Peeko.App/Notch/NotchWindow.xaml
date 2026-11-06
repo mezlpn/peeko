@@ -162,6 +162,8 @@
                             <prod:NotesModule x:Name="NotesModuleView" HorizontalAlignment="Center" VerticalAlignment="Top" Visibility="Collapsed" />
                             <sistem:LauncherModule x:Name="LauncherModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
                                                    Visibility="Collapsed" />
+                            <prod:ClipboardModule x:Name="ClipboardModuleView" HorizontalAlignment="Center" VerticalAlignment="Top"
+                                                  Visibility="Collapsed" />
                             <prod:ShelfModule x:Name="ShelfModuleView" Width="440" Height="96" HorizontalAlignment="Center"
                                               VerticalAlignment="Top" Visibility="Collapsed" />
                         </Grid>

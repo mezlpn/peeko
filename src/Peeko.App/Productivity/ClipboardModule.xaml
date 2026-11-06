@@ -1,0 +1,24 @@
+<!-- Tab Clipboard, 440 × 150: judul + daftar teks yang pernah disalin. Klik untuk menyalin lagi. -->
+<UserControl x:Class="Peeko.App.Productivity.ClipboardModule"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="440" Height="150">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="24" />
+            <RowDefinition Height="4" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Style="{StaticResource Peeko.Text.Overline}" VerticalAlignment="Center" Text="CLIPBOARD" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <TextBlock x:Name="CountText" Style="{StaticResource Peeko.Text.Caption}" VerticalAlignment="Center" Margin="0,0,10,0" />
+            <Button x:Name="ClearButton" Style="{StaticResource Peeko.Button.Text}" Height="22" Padding="8,0" Content="Bersihkan"
+                    ToolTip="Hapus semua yang tidak di-pin" Click="OnClear" />
+        </StackPanel>
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden">
+            <StackPanel x:Name="List" />
+        </ScrollViewer>
+        <TextBlock x:Name="Empty" Grid.Row="2" Style="{StaticResource Peeko.Text.Caption}" TextWrapping="Wrap" Margin="0,6,0,0"
+                   Text="Teks yang kamu salin (Ctrl + C) akan muncul di sini. Pin yang sering dipakai supaya tetap tersimpan; yang lain hilang saat Peeko ditutup." />
+    </Grid>
+</UserControl>
