@@ -301,6 +301,10 @@ public partial class NotchWindow : Window
             PeekBanner.BeginAnimation(OpacityProperty, null);
             PeekBanner.Opacity = 0;
             PeekBanner.Visibility = Visibility.Collapsed;
+            StatusBar.BeginAnimation(OpacityProperty, null);
+            StatusBar.Opacity = 1;
+            Dots.BeginAnimation(OpacityProperty, null);
+            Dots.Opacity = 1;
         }
         if (from == NotchState.Expanded || to == NotchState.Expanded)
             NotifyVisibleModule();
@@ -544,6 +548,9 @@ public partial class NotchWindow : Window
         PeekBannerContent.Show(request);
         PeekBanner.Visibility = Visibility.Visible;
         PeekBanner.Animate(OpacityProperty, Motion.To(1, Motion.Fast, Motion.Out));
+        // Baris status dan titik memberi tempat; isi tab tetap terlihat utuh.
+        StatusBar.Animate(OpacityProperty, Motion.To(0, Motion.Fast, Motion.Out));
+        Dots.Animate(OpacityProperty, Motion.To(0, Motion.Fast, Motion.Out));
         _bannerTimer.Stop();
         _bannerTimer.Interval = request.Hold;
         _bannerTimer.Start();
@@ -554,6 +561,8 @@ public partial class NotchWindow : Window
         _bannerTimer.Stop();
         if (PeekBanner.Visibility != Visibility.Visible) return;
         FadeOut(PeekBanner, Motion.Fast);
+        StatusBar.Animate(OpacityProperty, Motion.To(1, Motion.Fast, Motion.Out));
+        Dots.Animate(OpacityProperty, Motion.To(1, Motion.Fast, Motion.Out));
     }
 
     private void ToHidden()
