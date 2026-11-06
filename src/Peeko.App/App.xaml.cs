@@ -31,6 +31,9 @@ public partial class App : Application
 
     private Mutex? _singleInstance;
     private IHost? _host;
+
+    /// <summary>Layanan aplikasi (untuk jendela yang dibuat di luar DI, mis. Pengaturan).</summary>
+    public IServiceProvider Services => _host!.Services;
     private TaskbarIcon? _tray;
 
     public static string DataDirectory { get; } =
@@ -138,6 +141,7 @@ public partial class App : Application
         builder.Services.AddSingleton<Today.CalendarService>();
         builder.Services.AddSingleton<RadioService>();
         builder.Services.AddSingleton<Today.GitHubService>();
+        builder.Services.AddSingleton<Sistem.ClaudeCodeService>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
 

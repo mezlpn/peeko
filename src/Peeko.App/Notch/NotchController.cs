@@ -13,6 +13,7 @@ using Peeko.Core.Settings;
 using Peeko.Core.Notch;
 using Peeko.Core.Peeks;
 using Peeko.Platform.Display;
+using Peeko.Platform.Network;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 
@@ -43,6 +44,8 @@ public sealed class NotchController : IDisposable
     private readonly Today.CalendarService _calendar;
     private readonly RadioService _radio;
     private readonly Today.GitHubService _github;
+    private readonly Sistem.ClaudeCodeService _claude;
+    private readonly SemaphoreSlim _claudeOne = new(1, 1);
     private bool _rawFullscreen;
     private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
@@ -63,7 +66,7 @@ public sealed class NotchController : IDisposable
         Today.WeatherService weather, Prayer.PrayerController prayer, CollapsedSlotsController slots,
         TaskReminderController tasks, HealthController health, Sistem.ScreenTimeController screenTime,
         ClipboardController clipboard, Today.CalendarService calendar, RadioService radio,
-        Today.GitHubService github, ILogger<NotchController> log)
+        Today.GitHubService github, Sistem.ClaudeCodeService claude, ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -85,6 +88,7 @@ public sealed class NotchController : IDisposable
         _calendar = calendar;
         _radio = radio;
         _github = github;
+        _claude = claude;
         _log = log;
         _window.AttachWeather(weather);
     }
@@ -199,6 +203,19 @@ public sealed class NotchController : IDisposable
             _stateMachine.SetHoldOpen(active);
         };
         _window.ClipboardModule.Attach(_clipboard);
+
+        // ── Claude Code ──
+        _claude.Bridge.Notified += (ev, message, folder) => _window.Dispatcher.BeginInvoke(() =>
+        {
+            bool done = ev is "Stop" or "SubagentStop";
+            ShowPeek(new PeekRequest(PeekKind.Claude)
+            {
+                Flag = done,
+                Text = done ? "Claude selesai" : "Claude Code",
+                Detail = done ? folder : message.Length > 0 ? message : folder,
+            });
+        });
+        _claude.Bridge.PermissionHandler = (request, ct) => _window.Dispatcher.InvokeAsync(() => AskClaudeAsync(request, ct)).Task.Unwrap();
 
         // ── Radio ──
         _window.RadioModule.Attach(_radio);
@@ -399,7 +416,11 @@ public sealed class NotchController : IDisposable
         // Dibuka karena file diseret: tetap di tab Rak walau musik sedang diputar.
         // Sedang mengubah format: tetap di tab Rak.
         // Hitung mundur salat/tugas sedang tampil: buka tab terkait.
-        if (to == NotchState.Expanded && _window.CollapsedActivity == CollapsedActivity.Prayer && !_expandingForShelf)
+        // Pilihan zona snap / permintaan izin Claude: jangan diganti tab lain.
+        if (to == NotchState.Expanded && (_window.Snapping || _window.AskingClaude))
+        {
+        }
+        else if (to == NotchState.Expanded && _window.CollapsedActivity == CollapsedActivity.Prayer && !_expandingForShelf)
             _window.SelectModule(NotchWindow.PrayerTab);
         else if (to == NotchState.Expanded && _window.CollapsedActivity == CollapsedActivity.Task && !_expandingForShelf)
             _window.SelectModule(NotchWindow.TodoTab);
@@ -634,6 +655,7 @@ public sealed class NotchController : IDisposable
         _clipboard.Apply();
         _calendar.Apply();
         _github.Apply();
+        _claude.Apply();
         _window.Agenda.Refresh();
         _prayer.Apply();
         _tasks.Evaluate();
@@ -668,6 +690,39 @@ public sealed class NotchController : IDisposable
         UpdateActivity();
         UpdateLyricPill();
         _slots.Refresh();
+    }
+
+    /// <summary>Tampilkan permintaan izin di notch dan tunggu jawabannya (satu per satu).</summary>
+    private async Task<ClaudeDecision?> AskClaudeAsync(ClaudePermission request, CancellationToken ct)
+    {
+        try
+        {
+            await _claudeOne.WaitAsync(ct);
+        }
+        catch (OperationCanceledException)
+        {
+            return null;
+        }
+        var answer = new TaskCompletionSource<ClaudeDecision?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        void OnAnswer(ClaudeDecision d) => answer.TrySetResult(d);
+        _window.ClaudeModule.Answered += OnAnswer;
+        using var reg = ct.Register(() => answer.TrySetResult(null));
+        try
+        {
+            _window.ClaudeModule.Show(request);
+            _window.ShowClaude(true);
+            _stateMachine.ExpandNow();
+            _stateMachine.SetHoldOpen(true);
+            return await answer.Task;
+        }
+        finally
+        {
+            _window.ClaudeModule.Answered -= OnAnswer;
+            _window.ShowClaude(false);
+            _stateMachine.SetHoldOpen(false);
+            _stateMachine.PointerExited();
+            _claudeOne.Release();
+        }
     }
 
     private void TrackSnap()
@@ -743,6 +798,7 @@ public sealed class NotchController : IDisposable
         _calendar.Dispose();
         _radio.Dispose();
         _github.Dispose();
+        _claude.Dispose();
         _window.LauncherModule.Flush();
         _water.Dispose();
         _lists.Dispose();

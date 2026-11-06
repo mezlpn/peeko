@@ -93,6 +93,33 @@ public partial class SettingsWindow : Window
 
     private void OnSaveCalendar(object sender, RoutedEventArgs e) => _vm.SaveCalendar();
 
+    private void OnInstallClaudeHooks(object sender, RoutedEventArgs e) => ClaudeHooks(install: true);
+
+    private void OnRemoveClaudeHooks(object sender, RoutedEventArgs e) => ClaudeHooks(install: false);
+
+    private void ClaudeHooks(bool install)
+    {
+        var service = ((App)Application.Current).Services.GetService(typeof(Sistem.ClaudeCodeService)) as Sistem.ClaudeCodeService;
+        if (service is null) return;
+        try
+        {
+            if (install)
+            {
+                if (!_vm.ClaudeCodeEnabled) _vm.ClaudeCodeEnabled = true;
+                service.InstallHooks();
+            }
+            else
+            {
+                service.UninstallHooks();
+            }
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException or System.Text.Json.JsonException or System.IO.InvalidDataException)
+        {
+            MessageBox.Show(this, "settings.json Claude Code tidak bisa diubah: " + ex.Message, "Peeko", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        _vm.RefreshClaudeStatus();
+    }
+
     private void OnBackup(object sender, RoutedEventArgs e)
     {
         var dialog = new Microsoft.Win32.SaveFileDialog

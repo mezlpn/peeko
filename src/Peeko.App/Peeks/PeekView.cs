@@ -174,6 +174,12 @@ public sealed class PeekView : Grid
                 AddLabel(r.Text ?? "Selesai");
                 AddValue(r.Detail ?? "", "TextSecondary", small: true);
                 break;
+            case PeekKind.Claude:
+                if (r.Flag) AddHappyEyes();
+                else AddIcon(Geometry.Parse("M12,3 L13.6,9.2 L20,8 L15,12 L20,16 L13.6,14.8 L12,21 L10.4,14.8 L4,16 L9,12 L4,8 L10.4,9.2 Z"), "Accent");
+                AddLabel(r.Text ?? "Claude Code");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true, maxWidth: 170);
+                break;
             case PeekKind.PullRequest:
                 AddIcon(Geometry.Parse("M7,5 A2,2 0 1 0 7,9 A2,2 0 1 0 7,5 M7,9 V19 M17,15 A2,2 0 1 0 17,19 A2,2 0 1 0 17,15 M17,15 V9 A2,2 0 0 0 15,7 H11 M13,5 L11,7 L13,9"), "Accent");
                 AddLabel(r.Text ?? "");

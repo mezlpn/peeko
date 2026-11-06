@@ -173,6 +173,23 @@ public sealed class SettingsViewModel : ObservableObject
     public bool ScreenTimeEnabled { get => S.ScreenTimeEnabled; set => Set(value, s => s.ScreenTimeEnabled, (s, v) => s.ScreenTimeEnabled = v); }
     public bool LauncherEnabled { get => S.LauncherEnabled; set => Set(value, s => s.LauncherEnabled, (s, v) => s.LauncherEnabled = v); }
     public bool ClipboardEnabled { get => S.ClipboardEnabled; set => Set(value, s => s.ClipboardEnabled, (s, v) => s.ClipboardEnabled = v); }
+    public bool ClaudeCodeEnabled
+    {
+        get => S.ClaudeCodeEnabled;
+        set
+        {
+            Set(value, s => s.ClaudeCodeEnabled, (s, v) => s.ClaudeCodeEnabled = v);
+            OnPropertyChanged(nameof(ClaudeStatus));
+        }
+    }
+
+    public string ClaudeStatus => !S.ClaudeCodeEnabled ? "Mati"
+        : Sistem.ClaudeCodeService.SettingsPath is { } path && System.IO.File.Exists(path) && System.IO.File.ReadAllText(path).Contains("127.0.0.1:47821/claude")
+            ? "Hook terpasang. Kabar dan izin Claude Code muncul di notch."
+            : "Hook belum dipasang. Klik Pasang hook.";
+
+    public void RefreshClaudeStatus() => OnPropertyChanged(nameof(ClaudeStatus));
+
     public bool RadioEnabled { get => S.RadioEnabled; set => Set(value, s => s.RadioEnabled, (s, v) => s.RadioEnabled = v); }
     public bool SnapZonesEnabled { get => S.SnapZonesEnabled; set => Set(value, s => s.SnapZonesEnabled, (s, v) => s.SnapZonesEnabled = v); }
     public bool BreaksEnabled { get => S.BreaksEnabled; set => Set(value, s => s.BreaksEnabled, (s, v) => s.BreaksEnabled = v); }

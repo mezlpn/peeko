@@ -122,6 +122,12 @@ public sealed class AppSettings
     /// <summary>Token opsional (repo privat), diisi sendiri oleh pengguna.</summary>
     public string? GitHubToken { get; set; }
 
+    // ── Claude Code ──
+    /// <summary>Kabar dan permintaan izin Claude Code di notch. Mati dari awal.</summary>
+    public bool ClaudeCodeEnabled { get; set; }
+    /// <summary>Token acak yang dipasang di perintah hook supaya hanya hook Peeko yang diterima.</summary>
+    public string? ClaudeToken { get; set; }
+
     public const int MinBattery = 10, MaxBattery = 50;
     public const double MaxOffset = 300;
 

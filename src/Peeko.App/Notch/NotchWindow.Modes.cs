@@ -32,7 +32,9 @@ public partial class NotchWindow
     /// <summary>Pilihan zona saat jendela diseret ke notch; bukan tab biasa (tanpa titik, tidak ikut digulir).</summary>
     public const int RadioTab = 11;
     public const int SnapTab = 12;
-    private const int ModeCount = 13;
+    /// <summary>Permintaan izin Claude Code; seperti Snap, bukan tab biasa.</summary>
+    public const int ClaudeTab = 13;
+    private const int ModeCount = 14;
 
     // Di atas isi: 6 + baris status 24 + 2 + titik 6 + 12; di bawahnya 16. Isi diberi tepi 18.
     private const double ChromeHeight = 6 + 24 + 2 + 6 + 12 + 16;
@@ -41,7 +43,7 @@ public partial class NotchWindow
     private const double WheelStep = 120;
     private static readonly TimeSpan WheelIdleReset = TimeSpan.FromMilliseconds(400);
 
-    private readonly bool[] _modeEnabled = [true, true, true, true, true, true, true, true, true, true, false, false, false];
+    private readonly bool[] _modeEnabled = [true, true, true, true, true, true, true, true, true, true, false, false, false, false];
     private bool _lyricsEnabled = true, _calendarEnabled = true, _focusEnabled = true, _waterEnabled = true, _healthEnabled = true;
     private readonly Dictionary<FrameworkElement, SpringValue> _modeY = [];
     private readonly List<(Border Dot, SpringValue Width)> _dots = [];
@@ -73,6 +75,7 @@ public partial class NotchWindow
         LauncherTab => LauncherModuleView,
         ClipboardTab => ClipboardModuleView,
         SnapTab => SnapModuleView,
+        ClaudeTab => ClaudeModuleView,
         RadioTab => RadioModuleView,
         _ => ShelfModuleView,
     };
@@ -95,6 +98,8 @@ public partial class NotchWindow
                 return new Size(440, 150);
             case RadioTab:
                 return new Size(440, 150);
+            case ClaudeTab:
+                return new Size(Sistem.ClaudeModule.ContentWidth, Sistem.ClaudeModule.ContentHeight);
             case SnapTab:
                 return new Size(Sistem.SnapModule.ContentWidth, Sistem.SnapModule.ContentHeight);
             case LauncherTab:
@@ -249,6 +254,30 @@ public partial class NotchWindow
         if (back >= 0) SelectModule(back);
     }
 
+    public Sistem.ClaudeModule ClaudeModule => ClaudeModuleView;
+
+    private int _beforeClaude = MusicTab;
+
+    /// <summary>Sedang menampilkan permintaan izin Claude Code.</summary>
+    public bool AskingClaude { get; private set; }
+
+    public void ShowClaude(bool on)
+    {
+        if (on == AskingClaude) return;
+        AskingClaude = on;
+        if (on)
+        {
+            if (!Snapping) _beforeClaude = _moduleIndex;
+            _modeEnabled[ClaudeTab] = true;
+            SelectModule(ClaudeTab);
+            return;
+        }
+        ClaudeModuleView.Hide();
+        _modeEnabled[ClaudeTab] = false;
+        int back = _modeEnabled[_beforeClaude] ? _beforeClaude : Array.IndexOf(_modeEnabled, true);
+        if (back >= 0) SelectModule(back);
+    }
+
     /// <summary>Kursor (piksel layar) berada di atas atau dekat notch?</summary>
     public bool IsCursorNear(int screenX, int screenY)
     {
@@ -379,7 +408,7 @@ public partial class NotchWindow
         string[] names = ["Musik", "Kontrol", "Sistem", "Hari ini", "Salat", "Tugas", "Sehat", "Catatan", "Aplikasi", "Rak", "Clipboard", "Radio"];
         for (int i = 0; i < ModeCount; i++)
         {
-            if (!_modeEnabled[i] || i == SnapTab) continue;
+            if (!_modeEnabled[i] || i is SnapTab or ClaudeTab) continue;
             int index = i;
             var dot = new Border
             {
