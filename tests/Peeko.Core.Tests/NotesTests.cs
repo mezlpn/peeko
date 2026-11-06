@@ -32,6 +32,16 @@ public class NoteBookTests
         book.RemoveEmpty();
         Assert.Single(book.Notes);
     }
+
+    [Fact]
+    public void New_note_being_typed_survives_cleanup()
+    {
+        var book = new NoteBook(_time);
+        book.Add();
+        var fresh = book.Add()!;
+        book.RemoveEmpty(keep: fresh.Id);
+        Assert.Equal([fresh.Id], book.Notes.Select(n => n.Id));
+    }
 }
 
 public class FlashcardTests

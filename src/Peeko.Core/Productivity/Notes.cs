@@ -59,10 +59,10 @@ public sealed class NoteBook
         if (_d.Notes.RemoveAll(n => n.Id == id) > 0) Changed?.Invoke();
     }
 
-    /// <summary>Hapus catatan kosong (mis. dibuat lalu ditinggal).</summary>
-    public void RemoveEmpty()
+    /// <summary>Hapus catatan kosong (mis. dibuat lalu ditinggal), kecuali <paramref name="keep"/>.</summary>
+    public void RemoveEmpty(Guid? keep = null)
     {
-        if (_d.Notes.RemoveAll(n => string.IsNullOrWhiteSpace(n.Text)) > 0) Changed?.Invoke();
+        if (_d.Notes.RemoveAll(n => n.Id != keep && string.IsNullOrWhiteSpace(n.Text)) > 0) Changed?.Invoke();
     }
 
     public static string Title(Note note)

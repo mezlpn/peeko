@@ -84,7 +84,7 @@ public partial class NotesModule : UserControl
     {
         StopStudy();
         _selected = id;
-        _book?.RemoveEmpty();
+        _book?.RemoveEmpty(keep: id);
         RebuildList();
         LoadSelected();
     }
