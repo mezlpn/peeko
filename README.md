@@ -5,8 +5,12 @@ layar, dan Peeko terbuka menampilkan:
 
 - 🎵 **Musik** yang sedang diputar (Spotify, YouTube, dll.) + **lirik yang ikut berjalan** (bisa di-pin supaya baris yang diputar tetap tampil di notch), dengan visualizer
   yang bergoyang mengikuti bass, vokal, dan treble lagunya
-- ⏱️ **Timer fokus** (Pomodoro) dan 💧 **pengingat minum air**
-- ✅ **To-do** singkat dan 📁 **rak** (tempat menaruh file, teks, atau tautan sementara)
+- 🕌 **Jadwal salat** (kriteria Kemenag, offline), pengingat, hitung mundur di notch, dan azan
+- ⏱️ **Timer fokus** (Pomodoro), **timer bebas**, **stopwatch**, dan 💧 **pengingat minum air**
+- ✅ **To-do pintar**: tulis "besok jam 7 kumpul laporan" atau "tiap senin olahraga", lalu Peeko mengingatkan, dengan tunda dan tugas berulang
+- 🧘 **Sehat**: pengingat istirahat, mata 20-20-20, dan latihan napas
+- 📝 **Catatan + flashcard**: baris `pertanyaan :: jawaban` langsung bisa dipakai belajar
+- 📁 **Rak** (tempat menaruh file, teks, atau tautan sementara)
 - 🎛️ **Kontrol cepat**: Wi-Fi, Bluetooth, Jangan ganggu, volume, kecerahan, tangkap layar, kunci layar
 - 📅 **Hari ini**: kalender bulan ini, cuaca, dan kondisi baterai
 - 🔄 **Ubah format file**: seret foto, PDF, atau dokumen ke notch, lalu pilih PNG, JPG, PDF, Word… (ditenagai [Filee](https://github.com/KnifeLemon/Filee))
@@ -54,9 +58,11 @@ Butuh **Windows 10 atau 11**. Tidak perlu memasang apa-apa lagi.
 
 - **Arahkan kursor** ke notch di tengah atas layar untuk membukanya. Jauhkan kursor untuk menutup.
 - Bagian atas panel menampilkan cuaca, jam (dengan mata Peeko), dan baterai.
-- **Gulir mouse** di panel untuk pindah tampilan, atau klik **titik kecil** di bawah jam. Ada lima tampilan,
+- **Gulir mouse** di panel untuk pindah tampilan, atau klik **titik kecil** di bawah jam. Ada delapan tampilan,
   dan ukuran notch menyesuaikan isinya:
-  **Musik + lirik** · **Kontrol** · **Hari ini** (kalender + timer fokus) · **Tugas + minum** · **Rak**.
+  **Musik + lirik** · **Kontrol** · **Hari ini** (kalender + timer) · **Salat** · **Tugas + minum** · **Sehat** · **Catatan** · **Rak**.
+- Saat tertutup, kiri dan kanan notch bisa menampilkan jam, tanggal, cuaca, baterai, salat berikutnya, atau
+  tugas berikutnya. Atur di Pengaturan → **Isi notch tertutup**.
 - Cuaca memakai perkiraan lokasi dari internet. Kalau kotanya meleset, isi kotamu di
   Pengaturan → **Cuaca**.
 - **Seret file, teks, atau tautan** (dari Explorer, browser, chat…) ke notch. Tahan sebentar sampai panel terbuka, lalu lepaskan di:
