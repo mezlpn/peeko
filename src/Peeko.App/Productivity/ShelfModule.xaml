@@ -30,6 +30,9 @@
                                Text="Seret file, teks, atau tautan ke sini" />
                     <TextBlock x:Name="ZoneDetail" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,2,0,0"
                                TextAlignment="Center" TextWrapping="Wrap" Text="Simpan sementara, lalu seret keluar ke mana saja" />
+                    <TextBlock x:Name="ZonePhoneLink" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,6,0,0"
+                               Foreground="{StaticResource Peeko.Brush.Accent}" Cursor="Hand" Text="atau kirim dari HP"
+                               MouseLeftButtonUp="OnPhoneLink" />
                 </StackPanel>
             </Grid>
 
@@ -59,6 +62,8 @@
                            VerticalAlignment="Center" Margin="4,0,0,0" Text="RAK" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <TextBlock x:Name="SummaryText" Style="{StaticResource Peeko.Text.Caption}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <Button Style="{StaticResource Peeko.Button.Text}" Content="Dari HP" ToolTip="Kirim file atau teks dari HP lewat Wi-Fi yang sama"
+                            Click="OnPhone" />
                     <Button Style="{StaticResource Peeko.Button.Text}" Content="Bersihkan" Click="OnClear" />
                 </StackPanel>
             </Grid>
@@ -66,6 +71,29 @@
                           PreviewMouseWheel="OnCardWheel">
                 <StackPanel x:Name="Cards" Orientation="Horizontal" Margin="0,6,0,0" />
             </ScrollViewer>
+        </Grid>
+
+        <!-- ── Kirim dari HP: kode QR berisi alamat server lokal sementara ── -->
+        <Grid x:Name="PhoneView" Visibility="Collapsed" Background="{StaticResource Peeko.Brush.NotchBg}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="128" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Width="128" Height="128" CornerRadius="12" Background="White" Padding="4" VerticalAlignment="Top">
+                <Image x:Name="QrImage" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+            </Border>
+            <StackPanel Grid.Column="2" VerticalAlignment="Top" Margin="0,4,30,0">
+                <TextBlock Style="{StaticResource Peeko.Text.BodyStrong}" Text="Kirim dari HP" />
+                <TextBlock Style="{StaticResource Peeko.Text.Caption}" TextWrapping="Wrap" Margin="0,4,0,0"
+                           Text="Sambungkan HP ke Wi-Fi yang sama, lalu pindai kode ini dengan kamera. File masuk ke folder Unduhan dan muncul di Rak." />
+                <TextBlock x:Name="PhoneUrl" Style="{StaticResource Peeko.Text.Caption}" Foreground="{StaticResource Peeko.Brush.TextSecondary}"
+                           Margin="0,8,0,0" TextTrimming="CharacterEllipsis" />
+                <TextBlock x:Name="PhoneStatus" Style="{StaticResource Peeko.Text.Caption}" Foreground="{StaticResource Peeko.Brush.Accent}"
+                           Margin="0,4,0,0" TextWrapping="Wrap" />
+            </StackPanel>
+            <Button Grid.Column="2" Style="{StaticResource Peeko.Button.Icon}" Tag="{StaticResource Peeko.Icon.Close}" Width="24" Height="24"
+                    HorizontalAlignment="Right" VerticalAlignment="Top" ToolTip="Tutup dan matikan penerima" Click="OnPhoneClose" />
         </Grid>
 
         <!-- ── Ubah format: menimpa isi rak selama berjalan ── -->

@@ -105,7 +105,8 @@ public partial class NotchWindow
                 return new Size(440, 170);
             default:
                 // Rak kosong cukup zona drop; berisi: judul + kartu; Ubah format butuh ruang chip.
-                double shelf = ShelfModuleView.ConvertPanel.IsActive ? 160
+                double shelf = ShelfModuleView.PhoneActive ? 136
+                    : ShelfModuleView.ConvertPanel.IsActive ? 160
                     : ShelfModuleView.FilledView.Visibility == Visibility.Visible ? 124 : 96;
                 ShelfModuleView.Height = shelf;
                 return new Size(440, shelf);
@@ -142,6 +143,7 @@ public partial class NotchWindow
     {
         ShelfModuleView.FilledView.IsVisibleChanged += (_, _) => RefreshExpandedShape();
         LauncherModuleView.SizeChanged += RefreshExpandedShape;
+        ShelfModuleView.PhoneChanged += RefreshExpandedShape;
         ShelfModuleView.ConvertPanel.IsVisibleChanged += (_, _) => RefreshExpandedShape();
         if (LyricsModuleView.DataContext is INotifyPropertyChanged lyrics)
             lyrics.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(LyricsViewModel.State)) RefreshExpandedShape(); };

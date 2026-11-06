@@ -423,6 +423,145 @@ public partial class ShelfModule : UserControl
         }
     }
 
+    // ── Kirim dari HP ──────────────────────────────────────────────────────
+
+    private Peeko.Platform.Network.PhoneDropServer? _phone;
+    private readonly System.Windows.Threading.DispatcherTimer _phoneIdle = new() { Interval = TimeSpan.FromMinutes(10) };
+    private int _phoneFiles;
+
+    /// <summary>Panel QR sedang tampil (rak butuh tinggi lebih).</summary>
+    public bool PhoneActive => PhoneView.Visibility == Visibility.Visible;
+
+    /// <summary>Panel QR dibuka/ditutup: notch menyesuaikan tinggi.</summary>
+    public event Action? PhoneChanged;
+
+    private void OnPhoneLink(object sender, MouseButtonEventArgs e)
+    {
+        e.Handled = true; // jangan ikut membuka pemilih file zona drop
+        OpenPhone();
+    }
+
+    private void OnPhone(object sender, RoutedEventArgs e) => OpenPhone();
+
+    private void OnPhoneClose(object sender, RoutedEventArgs e) => ClosePhone();
+
+    private void OpenPhone()
+    {
+        if (_phone is null)
+        {
+            _phone = new Peeko.Platform.Network.PhoneDropServer(DownloadsFolder());
+            _phone.FileReceived += path => Dispatcher.BeginInvoke(() => OnPhoneFile(path));
+            _phone.TextReceived += text => Dispatcher.BeginInvoke(() => OnPhoneText(text));
+            _phone.Visited += () => Dispatcher.BeginInvoke(() =>
+            {
+                Touch();
+                if (_phoneFiles == 0) PhoneStatus.Text = "HP tersambung. Pilih file atau tulis teks di HP.";
+            });
+            _phoneIdle.Tick += (_, _) => ClosePhone();
+        }
+        string? url;
+        try
+        {
+            url = _phone.Start();
+        }
+        catch (System.Net.Sockets.SocketException)
+        {
+            url = null;
+        }
+        if (url is null)
+        {
+            PeekRequested?.Invoke(new Peeko.Core.Peeks.PeekRequest(Peeko.Core.Peeks.PeekKind.FileAction)
+            {
+                Text = "Belum tersambung Wi-Fi",
+                Detail = "Sambungkan laptop ke Wi-Fi dulu",
+            });
+            return;
+        }
+        _phoneFiles = 0;
+        QrImage.Source = RenderQr(Peeko.Core.Conversion.QrCode.Encode(url));
+        PhoneUrl.Text = url;
+        PhoneStatus.Text = "Menunggu HP… Kalau Windows bertanya, izinkan Peeko di jaringan Pribadi.";
+        PhoneView.Visibility = Visibility.Visible;
+        Touch();
+        PhoneChanged?.Invoke();
+    }
+
+    public void ClosePhone()
+    {
+        _phoneIdle.Stop();
+        _phone?.Stop();
+        if (!PhoneActive) return;
+        PhoneView.Visibility = Visibility.Collapsed;
+        PhoneChanged?.Invoke();
+    }
+
+    /// <summary>Ada kegiatan: penerima mati sendiri 10 menit setelah kegiatan terakhir.</summary>
+    private void Touch()
+    {
+        _phoneIdle.Stop();
+        _phoneIdle.Start();
+    }
+
+    private void OnPhoneFile(string path)
+    {
+        Touch();
+        _phoneFiles++;
+        _shelf?.Add([path]);
+        PhoneStatus.Text = _phoneFiles == 1 ? "1 file diterima" : $"{_phoneFiles} file diterima";
+        PeekRequested?.Invoke(new Peeko.Core.Peeks.PeekRequest(Peeko.Core.Peeks.PeekKind.FileAction)
+        {
+            Flag = true,
+            Text = "Dari HP",
+            Detail = System.IO.Path.GetFileName(path),
+        });
+    }
+
+    private void OnPhoneText(string text)
+    {
+        Touch();
+        _shelf?.AddText(text);
+        PhoneStatus.Text = "Teks diterima, ada di Rak";
+        PeekRequested?.Invoke(new Peeko.Core.Peeks.PeekRequest(Peeko.Core.Peeks.PeekKind.FileAction)
+        {
+            Flag = true,
+            Text = "Teks dari HP",
+            Detail = Shelf.TextLabel(text),
+        });
+    }
+
+    /// <summary>Folder Unduhan pengguna (Known Folder, bisa sudah dipindah ke drive lain).</summary>
+    private static string DownloadsFolder()
+    {
+        var id = new Guid("374DE290-123F-4565-9164-39C4925E467B");
+        if (SHGetKnownFolderPath(ref id, 0, IntPtr.Zero, out var p) == 0)
+        {
+            var path = System.Runtime.InteropServices.Marshal.PtrToStringUni(p);
+            System.Runtime.InteropServices.Marshal.FreeCoTaskMem(p);
+            if (!string.IsNullOrEmpty(path)) return path;
+        }
+        return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+    }
+
+    [System.Runtime.InteropServices.DllImport("shell32.dll")]
+    private static extern int SHGetKnownFolderPath(ref Guid id, uint flags, IntPtr token, out IntPtr path);
+
+    /// <summary>Modul QR → gambar hitam-putih dengan zona tenang 4 modul.</summary>
+    private static ImageSource RenderQr(Peeko.Core.Conversion.QrCode qr)
+    {
+        const int quiet = 4;
+        int size = qr.Size + quiet * 2;
+        var group = new GeometryGroup { FillRule = FillRule.Nonzero };
+        for (int y = 0; y < qr.Size; y++)
+            for (int x = 0; x < qr.Size; x++)
+                if (qr[x, y]) group.Children.Add(new RectangleGeometry(new Rect(x + quiet, y + quiet, 1, 1)));
+        var drawing = new DrawingGroup();
+        drawing.Children.Add(new GeometryDrawing(Brushes.White, null, new RectangleGeometry(new Rect(0, 0, size, size))));
+        drawing.Children.Add(new GeometryDrawing(Brushes.Black, null, group));
+        var image = new DrawingImage(drawing);
+        image.Freeze();
+        return image;
+    }
+
     private void DragOut(FrameworkElement source, ShelfItem item)
     {
         BusyChanged?.Invoke(true);
