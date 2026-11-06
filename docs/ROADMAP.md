@@ -110,3 +110,13 @@ Disetujui untuk dikerjakan, tapi paling akhir karena paling berisiko untuk perfo
 | Dock / pengganti taskbar | Dulu sengaja tidak diambil dari Bloom; akan dibuat sebagai jendela terpisah yang bisa dimatikan total. |
 | Buddy & kursor lucu | Buddy sebagai gambar/animasi 2D ringan (bukan 3D), kursor lewat skema kursor Windows yang dikembalikan saat dimatikan. |
 | FPS counter | Lewat ETW (DXGI present events); Windows meminta izin sekali. |
+
+## Status (7 Nov 2026)
+
+- **1 · Harian**: selesai (versi 0.4.0 di kode, belum dirilis).
+- **2 · Kontrol sistem**: selesai: daftar Wi-Fi/Bluetooth/audio, tetap terjaga, mode gelap, bisukan mikrofon, HUD Num Lock/mikrofon/pesawat, tab Sistem (CPU/RAM/GPU/suhu, progres hari, screen time), tab Aplikasi.
+- **3 · File & produktivitas**: selesai: aksi file di Rak, riwayat clipboard, kirim dari HP (QR), snap zones, tautan per kategori.
+- **4 · Konten online**: kalender iCal, radio, PR GitHub, lirik cari manual + romanisasi Korea/kana. Belum: cahaya warna sampul, VLC.
+- **5 · AI**: tab AI (Claude/Gemini/kompatibel OpenAI) dengan aksi + Urungkan, Claude Code di notch. Belum: pemakaian limit.
+- **6 · Tampilan**: cadangkan/pulihkan, banner peek tidak menutupi isi. Belum: tema/warna, sembunyi otomatis, konfeti, layar sentuh, bahasa Inggris.
+- **7 · Fitur berat**: belum dikerjakan.
