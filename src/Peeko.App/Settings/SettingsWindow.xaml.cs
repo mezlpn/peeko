@@ -93,6 +93,47 @@ public partial class SettingsWindow : Window
 
     private void OnSaveCalendar(object sender, RoutedEventArgs e) => _vm.SaveCalendar();
 
+    private void OnBackup(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Title = "Simpan cadangan Peeko",
+            FileName = BackupService.DefaultName,
+            Filter = "Cadangan Peeko (*.zip)|*.zip",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        };
+        if (dialog.ShowDialog(this) != true) return;
+        try
+        {
+            int n = BackupService.Create(dialog.FileName);
+            BackupStatus.Text = $"{n} file dicadangkan ke {System.IO.Path.GetFileName(dialog.FileName)}";
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            BackupStatus.Text = "Gagal menyimpan cadangan: " + ex.Message;
+        }
+    }
+
+    private void OnRestore(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Pilih cadangan Peeko",
+            Filter = "Cadangan Peeko (*.zip)|*.zip",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        };
+        if (dialog.ShowDialog(this) != true) return;
+        if (!BackupService.IsValid(dialog.FileName, out int files))
+        {
+            BackupStatus.Text = "File itu bukan cadangan Peeko.";
+            return;
+        }
+        var answer = MessageBox.Show(this,
+            $"Pulihkan {files} file dari cadangan ini? Data sekarang diganti, tapi salinannya tetap disimpan di folder \"sebelum-pulih\". Peeko akan dimulai ulang.",
+            "Pulihkan cadangan", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+        if (answer == MessageBoxResult.OK) BackupService.RestoreAndRestart(dialog.FileName);
+    }
+
     private async void OnCityKey(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key != System.Windows.Input.Key.Enter) return;

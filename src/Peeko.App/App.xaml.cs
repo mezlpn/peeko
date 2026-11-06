@@ -41,7 +41,7 @@ public partial class App : Application
         base.OnStartup(e);
 
         _singleInstance = new Mutex(initiallyOwned: true, SingleInstanceName, out bool isFirst);
-        if (!isFirst && e.Args.Any(a => a.StartsWith(UpdateController.UpdatedArg)))
+        if (!isFirst && e.Args.Any(a => a.StartsWith(UpdateController.UpdatedArg) || a == Settings.BackupService.RestartArg))
         {
             // Dinyalakan oleh versi lama setelah update: tunggu sampai versi lama selesai keluar.
             try
@@ -62,6 +62,7 @@ public partial class App : Application
         // Jika Serilog sendiri gagal menulis (izin, file terkunci), alasannya dicatat di sini.
         MigrateFromCelah();
         Directory.CreateDirectory(DataDirectory);
+        Settings.BackupService.ApplyPending(); // cadangan yang dipilih sebelum restart
         Serilog.Debugging.SelfLog.Enable(msg =>
         {
             try { File.AppendAllText(Path.Combine(DataDirectory, "serilog-selflog.txt"), msg + Environment.NewLine); }

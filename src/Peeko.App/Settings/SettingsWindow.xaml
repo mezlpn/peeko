@@ -168,8 +168,9 @@
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Tugas" Content="Tugas" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Salat" Content="Jadwal salat" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Lirik" Content="Lirik" Checked="OnNav" />
-                        <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Cuaca" Content="Cuaca" Checked="OnNav" />
+                        <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Cuaca" Content="Cuaca &amp; kalender" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Ubah" Content="Ubah format" Checked="OnNav" />
+                        <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Cadangan" Content="Cadangan" Checked="OnNav" />
                     </StackPanel>
                 </DockPanel>
             </Border>
@@ -642,12 +643,14 @@
                                         <StackPanel VerticalAlignment="Center" Margin="0,10,0,10">
                                             <TextBlock Style="{StaticResource Label}" Text="Pull request yang menunggu review-mu" />
                                             <TextBlock Style="{StaticResource Hint}" TextWrapping="Wrap" Text="Isi username GitHub. Untuk repo privat, tambahkan token (fine-grained, izin baca pull request)." />
-                                            <TextBox Text="{Binding GitHubUser, UpdateSourceTrigger=LostFocus}" Height="30" Margin="0,8,0,0"
+                                            <TextBlock Style="{StaticResource Hint}" Margin="0,8,0,0" Text="Username" />
+                                            <TextBox Text="{Binding GitHubUser, UpdateSourceTrigger=LostFocus}" Height="30" Margin="0,4,0,0"
                                                      VerticalContentAlignment="Center" Padding="8,0" FontSize="13"
                                                      Background="{StaticResource Peeko.Brush.WinBg}" Foreground="{StaticResource Peeko.Brush.TextPrimary}"
                                                      BorderBrush="{StaticResource Peeko.Brush.WinStroke}" CaretBrush="{StaticResource Peeko.Brush.TextPrimary}"
                                                      ToolTip="Username GitHub" />
-                                            <TextBox Text="{Binding GitHubToken, UpdateSourceTrigger=LostFocus}" Height="30" Margin="0,6,0,0"
+                                            <TextBlock Style="{StaticResource Hint}" Margin="0,8,0,0" Text="Token (opsional)" />
+                                            <TextBox Text="{Binding GitHubToken, UpdateSourceTrigger=LostFocus}" Height="30" Margin="0,4,0,0"
                                                      VerticalContentAlignment="Center" Padding="8,0" FontSize="12"
                                                      Background="{StaticResource Peeko.Brush.WinBg}" Foreground="{StaticResource Peeko.Brush.TextPrimary}"
                                                      BorderBrush="{StaticResource Peeko.Brush.WinStroke}" CaretBrush="{StaticResource Peeko.Brush.TextPrimary}"
@@ -694,6 +697,23 @@
                                 <Hyperlink NavigateUri="https://github.com/KnifeLemon/Filee" RequestNavigate="OnLink" Foreground="{StaticResource Peeko.Brush.Accent}">Filee</Hyperlink>
                                 karya KnifeLemon (lisensi MIT), sepenuhnya di laptopmu tanpa unggah ke internet.
                             </TextBlock>
+                        </StackPanel>
+                        <StackPanel x:Name="Cadangan" Margin="0,0,0,22">
+                            <TextBlock Style="{StaticResource SectionHeader}" Text="CADANGAN" />
+                            <Border Style="{StaticResource Card}">
+                                <Grid Style="{StaticResource Row}">
+                                    <StackPanel VerticalAlignment="Center" Margin="0,10,0,10">
+                                        <TextBlock Style="{StaticResource Label}" Text="Cadangkan atau pulihkan data" />
+                                        <TextBlock Style="{StaticResource Hint}" TextWrapping="Wrap" Text="Pengaturan, tugas, catatan, rak, favorit… dalam satu file .zip. Cocok untuk pindah laptop." />
+                                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                            <Button Style="{StaticResource CardButton}" Content="Cadangkan…" Click="OnBackup" />
+                                            <Button Style="{StaticResource CardButton}" Content="Pulihkan…" Margin="8,0,0,0" Click="OnRestore" />
+                                        </StackPanel>
+                                        <TextBlock x:Name="BackupStatus" Style="{StaticResource Hint}" Margin="0,6,0,0" TextWrapping="Wrap"
+                                                   Foreground="{StaticResource Peeko.Brush.Accent}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
                         </StackPanel>
                     </StackPanel>
                 </WrapPanel>
