@@ -164,6 +164,46 @@ public sealed class LyricsController : IDisposable
         Resync(animate: true);
     }
 
+    /// <summary>Teks awal kotak cari manual: "Artis Judul" yang sudah dirapikan.</summary>
+    public string ManualSuggestion()
+    {
+        if (_music.State is not { } state) return "";
+        var q = TrackQueryBuilder.Build(state.Track.Title, state.Track.Artist, state.Track.Album, TimeSpan.Zero).FirstOrDefault();
+        return q is null ? state.Track.Title : $"{q.Artist} {q.Title}".Trim();
+    }
+
+    /// <summary>Cari lirik dengan kata kunci sendiri untuk lagu yang sedang diputar.</summary>
+    public async Task SearchManualAsync(string text)
+    {
+        if (_music.State is not { } state || string.IsNullOrWhiteSpace(text)) return;
+        var key = state.Track.Key;
+        var track = state.Track;
+        var current = TrackQueryBuilder.Build(track.Title, track.Artist, track.Album, state.Timeline?.Duration ?? TimeSpan.Zero).FirstOrDefault()
+                      ?? new TrackQuery(track.Title, track.Artist, track.Album, state.Timeline?.Duration ?? TimeSpan.Zero);
+        CancelFetch();
+        _autoRetry.Stop();
+        var cts = new CancellationTokenSource(FetchTimeout);
+        _fetch = cts;
+        ViewModel.State = LyricsViewState.Loading;
+        LyricsResult result;
+        try
+        {
+            result = await _service.SearchManualAsync(text, current, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            if (_fetch != cts) return;
+            result = new LyricsResult.Failed("batas waktu");
+        }
+        finally
+        {
+            if (_fetch == cts) _fetch = null;
+            cts.Dispose();
+        }
+        if (key != _trackKey) return;
+        Apply(result, track.Title);
+    }
+
     private async Task FetchAsync(bool retry)
     {
         if (_music.State is not { } state) return;
@@ -194,8 +234,13 @@ public sealed class LyricsController : IDisposable
         }
 
         if (key != _trackKey) return;
+        Apply(result, track.Title);
+    }
+
+    private void Apply(LyricsResult result, string title)
+    {
         _loadingDelay.Stop();
-        _log.LogDebug("Lirik {Title}: {Result}", track.Title, result.GetType().Name);
+        _log.LogDebug("Lirik {Title}: {Result}", title, result.GetType().Name);
 
         switch (result)
         {

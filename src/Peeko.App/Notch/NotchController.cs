@@ -119,6 +119,13 @@ public sealed class NotchController : IDisposable
         _lyrics.LinesChanged += lyricsView.SetLines;
         _lyrics.ActiveLineChanged += lyricsView.SetActive;
         lyricsView.LineClicked += _lyrics.SeekToLine;
+        lyricsView.ManualSuggestion = _lyrics.ManualSuggestion;
+        lyricsView.ManualSearchRequested += text => _ = _lyrics.SearchManualAsync(text);
+        lyricsView.TextInputChanged += active =>
+        {
+            _window.SetTextInput(active);
+            _stateMachine.SetHoldOpen(active);
+        };
         _window.VisibleModuleChanged += module => _lyrics.SetVisible(module == NotchWindow.MusicTab);
         _window.VisibleModuleChanged += module => _music.SetMusicTabVisible(module == NotchWindow.MusicTab);
         // Pin lirik: baris aktif tampil di pil musik saat notch mengecil.

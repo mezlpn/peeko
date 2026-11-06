@@ -143,6 +143,20 @@ public sealed class LyricsServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task Manual_search_result_is_remembered_for_the_playing_track()
+    {
+        _handler.Respond("/api/search", """[{"duration":60,"instrumental":false,"plainLyrics":"x","syncedLyrics":null},{"duration":199,"instrumental":false,"plainLyrics":"b","syncedLyrics":"[00:02.00]b"}]""");
+
+        var manual = await _service.SearchManualAsync("sela nada kertas biru", Query[0], default);
+        Assert.IsType<LyricsResult.Synced>(manual);
+
+        // Lagu yang sama diputar lagi: langsung dari cache, tanpa permintaan baru.
+        int calls = _handler.Calls;
+        Assert.IsType<LyricsResult.Synced>(await _service.GetAsync(Query, false, default));
+        Assert.Equal(calls, _handler.Calls);
+    }
+
+    [Fact]
     public async Task Falls_back_to_search_and_picks_matching_duration_with_sync()
     {
         _handler.Respond("/api/get", null, HttpStatusCode.NotFound);

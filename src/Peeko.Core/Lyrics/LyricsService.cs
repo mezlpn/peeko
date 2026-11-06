@@ -89,6 +89,33 @@ public sealed class LyricsService
     }
 
     /// <summary>
+    /// Pencarian manual (kata kunci bebas, mis. "nadin amizah bertaut"). Kalau ketemu, hasilnya juga
+    /// disimpan untuk lagu yang sedang diputar, jadi lain kali lirik langsung muncul.
+    /// </summary>
+    public async Task<LyricsResult> SearchManualAsync(string text, TrackQuery current, CancellationToken ct)
+    {
+        try
+        {
+            using var response = await GetWithRetryAsync($"{BaseUrl}/api/search?q={E(text.Trim())}", ct);
+            if (response.StatusCode == HttpStatusCode.NotFound) return new LyricsResult.NotFound();
+            response.EnsureSuccessStatusCode();
+            var results = await response.Content.ReadFromJsonAsync<List<LrclibRecord>>(Json, ct) ?? [];
+            // Durasi dipakai kalau ada yang cocok; kalau tidak, ambil hasil teratas yang punya lirik.
+            var best = PickBest(results, current.Duration) ?? PickBest(results, TimeSpan.Zero);
+            if (best is null) return new LyricsResult.NotFound();
+            var entry = best.Instrumental
+                ? new CacheEntry("instrumental", null, null, _time.GetUtcNow())
+                : new CacheEntry(string.IsNullOrWhiteSpace(best.SyncedLyrics) ? "plain" : "synced", best.SyncedLyrics, best.PlainLyrics, _time.GetUtcNow());
+            WriteCache(CachePath(current.CacheKey), entry);
+            return ToResult(entry);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException && !ct.IsCancellationRequested)
+        {
+            return new LyricsResult.Failed(ex.Message);
+        }
+    }
+
+    /// <summary>
     /// Lirik tersinkron selalu diutamakan: hasil yang hanya berisi teks biasa (atau instrumental)
     /// disimpan sebagai cadangan sambil kandidat lain tetap dicoba.
     /// </summary>

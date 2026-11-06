@@ -23,6 +23,53 @@ public partial class LyricsModule : UserControl
     private static readonly Color Tertiary = (Color)ColorConverter.ConvertFromString("#7A7A83");
 
     private readonly List<TextBlock> _lines = [];
+
+    /// <summary>Teks awal kotak cari manual (artis + judul lagu yang diputar).</summary>
+    public Func<string>? ManualSuggestion { get; set; }
+
+    /// <summary>Kata kunci cari manual dikirim.</summary>
+    public event Action<string>? ManualSearchRequested;
+
+    /// <summary>Mengetik kata kunci: pemilik mengaktifkan jendela dan menahan panel terbuka.</summary>
+    public event Action<bool>? TextInputChanged;
+
+    private void OnManual(object sender, RoutedEventArgs e)
+    {
+        ManualInput.Text = ManualSuggestion?.Invoke() ?? "";
+        ManualRow.Visibility = Visibility.Visible;
+        TextInputChanged?.Invoke(true);
+        Dispatcher.BeginInvoke(() =>
+        {
+            ManualInput.Focus();
+            Keyboard.Focus(ManualInput);
+            ManualInput.SelectAll();
+        }, System.Windows.Threading.DispatcherPriority.Input);
+    }
+
+    private void EndManual()
+    {
+        if (ManualRow.Visibility != Visibility.Visible) return;
+        ManualRow.Visibility = Visibility.Collapsed;
+        TextInputChanged?.Invoke(false);
+    }
+
+    private void OnManualKey(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            var text = ManualInput.Text.Trim();
+            EndManual();
+            if (text.Length > 0) ManualSearchRequested?.Invoke(text);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape)
+        {
+            EndManual();
+            e.Handled = true;
+        }
+    }
+
+    private void OnManualBlur(object sender, KeyboardFocusChangedEventArgs e) => EndManual();
     private int _active = -1;
     private bool _visible;
 
