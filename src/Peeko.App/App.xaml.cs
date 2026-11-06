@@ -135,6 +135,7 @@ public partial class App : Application
         builder.Services.AddSingleton<Sistem.ScreenTimeController>();
         builder.Services.AddSingleton<ClipboardController>();
         builder.Services.AddSingleton<Today.CalendarService>();
+        builder.Services.AddSingleton<RadioService>();
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
 

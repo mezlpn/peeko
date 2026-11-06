@@ -109,6 +109,11 @@ public sealed class AppSettings
     /// <summary>Peek pengingat sekian menit sebelum acara.</summary>
     public int CalendarReminderMinutes { get; set; } = 5;
 
+    // ── Radio ──
+    /// <summary>Tab Radio (Radio Browser, butuh internet). Mati dari awal.</summary>
+    public bool RadioEnabled { get; set; }
+    public List<Media.RadioStation> RadioFavorites { get; set; } = [];
+
     public const int MinBattery = 10, MaxBattery = 50;
     public const double MaxOffset = 300;
 

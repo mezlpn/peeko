@@ -330,6 +330,14 @@
                                     </Grid>
                                     <Border Style="{StaticResource RowLine}" />
                                     <Grid Style="{StaticResource Row}" MinHeight="40">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,0,56,0">
+                                            <TextBlock Style="{StaticResource Label}" Text="Radio internet" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Ribuan stasiun dari Radio Browser (radio-browser.info). Butuh internet; daftar diambil saat tab Radio dibuka." />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding RadioEnabled}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}" MinHeight="40">
                                         <TextBlock Style="{StaticResource Label}" VerticalAlignment="Center" Text="Kontrol (Wi-Fi, Bluetooth, volume…)" />
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ControlEnabled}" />
                                     </Grid>

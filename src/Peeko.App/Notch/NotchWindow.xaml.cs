@@ -193,6 +193,8 @@ public partial class NotchWindow : Window
 
     public Today.AgendaView Agenda => AgendaView;
 
+    public RadioModule RadioModule => RadioModuleView;
+
     public Today.TodayModule TodayModule => TodayModuleView;
 
     public FrameworkElement DropTarget => ShapeHost;

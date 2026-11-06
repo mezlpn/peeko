@@ -41,6 +41,7 @@ public sealed class NotchController : IDisposable
     private readonly Sistem.ScreenTimeController _screenTime;
     private readonly ClipboardController _clipboard;
     private readonly Today.CalendarService _calendar;
+    private readonly RadioService _radio;
     private bool _rawFullscreen;
     private bool _rawCoversTop;
     private readonly ILogger<NotchController> _log;
@@ -60,7 +61,8 @@ public sealed class NotchController : IDisposable
         ListsController lists, SettingsService settings, UpdateController updates, ConvertController convert,
         Today.WeatherService weather, Prayer.PrayerController prayer, CollapsedSlotsController slots,
         TaskReminderController tasks, HealthController health, Sistem.ScreenTimeController screenTime,
-        ClipboardController clipboard, Today.CalendarService calendar, ILogger<NotchController> log)
+        ClipboardController clipboard, Today.CalendarService calendar, RadioService radio,
+        ILogger<NotchController> log)
     {
         _window = window;
         _stateMachine = stateMachine;
@@ -80,6 +82,7 @@ public sealed class NotchController : IDisposable
         _screenTime = screenTime;
         _clipboard = clipboard;
         _calendar = calendar;
+        _radio = radio;
         _log = log;
         _window.AttachWeather(weather);
     }
@@ -187,6 +190,14 @@ public sealed class NotchController : IDisposable
             _stateMachine.SetHoldOpen(active);
         };
         _window.ClipboardModule.Attach(_clipboard);
+
+        // ── Radio ──
+        _window.RadioModule.Attach(_radio);
+        _window.RadioModule.TextInputChanged += active =>
+        {
+            _window.SetTextInput(active);
+            _stateMachine.SetHoldOpen(active);
+        };
 
         // ── Kalender (.ics) ──
         _window.Agenda.Attach(_calendar);
@@ -599,7 +610,8 @@ public sealed class NotchController : IDisposable
 
         _window.SetModulesEnabled(s.MusicEnabled, s.LyricsEnabled, s.ControlEnabled, s.SystemEnabled, s.TodayEnabled, s.FocusEnabled,
             s.PrayerEnabled, s.TodoEnabled, s.WaterEnabled, s.HealthEnabled, s.NotesEnabled, s.LauncherEnabled, s.ShelfEnabled,
-            s.ClipboardEnabled);
+            s.ClipboardEnabled, s.RadioEnabled);
+        if (!s.RadioEnabled && _radio.Playing is not null) _radio.Stop();
         _health.Apply();
         if (s.SnapZonesEnabled) _snapper.Start();
         else
@@ -713,6 +725,7 @@ public sealed class NotchController : IDisposable
         _screenTime.Dispose();
         _clipboard.Dispose();
         _calendar.Dispose();
+        _radio.Dispose();
         _window.LauncherModule.Flush();
         _water.Dispose();
         _lists.Dispose();
