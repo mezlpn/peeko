@@ -179,6 +179,11 @@ public sealed class NotchController : IDisposable
         // ── Sistem & aplikasi ──
         _window.SystemModule.Attach(_screenTime, _settings);
         _window.LauncherModule.MenuOpenChanged += _stateMachine.SetHoldOpen;
+        _window.LauncherModule.TextInputChanged += active =>
+        {
+            _window.SetTextInput(active);
+            _stateMachine.SetHoldOpen(active);
+        };
         _window.ClipboardModule.Attach(_clipboard);
         _window.ClipboardModule.PeekRequested += request =>
         {

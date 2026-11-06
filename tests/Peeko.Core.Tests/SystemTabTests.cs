@@ -99,3 +99,36 @@ public class LauncherTests
         Assert.Equal("b", l.Apps[0].Name);
     }
 }
+
+public class BookmarkTests
+{
+    [Fact]
+    public void Parses_url_title_and_category_in_any_order()
+    {
+        var b = Peeko.Core.Productivity.Bookmarks.Parse("Repo Peeko github.com/mezlpn/peeko #kerja")!;
+        Assert.Equal("https://github.com/mezlpn/peeko", b.Url);
+        Assert.Equal("Repo Peeko", b.Title);
+        Assert.Equal("Kerja", b.Category);
+
+        var plain = Peeko.Core.Productivity.Bookmarks.Parse("https://www.youtube.com/watch?v=1")!;
+        Assert.Equal("youtube.com", plain.Title);
+        Assert.Equal("", plain.Category);
+
+        Assert.Null(Peeko.Core.Productivity.Bookmarks.Parse("belanja telur 2.5 kg"));
+        Assert.Null(Peeko.Core.Productivity.Bookmarks.Parse("ftp://server.com"));
+    }
+
+    [Fact]
+    public void Same_url_updates_instead_of_duplicating_and_lists_categories()
+    {
+        var list = new Peeko.Core.Productivity.Bookmarks();
+        list.Add("kampus.ac.id Portal #Kuliah");
+        list.Add("kampus.ac.id Portal baru");
+        list.Add("figma.com #Desain");
+        Assert.Equal(2, list.Items.Count);
+        Assert.Equal("Portal baru", list.Items[0].Title);
+        Assert.Equal("Kuliah", list.Items[0].Category);
+        Assert.Equal(["Desain", "Kuliah"], list.Categories);
+        Assert.Single(list.In("desain"));
+    }
+}

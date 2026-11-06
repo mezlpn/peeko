@@ -171,6 +171,7 @@ public partial class NotchWindow
         if (VisibleModule == PrayerTab) PrayerModuleView.Refresh();
         if (VisibleModule != TodoTab) TodoModuleView.EndInput();
         if (VisibleModule != NotesTab) NotesModuleView.EndInput();
+        if (VisibleModule != LauncherTab) LauncherModuleView.EndInput();
         if (VisibleModule != HealthTab) HealthModuleView.StopBreath();
         else HealthModuleView.Refresh();
         VisibleModuleChanged?.Invoke(VisibleModule);

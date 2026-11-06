@@ -1,7 +1,49 @@
-<!-- Tab Aplikasi: ubin aplikasi favorit (ikon + nama), enam per baris, plus ubin "+" untuk menambah. -->
+<!-- Tab Aplikasi: dua tampilan lewat label di atas.
+     APLIKASI: ubin aplikasi favorit (ikon + nama), enam per baris, plus ubin "+".
+     TAUTAN: bookmark per kategori; tambah dengan satu baris "alamat judul #kategori". -->
 <UserControl x:Class="Peeko.App.Sistem.LauncherModule"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Width="440">
-    <WrapPanel x:Name="Tiles" ItemWidth="72" ItemHeight="76" HorizontalAlignment="Center" Width="432" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="22" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBlock x:Name="AppsTab" Style="{StaticResource Peeko.Text.Overline}" Cursor="Hand" Text="APLIKASI" MouseLeftButtonUp="OnAppsTab" />
+            <TextBlock x:Name="LinksTab" Style="{StaticResource Peeko.Text.Overline}" Cursor="Hand" Text="TAUTAN" Margin="14,0,0,0"
+                       MouseLeftButtonUp="OnLinksTab" />
+        </StackPanel>
+        <Button x:Name="AddLinkButton" Style="{StaticResource Peeko.Button.Icon}" Tag="{StaticResource Peeko.Icon.Plus}" Width="24" Height="24"
+                HorizontalAlignment="Right" Foreground="{StaticResource Peeko.Brush.TextPrimary}" ToolTip="Tambah tautan"
+                Visibility="Collapsed" Click="OnAddLink" />
+
+        <WrapPanel x:Name="Tiles" Grid.Row="2" ItemWidth="72" ItemHeight="76" HorizontalAlignment="Center" Width="432" />
+
+        <Grid x:Name="LinksView" Grid.Row="2" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <!-- Tambah: Enter menyimpan, Esc batal -->
+            <Grid x:Name="LinkInputRow" Height="32" Margin="0,0,0,6" Visibility="Collapsed">
+                <Border CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
+                        BorderBrush="{StaticResource Peeko.Brush.StrokeStrong}" BorderThickness="1" />
+                <TextBox x:Name="LinkInput" Margin="10,0" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
+                         Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{StaticResource Peeko.Brush.Accent}"
+                         SelectionBrush="{StaticResource Peeko.Brush.Accent}" FontFamily="{StaticResource Peeko.Font}" FontSize="13"
+                         MaxLength="500" KeyDown="OnLinkKey" LostKeyboardFocus="OnLinkLostFocus" TextChanged="OnLinkTextChanged" />
+                <TextBlock x:Name="LinkPlaceholder" Style="{StaticResource Peeko.Text.Body}" Margin="12,0" VerticalAlignment="Center"
+                           Foreground="{StaticResource Peeko.Brush.TextTertiary}" IsHitTestVisible="False" TextTrimming="CharacterEllipsis"
+                           Text="mis. kampus.ac.id Portal kuliah #Kuliah" />
+            </Grid>
+            <WrapPanel x:Name="Chips" Grid.Row="1" Margin="0,0,0,6" />
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden">
+                <StackPanel x:Name="LinkList" />
+            </ScrollViewer>
+        </Grid>
+    </Grid>
 </UserControl>
