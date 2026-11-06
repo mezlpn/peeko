@@ -32,6 +32,9 @@ public partial class ShelfModule : UserControl
     /// <summary>Tombol "Ubah format" di kartu rak.</summary>
     public event Action<string>? ConvertRequested;
 
+    /// <summary>Aksi file selesai/gagal (zip, ekstrak, salin…): kabar singkat di notch.</summary>
+    public event Action<Peeko.Core.Peeks.PeekRequest>? PeekRequested;
+
     public Conversion.ConvertPanel ConvertPanel => ConvertPanelView;
 
     /// <summary>Zona "Ubah format" ikut tampil saat file diseret (Pengaturan → Ubah format).</summary>
@@ -271,6 +274,8 @@ public partial class ShelfModule : UserControl
             card.Children.Add(convert);
         }
 
+        if (!item.IsText) card.ContextMenu = BuildMenu(item);
+
         card.MouseEnter += (_, _) =>
         {
             bg.Background = B("SurfaceRaised");
@@ -308,6 +313,114 @@ public partial class ShelfModule : UserControl
             DragOut(card, item);
         };
         return card;
+    }
+
+    // ── Aksi file (klik kanan) ─────────────────────────────────────────────
+
+    private ContextMenu BuildMenu(ShelfItem item)
+    {
+        var menu = new ContextMenu { Style = (Style)FindResource("Peeko.TrayMenu") };
+        void Add(string header, Action click)
+        {
+            var mi = new MenuItem { Header = header, Style = (Style)FindResource("Peeko.TrayItem") };
+            mi.Click += (_, _) => click();
+            menu.Items.Add(mi);
+        }
+        bool isZip = FileActions.IsZip(item.Path);
+        Add("Buka lokasi file", () => ShowInFolder(item.Path));
+        if (isZip) Add("Ekstrak di sini", () => Run(item, "Diekstrak", () => FileActions.ExtractAsync(item.Path), keepOriginal: true));
+        else Add("Kompres ke ZIP", () => Run(item, "Dikompres", () => FileActions.ZipAsync(item.Path), keepOriginal: true));
+        Add("Salin ke folder…", () =>
+        {
+            if (PickFolder("Salin ke folder") is { } folder)
+                Run(item, "Disalin", () => FileActions.CopyToAsync(item.Path, folder), keepOriginal: true);
+        });
+        Add("Pindahkan ke folder…", () =>
+        {
+            if (PickFolder("Pindahkan ke folder") is { } folder)
+                Run(item, "Dipindahkan", () => FileActions.MoveToAsync(item.Path, folder), keepOriginal: false);
+        });
+        Add("Bagikan…", () =>
+        {
+            if (!FileActions.Share(Window.GetWindow(this), item.Path))
+                PeekRequested?.Invoke(new Peeko.Core.Peeks.PeekRequest(Peeko.Core.Peeks.PeekKind.FileAction) { Text = "Gagal membuka Bagikan" });
+        });
+        menu.Items.Add(new Separator { Background = B("Stroke"), Margin = new Thickness(8, 4, 8, 4) });
+        Add("Kirim ke Recycle Bin", () =>
+        {
+            // Bukan hapus permanen: file bisa dipulihkan dari Recycle Bin.
+            if (FileActions.Recycle(item.Path))
+            {
+                _shelf?.Remove(item.Id);
+                PeekRequested?.Invoke(new Peeko.Core.Peeks.PeekRequest(Peeko.Core.Peeks.PeekKind.FileAction)
+                {
+                    Flag = true,
+                    Text = "Ke Recycle Bin",
+                    Detail = System.IO.Path.GetFileName(item.Path.TrimEnd('\\')),
+                });
+            }
+            else
+            {
+                PeekRequested?.Invoke(new Peeko.Core.Peeks.PeekRequest(Peeko.Core.Peeks.PeekKind.FileAction) { Text = "Gagal dibuang" });
+            }
+        });
+        menu.Opened += (_, _) => BusyChanged?.Invoke(true);
+        menu.Closed += (_, _) => BusyChanged?.Invoke(false);
+        return menu;
+    }
+
+    private async void Run(ShelfItem item, string done, Func<Task<string>> action, bool keepOriginal)
+    {
+        BusyChanged?.Invoke(true);
+        try
+        {
+            var result = await action();
+            if (!keepOriginal) _shelf?.Remove(item.Id);
+            _shelf?.Add([result]);
+            PeekRequested?.Invoke(new Peeko.Core.Peeks.PeekRequest(Peeko.Core.Peeks.PeekKind.FileAction)
+            {
+                Flag = true,
+                Text = done,
+                Detail = System.IO.Path.GetFileName(result.TrimEnd('\\')),
+            });
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
+        {
+            PeekRequested?.Invoke(new Peeko.Core.Peeks.PeekRequest(Peeko.Core.Peeks.PeekKind.FileAction)
+            {
+                Text = "Gagal",
+                Detail = ex is UnauthorizedAccessException ? "Akses ditolak" : ex is InvalidDataException ? "ZIP rusak" : "File sedang dipakai",
+            });
+        }
+        finally
+        {
+            BusyChanged?.Invoke(false);
+        }
+    }
+
+    private string? PickFolder(string title)
+    {
+        var dialog = new Microsoft.Win32.OpenFolderDialog { Title = title };
+        BusyChanged?.Invoke(true);
+        try
+        {
+            return dialog.ShowDialog(Window.GetWindow(this)) == true ? dialog.FolderName : null;
+        }
+        finally
+        {
+            BusyChanged?.Invoke(false);
+        }
+    }
+
+    private static void ShowInFolder(string path)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true })?.Dispose();
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+        }
     }
 
     private void DragOut(FrameworkElement source, ShelfItem item)

@@ -177,6 +177,7 @@ public sealed class NotchController : IDisposable
         _health.PeekRequested += ShowPeek;
         _window.ShelfModule.Attach(_lists.Shelf);
         _window.ShelfModule.BusyChanged += _stateMachine.SetHoldOpen;
+        _window.ShelfModule.PeekRequested += ShowPeek;
 
         // ── Ubah format (Filee) ──
         _window.ShelfModule.ConvertPanel.Attach(_convert);

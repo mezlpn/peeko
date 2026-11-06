@@ -48,6 +48,8 @@ public enum PeekKind
     MicMute,
     /// <summary>Mode pesawat berubah (Flag = aktif).</summary>
     Airplane,
+    /// <summary>Aksi file di rak (Flag = berhasil, Text = "Dikompres", Detail = nama hasil).</summary>
+    FileAction,
 }
 
 /// <summary>Isi satu peek. Arti tiap field bergantung pada <see cref="Kind"/>.</summary>
@@ -79,7 +81,7 @@ public sealed record PeekRequest(PeekKind Kind)
         PeekKind.BatteryLow => TimeSpan.FromSeconds(3),
         PeekKind.BatteryCritical => TimeSpan.FromSeconds(5),
         PeekKind.FocusDone or PeekKind.BreakDone or PeekKind.UpdateAvailable or PeekKind.Updated or PeekKind.TimerDone => TimeSpan.FromSeconds(4),
-        PeekKind.ConvertDone or PeekKind.ConvertReady => TimeSpan.FromSeconds(3),
+        PeekKind.ConvertDone or PeekKind.ConvertReady or PeekKind.FileAction => TimeSpan.FromSeconds(3),
         PeekKind.ConvertFailed or PeekKind.PrayerSoon => TimeSpan.FromSeconds(4),
         PeekKind.PrayerTime => TimeSpan.FromSeconds(8),
         PeekKind.TaskDue => TimeSpan.FromSeconds(5),
@@ -97,7 +99,7 @@ public sealed record PeekRequest(PeekKind Kind)
     public double Width => Kind switch
     {
         PeekKind.CapsLock or PeekKind.NumLock or PeekKind.MicMute => 280,
-        PeekKind.ShelfDrop or PeekKind.ConvertDone or PeekKind.ConvertFailed or PeekKind.TaskDue
+        PeekKind.ShelfDrop or PeekKind.ConvertDone or PeekKind.ConvertFailed or PeekKind.TaskDue or PeekKind.FileAction
             or PeekKind.MoveBreak or PeekKind.EyeBreak => 340,
         PeekKind.Language or PeekKind.Airplane or PeekKind.BatteryLow or PeekKind.Charging
             or PeekKind.WifiConnected or PeekKind.WifiDisconnected => 300,

@@ -174,6 +174,11 @@ public sealed class PeekView : Grid
                 AddLabel(r.Text ?? "Selesai");
                 AddValue(r.Detail ?? "", "TextSecondary", small: true);
                 break;
+            case PeekKind.FileAction:
+                AddIcon((Geometry)Application.Current.Resources["Peeko.Icon.Shelf"], r.Flag ? "Accent" : "Danger");
+                AddLabel(r.Text ?? "");
+                AddValue(r.Detail ?? "", "TextSecondary", small: true, maxWidth: 160);
+                break;
             case PeekKind.ConvertFailed:
                 AddIcon(ConvertIcon, "Danger");
                 AddLabel("Gagal mengubah format");
