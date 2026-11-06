@@ -10,6 +10,7 @@ public enum CollapsedSlot
     Battery,
     NextPrayer,
     NextTask,
+    DayProgress,
 }
 
 public static class CollapsedSlots
@@ -22,10 +23,12 @@ public static class CollapsedSlots
         CollapsedSlot.Battery => "Baterai",
         CollapsedSlot.NextPrayer => "Salat berikutnya",
         CollapsedSlot.NextTask => "Tugas berikutnya",
+        CollapsedSlot.DayProgress => "Progres hari",
         _ => "Kosong",
     };
 
     /// <summary>Isi yang berubah tiap menit (perlu tick per menit selama notch tertutup terlihat).</summary>
     public static bool IsTimeBased(CollapsedSlot slot) =>
-        slot is CollapsedSlot.Clock or CollapsedSlot.Date or CollapsedSlot.Battery or CollapsedSlot.NextPrayer or CollapsedSlot.NextTask;
+        slot is CollapsedSlot.Clock or CollapsedSlot.Date or CollapsedSlot.Battery or CollapsedSlot.NextPrayer or CollapsedSlot.NextTask
+            or CollapsedSlot.DayProgress;
 }

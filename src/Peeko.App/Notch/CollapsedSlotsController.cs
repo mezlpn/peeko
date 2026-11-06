@@ -73,6 +73,8 @@ public sealed class CollapsedSlotsController : IDisposable
                 return _prayer.IsEnabled && _prayer.Next() is { } p ? $"{p.Label} {p.At:HH.mm}" : null;
             case CollapsedSlot.NextTask:
                 return NextTask?.Invoke();
+            case CollapsedSlot.DayProgress:
+                return $"{Core.Status.DayProgress.Percent(Core.Status.DayProgress.At(now).Day)}% hari";
             default:
                 return null;
         }
