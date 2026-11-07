@@ -118,5 +118,5 @@ Disetujui untuk dikerjakan, tapi paling akhir karena paling berisiko untuk perfo
 - **3 · File & produktivitas**: selesai: aksi file di Rak, riwayat clipboard, kirim dari HP (QR), snap zones, tautan per kategori.
 - **4 · Konten online**: kalender iCal, radio, PR GitHub, lirik cari manual + romanisasi Korea/kana, cahaya warna sampul. Belum: VLC.
 - **5 · AI**: tab AI (Claude/Gemini/kompatibel OpenAI) dengan aksi + Urungkan, Claude Code di notch. Belum: pemakaian limit.
-- **6 · Tampilan**: cadangkan/pulihkan, banner peek tidak menutupi isi, konfeti saat tugas habis, warna aksen + latar hitam/kaca/berona, sembunyi otomatis saat diam, mode mengambang. layar sentuh (ketuk buka, geser pindah tab). Belum: kaca buram, bahasa Inggris.
+- **6 · Tampilan**: cadangkan/pulihkan, banner peek tidak menutupi isi, konfeti saat tugas habis, warna aksen + latar hitam/kaca/berona, sembunyi otomatis saat diam, mode mengambang, layar sentuh (ketuk buka, geser pindah tab). Belum: kaca buram, bahasa Inggris.
 - **7 · Fitur berat**: belum dikerjakan.
