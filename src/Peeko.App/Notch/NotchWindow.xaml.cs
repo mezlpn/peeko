@@ -53,6 +53,10 @@ public partial class NotchWindow : Window
     private readonly SpringValue _radius;
     private readonly SpringValue _shoulders;
     private readonly SpringValue _hideY;
+    /// <summary>Jarak dari tepi atas di mode mengambang (0 = menempel).</summary>
+    private readonly SpringValue _floatY;
+    private bool _floating;
+    private const double FloatGap = 8;
 
     public NotchWindow(MusicViewModel music, LyricsViewModel lyrics)
     {
@@ -62,15 +66,18 @@ public partial class NotchWindow : Window
         _radius = new SpringValue(CollapsedRadius.BottomLeft, SpringConfig.Radius, v =>
         {
             double r = Math.Max(0, v);
-            Body.CornerRadius = new CornerRadius(0, 0, r, r);
+            // Mengambang: sudut atas ikut bulat (garis tipis tetap menempel di tepi).
+            double top = _floating && _visualState != NotchState.Slim ? r : 0;
+            Body.CornerRadius = new CornerRadius(top, top, r, r);
         });
         _shoulders = new SpringValue(1, SpringConfig.Default, v =>
         {
-            double s = Math.Max(0, v);
+            double s = _floating ? 0 : Math.Max(0, v);
             LeftShoulderScale.ScaleX = LeftShoulderScale.ScaleY = s;
             RightShoulderScale.ScaleX = RightShoulderScale.ScaleY = s;
         });
         _hideY = new SpringValue(0, SpringConfig.Offset, v => HideShift.Y = v);
+        _floatY = new SpringValue(0, SpringConfig.Offset, v => ShapeHost.Margin = new Thickness(0, Math.Max(0, v), 0, 0));
         _clockTimer.Tick += (_, _) => UpdateClock();
         _bannerTimer.Tick += (_, _) => HideBanner();
         MusicPillView.DataContext = music;
@@ -290,9 +297,23 @@ public partial class NotchWindow : Window
             NotchWindowInterop.EnsureTopmost(Handle);
     }
 
+    /// <summary>Mode mengambang dari Pengaturan; langsung diterapkan.</summary>
+    public void SetFloating(bool floating)
+    {
+        if (_floating == floating) return;
+        _floating = floating;
+        _shoulders.Set(_shoulders.Value);
+        _radius.Set(_radius.Value);
+        UpdateFloat();
+    }
+
+    private void UpdateFloat() =>
+        _floatY.AnimateTo(_floating && _visualState is not (NotchState.Slim or NotchState.Hidden) ? FloatGap : 0);
+
     public void TransitionTo(NotchState from, NotchState to)
     {
         _visualState = to;
+        UpdateFloat();
         switch (to)
         {
             case NotchState.Expanded: ToExpanded(); break;

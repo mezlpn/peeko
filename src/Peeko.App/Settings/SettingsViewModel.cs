@@ -52,6 +52,8 @@ public sealed class SettingsViewModel : ObservableObject
     public bool HideOnFullscreen { get => S.HideOnFullscreen; set => Set(value, s => s.HideOnFullscreen, (s, v) => s.HideOnFullscreen = v); }
     public double HorizontalOffset { get => S.HorizontalOffset; set => Set(Math.Round(value), s => s.HorizontalOffset, (s, v) => s.HorizontalOffset = v); }
 
+    public bool Floating { get => S.Floating; set => Set(value, s => s.Floating, (s, v) => s.Floating = v); }
+
     public string? AccentColor
     {
         get => S.AccentColor;

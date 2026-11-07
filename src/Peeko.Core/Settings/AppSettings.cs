@@ -32,6 +32,8 @@ public sealed class AppSettings
     /// <summary>Warna aksen (#RRGGBB); kosong = limau bawaan.</summary>
     public string? AccentColor { get; set; }
     public NotchStyle NotchStyle { get; set; } = NotchStyle.Black;
+    /// <summary>Notch mengambang sedikit di bawah tepi atas, semua sudut bulat, tanpa bahu.</summary>
+    public bool Floating { get; set; }
 
     // ── Modul ──
     public bool MusicEnabled { get; set; } = true;

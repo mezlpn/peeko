@@ -689,6 +689,7 @@ public sealed class NotchController : IDisposable
         ApplySlim();
         RestartIdleHide();
         _window.SetHorizontalOffset(s.HorizontalOffset);
+        _window.SetFloating(s.Floating);
 
         _window.SetModulesEnabled(s.MusicEnabled, s.LyricsEnabled, s.ControlEnabled, s.SystemEnabled, s.TodayEnabled, s.FocusEnabled,
             s.PrayerEnabled, s.TodoEnabled, s.WaterEnabled, s.HealthEnabled, s.NotesEnabled, s.LauncherEnabled, s.ShelfEnabled,
