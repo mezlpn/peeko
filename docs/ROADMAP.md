@@ -113,7 +113,7 @@ Disetujui untuk dikerjakan, tapi paling akhir karena paling berisiko untuk perfo
 
 ## Status (7 Nov 2026)
 
-- **1 · Harian**: selesai (versi 0.4.0 di kode, belum dirilis).
+- **1 · Harian**: selesai (dirilis di 0.5.0).
 - **2 · Kontrol sistem**: selesai: daftar Wi-Fi/Bluetooth/audio, tetap terjaga, mode gelap, bisukan mikrofon, HUD Num Lock/mikrofon/pesawat, tab Sistem (CPU/RAM/GPU/suhu, progres hari, screen time), tab Aplikasi.
 - **3 · File & produktivitas**: selesai: aksi file di Rak, riwayat clipboard, kirim dari HP (QR), snap zones, tautan per kategori.
 - **4 · Konten online**: kalender iCal, radio, PR GitHub, lirik cari manual + romanisasi Korea/kana, cahaya warna sampul. Belum: VLC.
