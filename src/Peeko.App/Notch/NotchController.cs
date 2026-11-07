@@ -49,6 +49,9 @@ public sealed class NotchController : IDisposable
     private readonly SemaphoreSlim _claudeOne = new(1, 1);
     private bool _rawFullscreen;
     private bool _rawCoversTop;
+    /// <summary>Sembunyi otomatis: notch sudah diam cukup lama dan menjadi garis tipis.</summary>
+    private bool _idleHidden;
+    private readonly DispatcherTimer _idleHide = new();
     private readonly ILogger<NotchController> _log;
     private readonly DispatcherTimer _dragExpand = new() { Interval = TimeSpan.FromMilliseconds(600) };
     private readonly DispatcherTimer _dragLeave = new() { Interval = TimeSpan.FromMilliseconds(120) };
@@ -101,6 +104,13 @@ public sealed class NotchController : IDisposable
     public void Start()
     {
         _stateMachine.StateChanged += OnStateChanged;
+        _idleHide.Tick += (_, _) =>
+        {
+            _idleHide.Stop();
+            if (!CanIdleHide() || _stateMachine.IsPointerOver) return;
+            _idleHidden = true;
+            ApplySlim();
+        };
 
         _window.HoverTarget.MouseEnter += OnPointerEnter;
         _window.HoverTarget.MouseLeave += OnPointerLeave;
@@ -424,6 +434,13 @@ public sealed class NotchController : IDisposable
     private void OnStateChanged(NotchState from, NotchState to)
     {
         _log.LogDebug("Notch {From} → {To}", from, to);
+        // Dibuka dari garis tipis: setelah ditutup kembali ke pil dulu, lalu menyingkir lagi saat diam.
+        if (to == NotchState.Expanded && _idleHidden)
+        {
+            _idleHidden = false;
+            ApplySlim();
+        }
+        RestartIdleHide();
 
         // Hover membuka tab aktivitas terkait (Collapsed.dc.html → Interaksi). Tab Lirik dibiarkan
         // jika terakhir dipilih, supaya pengguna yang membaca lirik tidak dilempar balik ke Musik.
@@ -463,6 +480,24 @@ public sealed class NotchController : IDisposable
             s.PrayerEnabled && _prayer.CountdownActive,
             _tasks.Active is not null));
         UpdateFocusDisplay();
+        if (_idleHidden && !CanIdleHide())
+        {
+            _idleHidden = false;
+            ApplySlim();
+        }
+        RestartIdleHide();
+    }
+
+    private bool CanIdleHide() =>
+        _settings.Current.AutoHide && _window.CollapsedActivity == CollapsedActivity.Idle;
+
+    /// <summary>Hitung ulang jeda sembunyi otomatis setiap kali notch kembali diam sebagai pil.</summary>
+    private void RestartIdleHide()
+    {
+        _idleHide.Stop();
+        if (_idleHidden || !CanIdleHide() || _stateMachine.State != NotchState.Collapsed) return;
+        _idleHide.Interval = TimeSpan.FromSeconds(_settings.Current.AutoHideSeconds);
+        _idleHide.Start();
     }
 
     /// <summary>Tick 1 dtk timer fokus hanya saat timernya terlihat (pil atau modul Fokus).</summary>
@@ -636,7 +671,7 @@ public sealed class NotchController : IDisposable
         ApplySlim();
     }
 
-    private void ApplySlim() => _stateMachine.SetSlim(_settings.Current.SlimMode switch
+    private void ApplySlim() => _stateMachine.SetSlim(_idleHidden || _settings.Current.SlimMode switch
     {
         SlimMode.AlwaysLine => true,
         SlimMode.AlwaysPill => false,
@@ -650,7 +685,9 @@ public sealed class NotchController : IDisposable
     private void ApplySettings(AppSettings s)
     {
         _stateMachine.SetFullscreen(_rawFullscreen && s.HideOnFullscreen);
+        if (!s.AutoHide) _idleHidden = false;
         ApplySlim();
+        RestartIdleHide();
         _window.SetHorizontalOffset(s.HorizontalOffset);
 
         _window.SetModulesEnabled(s.MusicEnabled, s.LyricsEnabled, s.ControlEnabled, s.SystemEnabled, s.TodayEnabled, s.FocusEnabled,

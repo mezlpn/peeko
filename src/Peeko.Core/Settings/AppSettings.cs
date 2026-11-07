@@ -18,6 +18,10 @@ public sealed class AppSettings
     public bool StartWithWindows { get; set; }
     public bool HideOnFullscreen { get; set; } = true;
     public SlimMode SlimMode { get; set; } = SlimMode.Auto;
+    /// <summary>Notch menjadi garis tipis saat tidak ada aktivitas (tanpa musik, timer, pengingat).</summary>
+    public bool AutoHide { get; set; }
+    /// <summary>Lama diam sebelum notch menyingkir, dalam detik.</summary>
+    public int AutoHideSeconds { get; set; } = 8;
     /// <summary>Geser horizontal dari tengah layar, dalam DIP (−300 … 300), mis. untuk menghindari webcam.</summary>
     public double HorizontalOffset { get; set; }
     /// <summary>Info di kiri dan kanan notch tertutup.</summary>
@@ -165,6 +169,7 @@ public sealed class AppSettings
         BreakIntervalMinutes = Math.Clamp(BreakIntervalMinutes, 20, 120);
         PrayerCountdownMinutes = Math.Clamp(PrayerCountdownMinutes, 0, 60);
         PrayerOffsetMinutes = Math.Clamp(PrayerOffsetMinutes, -10, 10);
+        AutoHideSeconds = Math.Clamp(AutoHideSeconds, 3, 60);
         if (!Enum.IsDefined(SlimMode)) SlimMode = SlimMode.Auto;
         if (!Enum.IsDefined(NotchStyle)) NotchStyle = NotchStyle.Black;
         if (!Enum.IsDefined(CollapsedLeft)) CollapsedLeft = Notch.CollapsedSlot.None;

@@ -244,6 +244,23 @@
                                         </StackPanel>
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding HideOnFullscreen}" />
                                     </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Sembunyi otomatis" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Jadi garis tipis saat tidak ada musik, timer, atau pengingat; arahkan kursor ke atas untuk membuka" />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding AutoHide}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,130,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Sembunyi setelah" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Lama diam sebelum notch menyingkir" />
+                                        </StackPanel>
+                                        <controls:Stepper HorizontalAlignment="Right" VerticalAlignment="Center" Minimum="3" Maximum="60" Step="1" Suffix="dtk"
+                                                          Value="{Binding AutoHideSeconds}" IsEnabled="{Binding AutoHide}" />
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                         </StackPanel>

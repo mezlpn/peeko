@@ -47,6 +47,8 @@ public sealed class SettingsViewModel : ObservableObject
 
     // ── Umum ──
     public bool StartWithWindows { get => S.StartWithWindows; set => Set(value, s => s.StartWithWindows, (s, v) => s.StartWithWindows = v); }
+    public bool AutoHide { get => S.AutoHide; set => Set(value, s => s.AutoHide, (s, v) => s.AutoHide = v); }
+    public int AutoHideSeconds { get => S.AutoHideSeconds; set => Set(value, s => s.AutoHideSeconds, (s, v) => s.AutoHideSeconds = v); }
     public bool HideOnFullscreen { get => S.HideOnFullscreen; set => Set(value, s => s.HideOnFullscreen, (s, v) => s.HideOnFullscreen = v); }
     public double HorizontalOffset { get => S.HorizontalOffset; set => Set(Math.Round(value), s => s.HorizontalOffset, (s, v) => s.HorizontalOffset = v); }
 
