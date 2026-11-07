@@ -38,13 +38,17 @@ public sealed class MusicController : IDisposable
     private bool _pausedLongEnough;
     private CollapsedActivity _activity = CollapsedActivity.Idle;
 
-    public MusicController(IMediaSource source, Dispatcher dispatcher, ILogger<MusicController> log)
+    public MusicController(IMediaSource source, Dispatcher dispatcher, ILogger<MusicController> log, Settings.SettingsService settings)
     {
         _source = source;
         _dispatcher = dispatcher;
         _log = log;
 
-        ViewModel = new MusicViewModel(source.TogglePlayPauseAsync, source.NextAsync, source.PreviousAsync, source.SwitchSessionAsync);
+        ViewModel = new MusicViewModel(source.TogglePlayPauseAsync, source.NextAsync, source.PreviousAsync, source.SwitchSessionAsync)
+        {
+            CoverGlowEnabled = settings.Current.CoverGlowEnabled,
+        };
+        settings.Changed += s => dispatcher.BeginInvoke(() => ViewModel.CoverGlowEnabled = s.CoverGlowEnabled);
 
         _progressTimer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(250) };
         _progressTimer.Tick += (_, _) => UpdateProgress();

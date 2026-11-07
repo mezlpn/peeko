@@ -41,7 +41,16 @@ public sealed partial class MusicViewModel : ObservableObject
     [ObservableProperty] private string _artist = "";
     [ObservableProperty] private string _sourceName = "";
     [ObservableProperty] private Brush _sourceBrush = Brushes.Gray;
-    [ObservableProperty] private ImageSource? _cover;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowCoverGlow))]
+    private ImageSource? _cover;
+
+    /// <summary>Cahaya lembut berwarna sampul di belakang cover (pengaturan).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowCoverGlow))]
+    private bool _coverGlowEnabled = true;
+
+    public bool ShowCoverGlow => HasCover && CoverGlowEnabled;
     [ObservableProperty] private Brush _accentBrush = Brushes.White;
     [ObservableProperty] private bool _isPlaying;
     [ObservableProperty] private bool _canSeek;

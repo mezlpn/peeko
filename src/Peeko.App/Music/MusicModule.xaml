@@ -150,6 +150,14 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
+            <!-- Cahaya warna sampul: warna dominan cover, diburamkan di belakangnya. -->
+            <Border Margin="-4,2,-4,-6" CornerRadius="18" Background="{Binding AccentBrush}" Opacity="0.5" IsHitTestVisible="False"
+                    Visibility="{Binding ShowCoverGlow, Converter={StaticResource Vis}}">
+                <Border.Effect>
+                    <BlurEffect Radius="22" KernelType="Gaussian" />
+                </Border.Effect>
+            </Border>
+
             <!-- Cover 64, radius 14. Kosong: Kedip redup. -->
             <Border CornerRadius="{StaticResource Peeko.Radius.Lg}" Background="{StaticResource Peeko.Brush.SurfaceRaised}">
                 <Grid>

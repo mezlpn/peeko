@@ -223,6 +223,7 @@ public sealed class SettingsViewModel : ObservableObject
     public bool EyeBreaksEnabled { get => S.EyeBreaksEnabled; set => Set(value, s => s.EyeBreaksEnabled, (s, v) => s.EyeBreaksEnabled = v); }
 
     // ── Tugas ──
+    public bool CoverGlowEnabled { get => S.CoverGlowEnabled; set => Set(value, s => s.CoverGlowEnabled, (s, v) => s.CoverGlowEnabled = v); }
     public bool ConfettiEnabled { get => S.ConfettiEnabled; set => Set(value, s => s.ConfettiEnabled, (s, v) => s.ConfettiEnabled = v); }
     public bool TaskRemindersEnabled { get => S.TaskRemindersEnabled; set => Set(value, s => s.TaskRemindersEnabled, (s, v) => s.TaskRemindersEnabled = v); }
     public int TaskCountdownMinutes { get => S.TaskCountdownMinutes; set => Set(value, s => s.TaskCountdownMinutes, (s, v) => s.TaskCountdownMinutes = v); }
