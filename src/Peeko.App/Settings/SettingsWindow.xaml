@@ -486,6 +486,14 @@
                                         <controls:Stepper HorizontalAlignment="Right" VerticalAlignment="Center" Minimum="0" Maximum="60" Step="5" Suffix="mnt"
                                                           Value="{Binding TaskCountdownMinutes}" />
                                     </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,56,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Konfeti saat semua tugas selesai" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Ikut mati kalau animasi Windows dimatikan" />
+                                        </StackPanel>
+                                        <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding ConfettiEnabled}" />
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                         </StackPanel>

@@ -31,6 +31,9 @@ public partial class TodoModule : UserControl
     /// </summary>
     public event Action<bool>? TextInputChanged;
 
+    /// <summary>Konfeti boleh muncul (pengaturan); diisi pemilik modul.</summary>
+    public Func<bool> ConfettiAllowed { get; set; } = () => true;
+
     public bool IsEditing => InputRow.Visibility == Visibility.Visible;
 
     public void Attach(TodoList list)
@@ -165,6 +168,9 @@ public partial class TodoModule : UserControl
             _sinkDelay.Stop();
             _sinkDelay.Start();
             _list.Toggle(item.Id);
+            // Tugas terakhir dicentang: rayakan dari kotak centangnya.
+            if (nowDone && _list.Count > 0 && _list.DoneCount == _list.Count && ConfettiAllowed() && !Motion.Reduced)
+                Controls.Confetti.Burst(ConfettiLayer, box.TranslatePoint(new Point(8, 8), ConfettiLayer));
         }
         row.MouseLeftButtonUp += (_, e) =>
         {

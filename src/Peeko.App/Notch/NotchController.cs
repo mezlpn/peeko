@@ -173,6 +173,7 @@ public sealed class NotchController : IDisposable
         _window.WaterPill.DrinkClicked += _water.Drink;
 
         _window.TodoModule.Attach(_lists.Todo);
+        _window.TodoModule.ConfettiAllowed = () => _settings.Current.ConfettiEnabled;
         _window.TodoModule.TextInputChanged += active =>
         {
             _window.SetTextInput(active);

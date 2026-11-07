@@ -50,5 +50,8 @@
             <Button Style="{StaticResource Peeko.Button.PillSecondary}" HorizontalAlignment="Center"
                     Tag="{StaticResource Peeko.Fill.Plus}" Content="Tambah tugas" Click="OnAddClick" />
         </StackPanel>
+
+        <!-- Konfeti saat semua tugas selesai -->
+        <Canvas x:Name="ConfettiLayer" Grid.RowSpan="3" IsHitTestVisible="False" ClipToBounds="True" />
     </Grid>
 </UserControl>

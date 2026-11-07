@@ -80,6 +80,8 @@ public sealed class AppSettings
     public bool TaskRemindersEnabled { get; set; } = true;
     /// <summary>Pil hitung mundur muncul sekian menit sebelum tenggat; 0 = hanya saat tenggat.</summary>
     public int TaskCountdownMinutes { get; set; } = 15;
+    /// <summary>Konfeti saat semua tugas selesai dicentang.</summary>
+    public bool ConfettiEnabled { get; set; } = true;
 
     // ── Jadwal salat ──
     public bool PrayerEnabled { get; set; } = true;
