@@ -31,7 +31,7 @@
                     <TextBlock x:Name="ZoneDetail" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,2,0,0"
                                TextAlignment="Center" TextWrapping="Wrap" Text="Simpan sementara, lalu seret keluar ke mana saja" />
                     <TextBlock x:Name="ZonePhoneLink" Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Center" Margin="0,6,0,0"
-                               Foreground="{StaticResource Peeko.Brush.Accent}" Cursor="Hand" Text="atau kirim dari HP"
+                               Foreground="{DynamicResource Peeko.Brush.Accent}" Cursor="Hand" Text="atau kirim dari HP"
                                MouseLeftButtonUp="OnPhoneLink" />
                 </StackPanel>
             </Grid>
@@ -74,7 +74,7 @@
         </Grid>
 
         <!-- ── Kirim dari HP: kode QR berisi alamat server lokal sementara ── -->
-        <Grid x:Name="PhoneView" Visibility="Collapsed" Background="{StaticResource Peeko.Brush.NotchBg}">
+        <Grid x:Name="PhoneView" Visibility="Collapsed" Background="{DynamicResource Peeko.Brush.NotchBg}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="128" />
                 <ColumnDefinition Width="18" />
@@ -89,7 +89,7 @@
                            Text="Sambungkan HP ke Wi-Fi yang sama, lalu pindai kode ini dengan kamera. File masuk ke folder Unduhan dan muncul di Rak." />
                 <TextBlock x:Name="PhoneUrl" Style="{StaticResource Peeko.Text.Caption}" Foreground="{StaticResource Peeko.Brush.TextSecondary}"
                            Margin="0,8,0,0" TextTrimming="CharacterEllipsis" />
-                <TextBlock x:Name="PhoneStatus" Style="{StaticResource Peeko.Text.Caption}" Foreground="{StaticResource Peeko.Brush.Accent}"
+                <TextBlock x:Name="PhoneStatus" Style="{StaticResource Peeko.Text.Caption}" Foreground="{DynamicResource Peeko.Brush.Accent}"
                            Margin="0,4,0,0" TextWrapping="Wrap" />
             </StackPanel>
             <Button Grid.Column="2" Style="{StaticResource Peeko.Button.Icon}" Tag="{StaticResource Peeko.Icon.Close}" Width="24" Height="24"

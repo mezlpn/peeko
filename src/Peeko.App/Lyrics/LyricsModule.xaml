@@ -55,7 +55,7 @@
         <Grid x:Name="SyncedView" Height="66" VerticalAlignment="Top" ClipToBounds="True"
               Visibility="{Binding State, Converter={StaticResource Is}, ConverterParameter=Synced}">
             <Rectangle x:Name="ActiveMarker" Width="3" Height="16" RadiusX="1.5" RadiusY="1.5" Margin="0,25,0,0"
-                       HorizontalAlignment="Left" VerticalAlignment="Top" Fill="{StaticResource Peeko.Brush.Accent}" />
+                       HorizontalAlignment="Left" VerticalAlignment="Top" Fill="{DynamicResource Peeko.Brush.Accent}" />
             <Canvas x:Name="LinesCanvas" Margin="13,0,0,0">
                 <StackPanel x:Name="LinesPanel">
                     <StackPanel.RenderTransform>
@@ -119,12 +119,12 @@
 
         <!-- Cari manual: kata kunci bebas, Enter mencari, Esc batal -->
         <Grid x:Name="ManualRow" Height="28" VerticalAlignment="Top" Visibility="Collapsed"
-              Background="{StaticResource Peeko.Brush.NotchBg}">
+              Background="{DynamicResource Peeko.Brush.NotchBg}">
             <Border CornerRadius="14" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
                     BorderBrush="{StaticResource Peeko.Brush.StrokeStrong}" BorderThickness="1" />
             <TextBox x:Name="ManualInput" Margin="12,0,70,0" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
-                     Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{StaticResource Peeko.Brush.Accent}"
-                     SelectionBrush="{StaticResource Peeko.Brush.Accent}" FontFamily="{StaticResource Peeko.Font}" FontSize="12.5"
+                     Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{DynamicResource Peeko.Brush.Accent}"
+                     SelectionBrush="{DynamicResource Peeko.Brush.Accent}" FontFamily="{StaticResource Peeko.Font}" FontSize="12.5"
                      MaxLength="120" KeyDown="OnManualKey" LostKeyboardFocus="OnManualBlur" />
             <TextBlock Style="{StaticResource Peeko.Text.Caption}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0"
                        IsHitTestVisible="False" Text="Enter · Esc" />

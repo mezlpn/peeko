@@ -24,17 +24,17 @@
             <Border CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
                     BorderBrush="{StaticResource Peeko.Brush.StrokeStrong}" BorderThickness="1" />
             <TextBox x:Name="Input" Margin="10,0" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
-                     Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{StaticResource Peeko.Brush.Accent}"
-                     SelectionBrush="{StaticResource Peeko.Brush.Accent}" FontFamily="{StaticResource Peeko.Font}" FontSize="13"
+                     Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{DynamicResource Peeko.Brush.Accent}"
+                     SelectionBrush="{DynamicResource Peeko.Brush.Accent}" FontFamily="{StaticResource Peeko.Font}" FontSize="13"
                      MaxLength="200" KeyDown="OnInputKeyDown" LostKeyboardFocus="OnInputLostFocus" TextChanged="OnInputTextChanged" />
             <TextBlock x:Name="Placeholder" Style="{StaticResource Peeko.Text.Body}" Margin="12,0" VerticalAlignment="Center"
                        Foreground="{StaticResource Peeko.Brush.TextTertiary}" IsHitTestVisible="False" TextTrimming="CharacterEllipsis"
                        Text="mis. besok jam 7 kumpul laporan" />
             <!-- Tenggat yang terbaca dari ketikan, sebelum Enter -->
             <Border x:Name="DuePreview" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0" Height="20" Padding="8,0"
-                    CornerRadius="10" Background="{StaticResource Peeko.Brush.AccentMuted}" Visibility="Collapsed" IsHitTestVisible="False">
+                    CornerRadius="10" Background="{DynamicResource Peeko.Brush.AccentMuted}" Visibility="Collapsed" IsHitTestVisible="False">
                 <TextBlock x:Name="DuePreviewText" Style="{StaticResource Peeko.Text.Caption}" FontWeight="SemiBold"
-                           Foreground="{StaticResource Peeko.Brush.Accent}" VerticalAlignment="Center" />
+                           Foreground="{DynamicResource Peeko.Brush.Accent}" VerticalAlignment="Center" />
             </Border>
         </Grid>
 

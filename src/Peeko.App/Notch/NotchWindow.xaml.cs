@@ -167,7 +167,7 @@ public partial class NotchWindow : Window
     }
 
     private void UpdateBodyTint() =>
-        Body.Background = (Brush)FindResource(_updateHighlight && _visualState == NotchState.Slim
+        Body.SetResourceReference(BackgroundProperty, _updateHighlight && _visualState == NotchState.Slim
             ? "Peeko.Brush.Accent"
             : "Peeko.Brush.NotchBg");
 

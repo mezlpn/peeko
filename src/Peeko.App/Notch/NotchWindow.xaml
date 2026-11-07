@@ -46,7 +46,7 @@
 
             <!-- Bahu cekung 10 × 10 yang menyatukan pil dengan tepi layar -->
             <Path x:Name="LeftShoulder" Width="10" Height="10" VerticalAlignment="Top"
-                  Fill="{StaticResource Peeko.Brush.NotchBg}" RenderTransformOrigin="1,0"
+                  Fill="{DynamicResource Peeko.Brush.NotchBg}" RenderTransformOrigin="1,0"
                   Data="M0,0 L10,0 L10,10 A10,10 0 0 0 0,0 Z">
                 <Path.RenderTransform>
                     <ScaleTransform x:Name="LeftShoulderScale" />
@@ -55,7 +55,7 @@
 
             <Border x:Name="Body" Width="200" Height="32" VerticalAlignment="Top"
                     CornerRadius="{StaticResource Peeko.Radius.NotchPill}"
-                    Background="{StaticResource Peeko.Brush.NotchBg}" ClipToBounds="True">
+                    Background="{DynamicResource Peeko.Brush.NotchBg}" ClipToBounds="True">
                 <Grid>
                     <!-- ── Collapsed ── -->
                     <Grid x:Name="CollapsedLayer" Height="32" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
@@ -123,7 +123,7 @@
                                 <Button x:Name="UpdateChip" Style="{StaticResource Peeko.Button.Pill}" Height="22" Padding="8,0"
                                         Margin="0,0,10,0" Visibility="Collapsed" Tag="{StaticResource Peeko.Icon.UpdateArrow}" />
                                 <Path x:Name="BatteryBolt" Style="{StaticResource StatusIcon}" Data="{StaticResource Peeko.Icon.Bolt}"
-                                      Stroke="{StaticResource Peeko.Brush.Accent}" Visibility="Collapsed" Margin="0,0,1,0" />
+                                      Stroke="{DynamicResource Peeko.Brush.Accent}" Visibility="Collapsed" Margin="0,0,1,0" />
                                 <Border Width="20" Height="11" CornerRadius="3" BorderThickness="1.2" Padding="1.5" VerticalAlignment="Center"
                                         BorderBrush="{StaticResource Peeko.Brush.TextSecondary}">
                                     <Border x:Name="BatteryFill" HorizontalAlignment="Left" CornerRadius="1" Width="8"
@@ -192,7 +192,7 @@
             </Border>
 
             <Path x:Name="RightShoulder" Width="10" Height="10" VerticalAlignment="Top"
-                  Fill="{StaticResource Peeko.Brush.NotchBg}" RenderTransformOrigin="0,0"
+                  Fill="{DynamicResource Peeko.Brush.NotchBg}" RenderTransformOrigin="0,0"
                   Data="M10,0 L0,0 L0,10 A10,10 0 0 1 10,0 Z">
                 <Path.RenderTransform>
                     <ScaleTransform x:Name="RightShoulderScale" />

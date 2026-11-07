@@ -24,6 +24,11 @@ public sealed class AppSettings
     public Notch.CollapsedSlot CollapsedLeft { get; set; } = Notch.CollapsedSlot.Clock;
     public Notch.CollapsedSlot CollapsedRight { get; set; } = Notch.CollapsedSlot.Battery;
 
+    // ── Tampilan ──
+    /// <summary>Warna aksen (#RRGGBB); kosong = limau bawaan.</summary>
+    public string? AccentColor { get; set; }
+    public NotchStyle NotchStyle { get; set; } = NotchStyle.Black;
+
     // ── Modul ──
     public bool MusicEnabled { get; set; } = true;
     public bool LyricsEnabled { get; set; } = true;
@@ -161,6 +166,7 @@ public sealed class AppSettings
         PrayerCountdownMinutes = Math.Clamp(PrayerCountdownMinutes, 0, 60);
         PrayerOffsetMinutes = Math.Clamp(PrayerOffsetMinutes, -10, 10);
         if (!Enum.IsDefined(SlimMode)) SlimMode = SlimMode.Auto;
+        if (!Enum.IsDefined(NotchStyle)) NotchStyle = NotchStyle.Black;
         if (!Enum.IsDefined(CollapsedLeft)) CollapsedLeft = Notch.CollapsedSlot.None;
         if (!Enum.IsDefined(CollapsedRight)) CollapsedRight = Notch.CollapsedSlot.None;
         return this;

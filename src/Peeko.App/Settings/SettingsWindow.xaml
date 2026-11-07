@@ -57,7 +57,7 @@
                         <Border x:Name="Bg" CornerRadius="6" Background="Transparent" Padding="12,0">
                             <Grid>
                                 <Border x:Name="Marker" Width="3" Height="16" CornerRadius="1.5" Margin="-12,0,0,0"
-                                        HorizontalAlignment="Left" Background="{StaticResource Peeko.Brush.Accent}" Visibility="Hidden" />
+                                        HorizontalAlignment="Left" Background="{DynamicResource Peeko.Brush.Accent}" Visibility="Hidden" />
                                 <ContentPresenter VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
                             </Grid>
                         </Border>
@@ -160,6 +160,7 @@
                                Foreground="{StaticResource Peeko.Brush.TextTertiary}" Text="Pintasan: Win + Alt + C membuka notch" />
                     <StackPanel x:Name="Nav">
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" IsChecked="True" Tag="Umum" Content="Umum" Checked="OnNav" />
+                        <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Tampilan" Content="Tampilan" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Modul" Content="Modul" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Baterai" Content="Baterai" Checked="OnNav" />
                         <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" Tag="Minum" Content="Minum air" Checked="OnNav" />
@@ -242,6 +243,41 @@
                                             <TextBlock Style="{StaticResource Hint}" Text="Game, video, presentasi" />
                                         </StackPanel>
                                         <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding HideOnFullscreen}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="Tampilan" Margin="0,0,0,22">
+                            <TextBlock Style="{StaticResource SectionHeader}" Text="TAMPILAN" />
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,0,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Warna aksen" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Tombol, centang, dan sorotan di notch" />
+                                            <WrapPanel x:Name="AccentSwatches" Margin="0,10,0,2" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <Border Style="{StaticResource RowLine}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <StackPanel VerticalAlignment="Center" Margin="0,8,140,8">
+                                            <TextBlock Style="{StaticResource Label}" Text="Latar notch" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="Kaca: desktop sedikit terlihat di balik notch" />
+                                        </StackPanel>
+                                        <Button HorizontalAlignment="Right" VerticalAlignment="Center" Height="30" MinWidth="130" Click="OnNotchStyle"
+                                                Style="{StaticResource Peeko.Button.Flat}" Tag="6" BorderThickness="1">
+                                            <Border CornerRadius="6" BorderBrush="{StaticResource Peeko.Brush.WinStroke}" BorderThickness="1"
+                                                    Background="{StaticResource Peeko.Brush.WinBg}" Padding="10,0" Height="30" MinWidth="130">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock FontSize="12" Text="{Binding NotchStyleText}" />
+                                                    <Path Data="M6,9.5 L12,15.5 L18,9.5" Stroke="{StaticResource Peeko.Brush.TextSecondary}" StrokeThickness="2"
+                                                          Width="24" Height="24" Margin="6,0,0,0" VerticalAlignment="Center">
+                                                        <Path.LayoutTransform><ScaleTransform ScaleX="0.5" ScaleY="0.5" /></Path.LayoutTransform>
+                                                    </Path>
+                                                </StackPanel>
+                                            </Border>
+                                        </Button>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -376,7 +412,7 @@
                                             <TextBlock Style="{StaticResource Label}" Text="Ingatkan saat baterai di bawah" />
                                             <TextBlock Style="{StaticResource Hint}" Text="Peringatan kritis selalu muncul di 10%" />
                                         </StackPanel>
-                                        <TextBlock HorizontalAlignment="Right" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource Peeko.Brush.Accent}"
+                                        <TextBlock HorizontalAlignment="Right" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Peeko.Brush.Accent}"
                                                    Text="{Binding BatteryThreshold, StringFormat='{}{0}%'}" />
                                     </Grid>
                                     <Slider Style="{StaticResource Peeko.Slider}" Margin="0,10,0,0" Minimum="10" Maximum="50" SmallChange="5" LargeChange="5"
@@ -567,7 +603,7 @@
                                         <TextBlock Style="{StaticResource Label}" Text="Ambil lirik dari internet" />
                                         <TextBlock Style="{StaticResource Hint}">
                                             Judul, artis, dan durasi dikirim ke
-                                            <Hyperlink NavigateUri="https://lrclib.net" RequestNavigate="OnLink" Foreground="{StaticResource Peeko.Brush.Accent}">lrclib.net</Hyperlink>
+                                            <Hyperlink NavigateUri="https://lrclib.net" RequestNavigate="OnLink" Foreground="{DynamicResource Peeko.Brush.Accent}">lrclib.net</Hyperlink>
                                         </TextBlock>
                                     </StackPanel>
                                     <CheckBox Style="{StaticResource Peeko.Toggle}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding FetchLyrics}" />
@@ -593,7 +629,7 @@
                                             <TextBlock Style="{StaticResource Label}" Text="Tampilkan cuaca di tab Hari ini" />
                                             <TextBlock Style="{StaticResource Hint}">
                                                 Diambil dari
-                                                <Hyperlink NavigateUri="https://open-meteo.com" RequestNavigate="OnLink" Foreground="{StaticResource Peeko.Brush.Accent}">Open-Meteo</Hyperlink>
+                                                <Hyperlink NavigateUri="https://open-meteo.com" RequestNavigate="OnLink" Foreground="{DynamicResource Peeko.Brush.Accent}">Open-Meteo</Hyperlink>
                                                 hanya saat tab dibuka, paling sering tiap 30 menit
                                             </TextBlock>
                                         </StackPanel>
@@ -616,7 +652,7 @@
                                                 <Button Grid.Column="1" Style="{StaticResource CardButton}" Margin="8,0,0,0" Content="Simpan" Click="OnSaveCity" />
                                             </Grid>
                                             <TextBlock Style="{StaticResource Hint}" Margin="0,6,0,0" Text="{Binding WeatherLocationText}" />
-                                            <TextBlock Style="{StaticResource Hint}" Text="{Binding CityStatus}" Foreground="{StaticResource Peeko.Brush.Accent}" />
+                                            <TextBlock Style="{StaticResource Hint}" Text="{Binding CityStatus}" Foreground="{DynamicResource Peeko.Brush.Accent}" />
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -769,7 +805,7 @@
                             </Border>
                             <TextBlock Style="{StaticResource Hint}" Margin="2,8,0,0" Foreground="{StaticResource Peeko.Brush.TextTertiary}">
                                 Konversi dikerjakan oleh
-                                <Hyperlink NavigateUri="https://github.com/KnifeLemon/Filee" RequestNavigate="OnLink" Foreground="{StaticResource Peeko.Brush.Accent}">Filee</Hyperlink>
+                                <Hyperlink NavigateUri="https://github.com/KnifeLemon/Filee" RequestNavigate="OnLink" Foreground="{DynamicResource Peeko.Brush.Accent}">Filee</Hyperlink>
                                 karya KnifeLemon (lisensi MIT), sepenuhnya di laptopmu tanpa unggah ke internet.
                             </TextBlock>
                         </StackPanel>
@@ -785,7 +821,7 @@
                                             <Button Style="{StaticResource CardButton}" Content="Pulihkan…" Margin="8,0,0,0" Click="OnRestore" />
                                         </StackPanel>
                                         <TextBlock x:Name="BackupStatus" Style="{StaticResource Hint}" Margin="0,6,0,0" TextWrapping="Wrap"
-                                                   Foreground="{StaticResource Peeko.Brush.Accent}" />
+                                                   Foreground="{DynamicResource Peeko.Brush.Accent}" />
                                     </StackPanel>
                                 </Grid>
                             </Border>

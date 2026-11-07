@@ -33,8 +33,8 @@
                 <Border CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
                         BorderBrush="{StaticResource Peeko.Brush.StrokeStrong}" BorderThickness="1" />
                 <TextBox x:Name="LinkInput" Margin="10,0" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
-                         Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{StaticResource Peeko.Brush.Accent}"
-                         SelectionBrush="{StaticResource Peeko.Brush.Accent}" FontFamily="{StaticResource Peeko.Font}" FontSize="13"
+                         Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{DynamicResource Peeko.Brush.Accent}"
+                         SelectionBrush="{DynamicResource Peeko.Brush.Accent}" FontFamily="{StaticResource Peeko.Font}" FontSize="13"
                          MaxLength="500" KeyDown="OnLinkKey" LostKeyboardFocus="OnLinkLostFocus" TextChanged="OnLinkTextChanged" />
                 <TextBlock x:Name="LinkPlaceholder" Style="{StaticResource Peeko.Text.Body}" Margin="12,0" VerticalAlignment="Center"
                            Foreground="{StaticResource Peeko.Brush.TextTertiary}" IsHitTestVisible="False" TextTrimming="CharacterEllipsis"

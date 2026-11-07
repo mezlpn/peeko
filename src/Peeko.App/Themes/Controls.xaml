@@ -47,8 +47,8 @@
     <Style x:Key="Peeko.Button.Pill" TargetType="Button">
         <Setter Property="Height" Value="32" />
         <Setter Property="Padding" Value="16,0" />
-        <Setter Property="Background" Value="{StaticResource Peeko.Brush.Accent}" />
-        <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.AccentInk}" />
+        <Setter Property="Background" Value="{DynamicResource Peeko.Brush.Accent}" />
+        <Setter Property="Foreground" Value="{DynamicResource Peeko.Brush.AccentInk}" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
@@ -115,9 +115,9 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Track" Property="Background" Value="{StaticResource Peeko.Brush.Accent}" />
+                            <Setter TargetName="Track" Property="Background" Value="{DynamicResource Peeko.Brush.Accent}" />
                             <Setter TargetName="Track" Property="BorderThickness" Value="0" />
-                            <Setter TargetName="Knob" Property="Fill" Value="{StaticResource Peeko.Brush.AccentInk}" />
+                            <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource Peeko.Brush.AccentInk}" />
                             <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
                             <Setter TargetName="Knob" Property="Margin" Value="0,0,4,0" />
                         </Trigger>
@@ -160,7 +160,7 @@
                 <ControlTemplate TargetType="Slider">
                     <Track x:Name="PART_Track" VerticalAlignment="Center">
                         <Track.DecreaseRepeatButton>
-                            <RepeatButton Style="{StaticResource Peeko.SliderRepeat}" Background="{StaticResource Peeko.Brush.Accent}"
+                            <RepeatButton Style="{StaticResource Peeko.SliderRepeat}" Background="{DynamicResource Peeko.Brush.Accent}"
                                           Command="Slider.DecreaseLarge" />
                         </Track.DecreaseRepeatButton>
                         <Track.IncreaseRepeatButton>
@@ -272,7 +272,7 @@
                                         <ScaleTransform ScaleX="0.5" ScaleY="0.5" />
                                     </Path.LayoutTransform>
                                 </Path>
-                                <Path x:Name="Check" Data="M6,12.5 L10,16.5 L18,8" Stroke="{StaticResource Peeko.Brush.Accent}"
+                                <Path x:Name="Check" Data="M6,12.5 L10,16.5 L18,8" Stroke="{DynamicResource Peeko.Brush.Accent}"
                                       StrokeThickness="2.4" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Center"
                                       Visibility="Collapsed">
                                     <Path.LayoutTransform>

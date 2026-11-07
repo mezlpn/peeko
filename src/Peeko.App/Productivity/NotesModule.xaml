@@ -34,7 +34,7 @@
             <Border CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}" />
             <TextBox x:Name="Editor" Margin="10,8" Background="Transparent" BorderThickness="0" AcceptsReturn="True" AcceptsTab="False"
                      TextWrapping="Wrap" VerticalScrollBarVisibility="Hidden" Foreground="{StaticResource Peeko.Brush.TextPrimary}"
-                     CaretBrush="{StaticResource Peeko.Brush.Accent}" SelectionBrush="{StaticResource Peeko.Brush.Accent}"
+                     CaretBrush="{DynamicResource Peeko.Brush.Accent}" SelectionBrush="{DynamicResource Peeko.Brush.Accent}"
                      FontFamily="{StaticResource Peeko.Font}" FontSize="13" MaxLength="20000"
                      PreviewMouseDown="OnEditorMouseDown" LostKeyboardFocus="OnEditorLostFocus" TextChanged="OnEditorChanged"
                      PreviewKeyDown="OnEditorKey" />

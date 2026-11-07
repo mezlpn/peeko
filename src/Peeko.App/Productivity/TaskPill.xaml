@@ -20,8 +20,8 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource Peeko.Brush.Accent}" />
-                            <Setter TargetName="Box" Property="Background" Value="{StaticResource Peeko.Brush.AccentMuted}" />
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Peeko.Brush.Accent}" />
+                            <Setter TargetName="Box" Property="Background" Value="{DynamicResource Peeko.Brush.AccentMuted}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

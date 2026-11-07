@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Navigation;
 using Peeko.Core.Settings;
 
@@ -16,6 +17,48 @@ public partial class SettingsWindow : Window
         _vm = vm;
         DataContext = vm;
         Scroll.SizeChanged += (_, _) => UpdateColumns();
+        BuildSwatches();
+    }
+
+    /// <summary>Bulatan warna aksen; yang terpilih bercincin.</summary>
+    private void BuildSwatches()
+    {
+        AccentSwatches.Children.Clear();
+        var current = ThemePalette.ParseOrDefault(_vm.AccentColor);
+        foreach (var (name, hex) in ThemePalette.Presets)
+        {
+            var c = ThemePalette.ParseOrDefault(hex);
+            var dot = new Border
+            {
+                Width = 26,
+                Height = 26,
+                CornerRadius = new CornerRadius(13),
+                Margin = new Thickness(0, 0, 8, 0),
+                Background = new SolidColorBrush(Color.FromRgb(c.R, c.G, c.B)),
+                BorderBrush = c == current ? Brushes.White : Brushes.Transparent,
+                BorderThickness = new Thickness(2.5),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                ToolTip = name,
+            };
+            dot.MouseLeftButtonUp += (_, _) =>
+            {
+                _vm.AccentColor = hex == ThemePalette.Presets[0].Hex ? null : hex;
+                BuildSwatches();
+            };
+            AccentSwatches.Children.Add(dot);
+        }
+    }
+
+    private void OnNotchStyle(object sender, RoutedEventArgs e)
+    {
+        var menu = new ContextMenu { Style = (Style)FindResource("Peeko.TrayMenu"), PlacementTarget = (UIElement)sender };
+        foreach (var (style, label) in new[] { (NotchStyle.Black, "Hitam"), (NotchStyle.Glass, "Kaca"), (NotchStyle.Tinted, "Berona aksen") })
+        {
+            var item = new MenuItem { Header = label, Style = (Style)FindResource("Peeko.TrayItem"), IsChecked = _vm.NotchStyle == style };
+            item.Click += (_, _) => _vm.NotchStyle = style;
+            menu.Items.Add(item);
+        }
+        menu.IsOpen = true;
     }
 
     /// <summary>Dua kolom kartu jika cukup lebar (≥ 640 px area isi), satu kolom jika jendela sempit.</summary>

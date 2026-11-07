@@ -146,6 +146,7 @@ public partial class App : Application
         builder.Services.AddSingleton<NotchController>();
         _host = builder.Build();
 
+        Themes.ThemeService.Attach(_host.Services.GetRequiredService<SettingsService>());
         var controller = _host.Services.GetRequiredService<NotchController>();
         controller.OpenSettingsRequested += OpenSettings;
         controller.Start();

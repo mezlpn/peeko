@@ -50,6 +50,29 @@ public sealed class SettingsViewModel : ObservableObject
     public bool HideOnFullscreen { get => S.HideOnFullscreen; set => Set(value, s => s.HideOnFullscreen, (s, v) => s.HideOnFullscreen = v); }
     public double HorizontalOffset { get => S.HorizontalOffset; set => Set(Math.Round(value), s => s.HorizontalOffset, (s, v) => s.HorizontalOffset = v); }
 
+    public string? AccentColor
+    {
+        get => S.AccentColor;
+        set => Set(value, s => s.AccentColor, (s, v) => s.AccentColor = v);
+    }
+
+    public NotchStyle NotchStyle
+    {
+        get => S.NotchStyle;
+        set
+        {
+            Set(value, s => s.NotchStyle, (s, v) => s.NotchStyle = v);
+            OnPropertyChanged(nameof(NotchStyleText));
+        }
+    }
+
+    public string NotchStyleText => NotchStyle switch
+    {
+        NotchStyle.Glass => "Kaca",
+        NotchStyle.Tinted => "Berona aksen",
+        _ => "Hitam",
+    };
+
     public SlimMode SlimMode
     {
         get => S.SlimMode;

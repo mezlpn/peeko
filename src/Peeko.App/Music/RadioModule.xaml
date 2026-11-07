@@ -18,7 +18,7 @@
         <Grid Width="190" Height="26" HorizontalAlignment="Right">
             <Border CornerRadius="13" Background="{StaticResource Peeko.Brush.SurfaceRaised}" />
             <TextBox x:Name="SearchBox" Margin="12,0,8,0" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
-                     Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{StaticResource Peeko.Brush.Accent}"
+                     Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{DynamicResource Peeko.Brush.Accent}"
                      FontFamily="{StaticResource Peeko.Font}" FontSize="12" MaxLength="60"
                      PreviewMouseLeftButtonDown="OnSearchMouse" GotKeyboardFocus="OnSearchFocus" LostKeyboardFocus="OnSearchBlur" KeyDown="OnSearchKey" TextChanged="OnSearchText" />
             <TextBlock x:Name="SearchHint" Style="{StaticResource Peeko.Text.Caption}" Margin="13,0,0,0" VerticalAlignment="Center"

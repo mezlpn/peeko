@@ -31,9 +31,9 @@
                                 <Setter TargetName="IconBg" Property="Fill" Value="{StaticResource Peeko.Brush.SurfacePressed}" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Peeko.Brush.Accent}" />
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Peeko.Brush.Accent}" />
                                 <Setter TargetName="IconBg" Property="Fill" Value="#1A000000" />
-                                <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.AccentInk}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Peeko.Brush.AccentInk}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.45" />
@@ -102,8 +102,8 @@
                                 <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.TextPrimary}" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource Peeko.Brush.Accent}" />
-                                <Setter Property="Foreground" Value="{StaticResource Peeko.Brush.AccentInk}" />
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Peeko.Brush.Accent}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Peeko.Brush.AccentInk}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.45" />
@@ -277,8 +277,8 @@
             <Border CornerRadius="{StaticResource Peeko.Radius.Md}" Background="{StaticResource Peeko.Brush.SurfaceRaised}"
                     BorderBrush="{StaticResource Peeko.Brush.StrokeStrong}" BorderThickness="1" />
             <PasswordBox x:Name="PasswordInput" Margin="10,0,90,0" VerticalAlignment="Center" Background="Transparent" BorderThickness="0"
-                         Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{StaticResource Peeko.Brush.Accent}"
-                         SelectionBrush="{StaticResource Peeko.Brush.Accent}" FontSize="13" KeyDown="OnPasswordKey"
+                         Foreground="{StaticResource Peeko.Brush.TextPrimary}" CaretBrush="{DynamicResource Peeko.Brush.Accent}"
+                         SelectionBrush="{DynamicResource Peeko.Brush.Accent}" FontSize="13" KeyDown="OnPasswordKey"
                          PasswordChanged="OnPasswordChanged" />
             <TextBlock x:Name="PasswordPlaceholder" Style="{StaticResource Peeko.Text.Body}" Margin="12,0,90,0" VerticalAlignment="Center"
                        Foreground="{StaticResource Peeko.Brush.TextTertiary}" IsHitTestVisible="False" TextTrimming="CharacterEllipsis" />
