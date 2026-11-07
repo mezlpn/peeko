@@ -84,6 +84,7 @@ public partial class NotchWindow : Window
         MusicModuleView.DataContext = music;
         LyricsModuleView.DataContext = lyrics;
         WatchContentSize();
+        WatchTouch();
         BuildDots();
     }
 

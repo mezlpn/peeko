@@ -392,6 +392,45 @@ public partial class NotchWindow
         if (target != _moduleIndex) SelectModule(target);
     }
 
+    // ── Layar sentuh ──
+    // Sentuhan tidak punya hover: ketuk notch langsung membuka panel, dan geser kiri/kanan di
+    // panel berpindah tampilan seperti gulir mouse.
+
+    /// <summary>Notch diketuk dengan jari/pena saat belum terbuka.</summary>
+    public event Action? TouchOpenRequested;
+
+    private Point? _swipeStart;
+    private const double SwipeMin = 60;
+
+    private void WatchTouch()
+    {
+        ShapeHost.PreviewTouchDown += (_, e) =>
+        {
+            if (_visualState != NotchState.Expanded)
+            {
+                // Tidak di-Handled: sentuhan tetap dipromosikan jadi mouse, jadi ketukan di luar
+                // notch nanti memicu MouseLeave dan panel menutup seperti biasa.
+                TouchOpenRequested?.Invoke();
+                return;
+            }
+            _swipeStart = e.GetTouchPoint(this).Position;
+        };
+        ShapeHost.PreviewTouchUp += (_, e) =>
+        {
+            if (_swipeStart is not { } start || _visualState != NotchState.Expanded) return;
+            _swipeStart = null;
+            var end = e.GetTouchPoint(this).Position;
+            double dx = end.X - start.X, dy = end.Y - start.Y;
+            if (Math.Abs(dx) < SwipeMin || Math.Abs(dx) < Math.Abs(dy) * 2) return;
+            int next = NextEnabled(_moduleIndex, dx < 0 ? 1 : -1);
+            if (next >= 0)
+            {
+                SelectModule(next);
+                e.Handled = true;
+            }
+        };
+    }
+
     private bool CanScrollInside(DependencyObject? source, int step)
     {
         for (var node = source; node is not null && node != ModuleHost; node = VisualTreeHelper.GetParent(node) ?? LogicalTreeHelper.GetParent(node))

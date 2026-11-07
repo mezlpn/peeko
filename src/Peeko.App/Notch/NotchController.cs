@@ -113,6 +113,10 @@ public sealed class NotchController : IDisposable
         };
 
         _window.HoverTarget.MouseEnter += OnPointerEnter;
+        _window.TouchOpenRequested += () =>
+        {
+            if (_stateMachine.State is NotchState.Collapsed or NotchState.Slim or NotchState.Peek) _stateMachine.ExpandNow();
+        };
         _window.HoverTarget.MouseLeave += OnPointerLeave;
 
         _music.ActivityChanged += activity =>
